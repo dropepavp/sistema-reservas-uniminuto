@@ -1,0 +1,36 @@
+# Variables de entorno
+.env
+
+# Scripts de utilidad / diagnóstico (no deben estar en producción)
+check_*.py
+test_*.py
+add_*.py
+actualizar_*.py
+app_improved.py
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.db
+*.sqlite
+*.sqlite3
+*.log
+
+# Caches y herramientas de testing / IA
+.hypothesis/
+.pytest_cache/
+.continue/
+
+# IDE
+.vscode/
+.idea/
+
+# Archivos temporales
+temp_*.txt
+templates/temp_*.txt
+*.bak
+*.backup
+

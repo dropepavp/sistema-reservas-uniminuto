@@ -1,0 +1,1667 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<style>
+    .kpi-card {
+        border-radius: 12px;
+        border: none;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+    }
+    .puesto-card {
+        border-radius: 10px;
+        transition: all 0.2s ease;
+        position: relative;
+        cursor: pointer;
+    }
+    .puesto-card:hover {
+        transform: scale(1.03);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+    }
+    .puesto-operativo {
+        border: 2px solid #10b981;
+        background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 100%);
+    }
+    .puesto-falla-leve {
+        border: 2px solid #f59e0b;
+        background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%);
+    }
+    .puesto-fuera-servicio {
+        border: 2px solid #ef4444;
+        background: linear-gradient(180deg, #fef2f2 0%, #ffffff 100%);
+    }
+    .puesto-mantenimiento {
+        border: 2px solid #3b82f6;
+        background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+    }
+    .software-badge {
+        font-size: 0.75rem;
+        background-color: #f1f5f9;
+        color: #334155;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        padding: 2px 6px;
+    }
+    .nav-tabs .nav-link {
+        font-weight: 600;
+        color: #64748b;
+        border-radius: 8px 8px 0 0;
+        padding: 10px 18px;
+    }
+    .nav-tabs .nav-link.active {
+        color: var(--uniminuto-800);
+        border-bottom: 3px solid var(--uniminuto-600);
+        background-color: #fff;
+    }
+</style>
+
+<div class="container-fluid mt-3 px-4 pb-5">
+    
+    <!-- ENCABEZADO Y TÍTULO -->
+    <div class="row mb-3 align-items-center">
+        <div class="col-md-7">
+            <h2 class="mb-1 fw-bold text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-pc-display-horizontal text-primary"></i>
+                Salas de Cómputo e Informática
+            </h2>
+            <p class="text-muted mb-0 small">
+                Gestión de disponibilidad de puestos, software instalado, novedades técnicas y programación de clases.
+            </p>
+        </div>
+        <div class="col-md-5 text-md-end mt-2 mt-md-0 d-flex justify-content-md-end gap-2 flex-wrap">
+            <button type="button" class="btn btn-outline-danger shadow-xs btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#modalNuevaNovedad">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i> Reportar Falla Técnica
+            </button>
+            {% if session.rol in ('admin', 'superadmin') or mod_access.salas_computo.crear %}
+            <button type="button" class="btn btn-primary shadow-xs btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#modalNuevoSoftware">
+                <i class="bi bi-plus-circle me-1"></i> Nuevo Software
+            </button>
+            {% endif %}
+            <a href="{{ url_for('index') }}" class="btn btn-light btn-sm border shadow-xs">
+                <i class="bi bi-house-door"></i> Inicio
+            </a>
+        </div>
+    </div>
+
+    <!-- TARJETAS DE MÉTRICAS KPI GLOBALES -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card kpi-card shadow-xs bg-white border-start border-4 border-primary p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-muted small fw-bold uppercase">Total Puestos</span>
+                        <h3 class="mb-0 fw-bold text-dark">{{ total_puestos_global }}</h3>
+                        <small class="text-muted">En {{ salas_metricas|length }} salas/lab</small>
+                    </div>
+                    <div class="bg-primary-subtle text-primary p-3 rounded-circle">
+                        <i class="bi bi-pc-display fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card kpi-card shadow-xs bg-white border-start border-4 border-success p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-muted small fw-bold uppercase">Puestos Operativos</span>
+                        <h3 class="mb-0 fw-bold text-success">{{ total_puestos_operativos }}</h3>
+                        <small class="text-success fw-semibold">
+                            {% if total_puestos_global > 0 %}
+                                {{ ((total_puestos_operativos / total_puestos_global) * 100)|round(1) }}% de disponibilidad
+                            {% else %}
+                                100%
+                            {% endif %}
+                        </small>
+                    </div>
+                    <div class="bg-success-subtle text-success p-3 rounded-circle">
+                        <i class="bi bi-check-circle-fill fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card kpi-card shadow-xs bg-white border-start border-4 border-danger p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-muted small fw-bold uppercase">Novedades Pendientes</span>
+                        <h3 class="mb-0 fw-bold text-danger">{{ total_novedades_pendientes }}</h3>
+                        <small class="text-muted">{{ total_puestos_fallas }} puestos con falla</small>
+                    </div>
+                    <div class="bg-danger-subtle text-danger p-3 rounded-circle">
+                        <i class="bi bi-wrench-adjustable fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card kpi-card shadow-xs bg-white border-start border-4 border-info p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-muted small fw-bold uppercase">Catálogo de Software</span>
+                        <h3 class="mb-0 fw-bold text-info">{{ total_software }}</h3>
+                        <small class="text-muted">Programas instalados</small>
+                    </div>
+                    <div class="bg-info-subtle text-info p-3 rounded-circle">
+                        <i class="bi bi-disc fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PESTAÑAS PRINCIPALES DEL MÓDULO -->
+    <ul class="nav nav-tabs mb-4" id="salasTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {% if tab_activa == 'puestos' or not tab_activa %}active{% endif %}" id="puestos-tab" data-bs-toggle="tab" data-bs-target="#tab-puestos" type="button" role="tab">
+                <i class="bi bi-grid-3x3-gap me-1"></i> Mapa y Puestos por Sala
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {% if tab_activa == 'software' %}active{% endif %}" id="software-tab" data-bs-toggle="tab" data-bs-target="#tab-software" type="button" role="tab">
+                <i class="bi bi-app-indicator me-1"></i> Software por Sala ({{ total_software }})
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {% if tab_activa == 'novedades' %}active{% endif %}" id="novedades-tab" data-bs-toggle="tab" data-bs-target="#tab-novedades" type="button" role="tab">
+                <i class="bi bi-tools me-1"></i> Novedades e Incidencias 
+                {% if total_novedades_pendientes > 0 %}
+                <span class="badge bg-danger rounded-pill ms-1">{{ total_novedades_pendientes }}</span>
+                {% endif %}
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {% if tab_activa == 'clases' %}active{% endif %}" id="clases-tab" data-bs-toggle="tab" data-bs-target="#tab-clases" type="button" role="tab">
+                <i class="bi bi-calendar-event me-1"></i> Clases y Asistencia Docente
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {% if tab_activa == 'practica' %}active{% endif %}" id="practica-tab" data-bs-toggle="tab" data-bs-target="#tab-practica" type="button" role="tab">
+                <i class="bi bi-person-workspace me-1"></i> Práctica Libre
+                {% if total_practicas_activas > 0 %}
+                <span class="badge bg-success rounded-pill ms-1">{{ total_practicas_activas }}</span>
+                {% endif %}
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="salasTabsContent">
+        
+        <!-- ============================================================= -->
+        <!-- PESTAÑA 1: MAPA Y ESTADO DE PUESTOS POR SALA                  -->
+        <!-- ============================================================= -->
+        <div class="tab-pane fade {% if tab_activa == 'puestos' or not tab_activa %}show active{% endif %}" id="tab-puestos" role="tabpanel">
+            <div class="row">
+                <!-- Selector y Estadísticas de la Sala -->
+                <div class="col-12 mb-3">
+                    <div class="card shadow-xs border-0 p-3 bg-light">
+                        <div class="row align-items-center g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small text-muted mb-1">Seleccionar Sala de Cómputo / Laboratorio:</label>
+                                <select class="form-select form-select-lg fw-bold" id="selectorSalaPuestos" onchange="cargarPuestosDeSala(this.value)">
+                                    {% for sm in salas_metricas %}
+                                    <option value="{{ sm.sala.id }}" {% if loop.first %}selected{% endif %}>
+                                        {{ sm.sala.nombre }} ({{ sm.sede_nombre }}) - {{ sm.operativos }}/{{ sm.total_puestos }} Operativos
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-5">
+                                <div id="resumenSalaSeleccionada" class="d-flex align-items-center gap-3 flex-wrap">
+                                    <div>
+                                        <small class="text-muted d-block">Disponibilidad</small>
+                                        <span class="badge bg-success fs-6" id="badgeOperatividad">100% Operativa</span>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Puestos</small>
+                                        <strong id="textoPuestosCount" class="text-dark">--</strong>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Software Base</small>
+                                        <span id="textoSoftwareCount" class="badge bg-secondary">-- programas</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 text-md-end">
+                                <button type="button" class="btn btn-outline-primary btn-sm fw-semibold" onclick="abrirModalConfigurarPuestos()">
+                                    <i class="bi bi-gear me-1"></i> Configurar Capacidad
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leyenda de Estados de Puestos -->
+                <div class="col-12 mb-3 d-flex gap-3 flex-wrap align-items-center bg-white p-2 rounded border">
+                    <span class="small fw-bold text-muted">Leyenda:</span>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check-circle me-1"></i>Operativo</span>
+                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle text-dark"><i class="bi bi-exclamation-triangle me-1"></i>Falla Leve</span>
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="bi bi-x-octagon me-1"></i>Fuera de Servicio</span>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle"><i class="bi bi-wrench me-1"></i>Mantenimiento</span>
+                    <span class="ms-auto small text-muted"><i class="bi bi-info-circle me-1"></i>Haz clic en un puesto para cambiar su estado o reportar falla.</span>
+                </div>
+
+                <!-- Grid Visual de Puestos de la Sala -->
+                <div class="col-12">
+                    <div class="card shadow-xs border-0">
+                        <div class="card-body p-4">
+                            <div id="gridPuestosContenedor" class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3">
+                                <!-- Se puebla dinámicamente vía JS -->
+                                <div class="col-12 text-center py-5 text-muted">
+                                    <div class="spinner-border text-primary" role="status"></div>
+                                    <p class="mt-2">Cargando puestos de la sala...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- PESTAÑA 2: CATÁLOGO Y CONTROL DE SOFTWARE POR SALA            -->
+        <!-- ============================================================= -->
+        <div class="tab-pane fade {% if tab_activa == 'software' %}show active{% endif %}" id="tab-software" role="tabpanel">
+            <div class="row">
+                <!-- Barra de búsqueda rápida de software -->
+                <div class="col-12 mb-3">
+                    <div class="card shadow-xs border-0 p-3 bg-light">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                                    <input type="text" class="form-control" id="buscarSoftwareInput" onkeyup="filtrarTarjetasSoftware(this.value)" placeholder="Buscar por nombre de software, categoría, versión o sala...">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="filtroCategoriaSoftware" onchange="filtrarTarjetasSoftware()">
+                                    <option value="">Todas las Categorías</option>
+                                    <option value="Diseño">Diseño y Arquitectura</option>
+                                    <option value="Programación">Programación y Software</option>
+                                    <option value="Estadística">Estadística e Investigación</option>
+                                    <option value="Redes">Redes y Telecomunicaciones</option>
+                                    <option value="Ofimática">Ofimática y General</option>
+                                    <option value="Bases de Datos">Bases de Datos</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <button type="button" class="btn btn-success w-100 fw-semibold" data-bs-toggle="modal" data-bs-target="#modalNuevoSoftware">
+                                    <i class="bi bi-plus-circle me-1"></i> Agregar Software
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjetas del Catálogo de Software -->
+                <div class="col-12">
+                    <div class="row g-3" id="contenedorTarjetasSoftware">
+                        {% for item in software_catalogo %}
+                        <div class="col-md-6 col-lg-4 item-software-card" 
+                             data-nombre="{{ item.item.nombre|lower }}" 
+                             data-categoria="{{ item.item.categoria|lower }}"
+                             data-salas="{{ item.salas_nombres|join(' ')|lower }}">
+                            <div class="card shadow-xs border h-100 p-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="bg-primary-subtle text-primary p-2 rounded">
+                                            <i class="bi {{ item.item.icono or 'bi-app-indicator' }} fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0 fw-bold text-dark">{{ item.item.nombre }}</h6>
+                                            <small class="text-muted">v{{ item.item.version or '1.0' }}</small>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-light text-dark border">{{ item.item.licencia }}</span>
+                                </div>
+                                
+                                <p class="small text-muted mb-2 text-truncate" style="max-height: 40px;">
+                                    {{ item.item.descripcion or 'Sin descripción adicional.' }}
+                                </p>
+                                
+                                <div class="mb-3">
+                                    <small class="fw-bold d-block text-secondary mb-1">
+                                        <i class="bi bi-geo-alt me-1"></i> Instalado en {{ item.total_salas }} salas:
+                                    </small>
+                                    <div class="d-flex gap-1 flex-wrap" style="max-height: 60px; overflow-y: auto;">
+                                        {% if item.salas_nombres %}
+                                            {% for s_nombre in item.salas_nombres %}
+                                            <span class="software-badge"><i class="bi bi-pc me-1"></i>{{ s_nombre }}</span>
+                                            {% endfor %}
+                                        {% else %}
+                                            <span class="text-muted small fst-italic">No asignado a ninguna sala</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="mt-auto pt-2 border-top d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-secondary-subtle text-secondary">{{ item.item.categoria }}</span>
+                                    <button type="button" class="btn btn-outline-primary btn-sm fw-semibold" 
+                                            onclick="abrirModalAsignarSalas('{{ item.item.id }}', '{{ item.item.nombre }}')">
+                                        <i class="bi bi-pencil-square me-1"></i> Asignar Salas
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- PESTAÑA 3: BITÁCORA Y NOVEDADES TÉCNICAS                      -->
+        <!-- ============================================================= -->
+        <div class="tab-pane fade {% if tab_activa == 'novedades' %}show active{% endif %}" id="tab-novedades" role="tabpanel">
+            <div class="row">
+                <!-- Filtros de Novedades -->
+                <div class="col-12 mb-3">
+                    <div class="card shadow-xs border-0 p-3 bg-light">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div class="btn-group btn-group-sm" role="group" id="filtrosEstadoNovedades">
+                                <button type="button" class="btn btn-primary fw-bold active" onclick="filtrarTablaNovedades('todas', this)">
+                                    📋 Todas ({{ novedades|length }})
+                                </button>
+                                <button type="button" class="btn btn-outline-danger" onclick="filtrarTablaNovedades('Pendiente', this)">
+                                    🔴 Pendientes ({{ total_novedades_pendientes }})
+                                </button>
+                                <button type="button" class="btn btn-outline-warning" onclick="filtrarTablaNovedades('En Revisión', this)">
+                                    🟡 En Revisión ({{ total_novedades_revision }})
+                                </button>
+                                <button type="button" class="btn btn-outline-success" onclick="filtrarTablaNovedades('Solucionada', this)">
+                                    🟢 Solucionadas ({{ total_novedades_solucionadas }})
+                                </button>
+                            </div>
+                            <button type="button" class="btn btn-danger btn-sm fw-semibold shadow-xs" data-bs-toggle="modal" data-bs-target="#modalNuevaNovedad">
+                                <i class="bi bi-plus-circle me-1"></i> Reportar Nueva Falla
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Novedades Técnicas -->
+                <div class="col-12">
+                    <div class="card shadow-xs border-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0" id="tablaNovedadesTecnicas">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 70px;">ID</th>
+                                        <th>Sala / Puesto</th>
+                                        <th>Tipo de Falla</th>
+                                        <th>Prioridad</th>
+                                        <th>Descripción del Problema</th>
+                                        <th>Reportado Por</th>
+                                        <th>Estado</th>
+                                        <th class="text-end" style="min-width: 130px;">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for n in novedades %}
+                                    <tr data-estado="{{ n.estado }}">
+                                        <td><span class="badge bg-secondary">#{{ n.id }}</span></td>
+                                        <td>
+                                            <strong class="text-dark">{{ n.recurso.nombre if n.recurso else 'Sala' }}</strong>
+                                            {% if n.puesto %}
+                                            <div class="small text-muted">Puesto #{{ n.puesto.numero_puesto }}</div>
+                                            {% else %}
+                                            <div class="small text-muted">Toda la sala</div>
+                                            {% endif %}
+                                        </td>
+                                        <td><span class="badge bg-light text-dark border">{{ n.tipo_falla }}</span></td>
+                                        <td>
+                                            {% if n.prioridad in ('Alta', 'Crítica') %}
+                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle">{{ n.prioridad }}</span>
+                                            {% elif n.prioridad == 'Media' %}
+                                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle text-dark">{{ n.prioridad }}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary-subtle text-secondary">{{ n.prioridad }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="text-dark fw-semibold" style="max-width: 320px;">{{ n.descripcion }}</div>
+                                            {% if n.solucion_aplicada %}
+                                            <small class="text-success d-block mt-1">
+                                                <i class="bi bi-check2-circle me-1"></i><strong>Solución:</strong> {{ n.solucion_aplicada }}
+                                            </small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <small class="fw-bold d-block">{{ n.auxiliar_reporta }}</small>
+                                            <small class="text-muted">{{ n.fecha_reporte.strftime('%d/%m/%Y') }} {{ n.hora_reporte.strftime('%H:%M') }}</small>
+                                        </td>
+                                        <td>
+                                            {% if n.estado == 'Pendiente' %}
+                                                <span class="badge bg-danger text-white"><i class="bi bi-clock-history me-1"></i>Pendiente</span>
+                                            {% elif n.estado == 'En Revisión' %}
+                                                <span class="badge bg-warning text-dark"><i class="bi bi-wrench me-1"></i>En Revisión</span>
+                                            {% else %}
+                                                <span class="badge bg-success text-white"><i class="bi bi-check2-all me-1"></i>Solucionada</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            {% if n.estado != 'Solucionada' %}
+                                            <button type="button" class="btn btn-sm btn-success fw-semibold" 
+                                                    onclick="abrirModalResolverNovedad('{{ n.id }}', '{{ n.recurso.nombre }}', '{{ n.puesto.numero_puesto if n.puesto else '' }}', '{{ n.descripcion|replace("'", "\\'") }}')">
+                                                <i class="bi bi-check2-circle me-1"></i> Resolver
+                                            </button>
+                                            {% else %}
+                                            <span class="text-muted small"><i class="bi bi-check-all text-success me-1"></i>Listo</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="8" class="text-center py-4 text-muted">
+                                            <i class="bi bi-check-circle text-success fs-3 d-block mb-2"></i>
+                                            No hay novedades técnicas registradas. Todas las salas están al 100%.
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- PESTAÑA 4: CLASES Y ASISTENCIA DOCENTE                        -->
+        <!-- ============================================================= -->
+        <div class="tab-pane fade {% if tab_activa == 'clases' %}show active{% endif %}" id="tab-clases" role="tabpanel">
+            <div class="row">
+                
+                <!-- Formulario Colapsable de Programación -->
+                {% if session.rol in ('admin', 'superadmin') or mod_access.salas_computo.crear %}
+                <div class="col-12 mb-4">
+                    <div class="card border-primary shadow-xs">
+                        <a class="card-header bg-primary text-white text-decoration-none d-flex justify-content-between align-items-center"
+                            data-bs-toggle="collapse" href="#collapseClaseForm" role="button" aria-expanded="false">
+                            <h6 class="mb-0 fw-bold"><i class="bi bi-plus-circle me-1"></i> Programar Nueva Clase en Sala de Cómputo</h6>
+                            <i class="bi bi-chevron-down"></i>
+                        </a>
+                        <div class="collapse" id="collapseClaseForm">
+                            <div class="card-body p-3">
+                                <form id="formClase" action="{{ url_for('salas_computo.nueva_clase') }}" method="POST">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <div class="row g-3">
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold">Fecha:</label>
+                                            <input type="date" class="form-control form-control-sm" name="fecha" value="{{ hoy_str }}" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold">Hora Inicio (24h):</label>
+                                            <input type="text" class="form-control form-control-sm" name="hora_inicio" id="hora_inicio" placeholder="07:00" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold">Hora Fin (24h):</label>
+                                            <input type="text" class="form-control form-control-sm" name="hora_fin" id="hora_fin" placeholder="09:00" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold">Sede:</label>
+                                            <select class="form-select form-select-sm" id="form_sede_id" name="sede_id" required>
+                                                <option value="">Seleccionar...</option>
+                                                {% for s in sedes %}
+                                                <option value="{{ s.id }}">{{ s.nombre }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold">Salón de Cómputo:</label>
+                                            <select class="form-select form-select-sm" id="form_recurso_id" name="recurso_id" required>
+                                                <option value="">Seleccionar...</option>
+                                                {% for sm in salas_metricas %}
+                                                <option value="{{ sm.sala.id }}">{{ sm.sala.nombre }} ({{ sm.sede_nombre }})</option>
+                                                {% endfor %}
+                                            </select>
+                                            <input type="hidden" name="salon" id="form_salon_hidden">
+                                        </div>
+                                        <div class="col-md-5">
+                                            <label class="form-label small fw-bold">Profesor:</label>
+                                            <input list="list-profesores" class="form-control form-control-sm" name="nombre_profesor" placeholder="Escriba para autocompletar..." required>
+                                            <datalist id="list-profesores">
+                                                {% for prof in profesores %}
+                                                <option value="{{ prof.nombre_completo }}">
+                                                {% endfor %}
+                                            </datalist>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold">Materia / Asignatura:</label>
+                                            <input type="text" class="form-control form-control-sm" name="materia" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold">Jornada:</label>
+                                            <select class="form-select form-select-sm" name="jornada" required>
+                                                <option value="MAÑANA">MAÑANA</option>
+                                                <option value="TARDE">TARDE</option>
+                                                <option value="NOCHE">NOCHE</option>
+                                                <option value="SÁBADO">SÁBADO</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold">Modalidad:</label>
+                                            <select class="form-select form-select-sm" name="modalidad" required>
+                                                <option value="Presencial">Presencial</option>
+                                                <option value="Distancia">Distancia</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold">Estudiantes:</label>
+                                            <input type="number" class="form-control form-control-sm" name="num_estudiantes" placeholder="Cant.">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label small fw-bold">Programa:</label>
+                                            <input type="text" class="form-control form-control-sm" name="programa" placeholder="ej. Ingeniería de Sistemas">
+                                        </div>
+                                        <div class="col-12 text-end">
+                                            <button type="submit" class="btn btn-primary btn-sm px-4 fw-semibold">
+                                                <i class="bi bi-save me-1"></i> Guardar Programación
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Filtros y Listado de Clases -->
+                <div class="col-12">
+                    <div class="card shadow-xs border-0">
+                        <div class="card-header bg-white py-3 border-bottom">
+                            <form method="GET" action="{{ url_for('salas_computo.dashboard_salas') }}" class="row g-2 align-items-center">
+                                <input type="hidden" name="tab" value="clases">
+                                <div class="col-md-3">
+                                    <input type="date" class="form-control form-control-sm" name="fecha" value="{{ filtros.fecha or '' }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control form-control-sm" name="salon" value="{{ filtros.salon or '' }}" placeholder="Filtrar por salón (ej: LS1, A501)">
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control form-control-sm" name="busqueda" value="{{ filtros.busqueda or '' }}" placeholder="Profesor, materia, programa...">
+                                </div>
+                                <div class="col-md-2 d-flex gap-2">
+                                    <button type="submit" class="btn btn-sm btn-secondary w-100"><i class="bi bi-funnel me-1"></i> Filtrar</button>
+                                    <a href="{{ url_for('salas_computo.dashboard_salas', tab='clases') }}" class="btn btn-sm btn-light border"><i class="bi bi-x"></i></a>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Horario</th>
+                                        <th>Salón</th>
+                                        <th>Profesor</th>
+                                        <th>Materia</th>
+                                        <th>Asistencia</th>
+                                        <th>Estudiantes</th>
+                                        <th>Modalidad</th>
+                                        <th class="text-end">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for c in clases %}
+                                    <tr>
+                                        <td><strong>{{ c.fecha.strftime('%d/%m/%Y') }}</strong></td>
+                                        <td>
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                                                <i class="bi bi-clock me-1"></i>{{ c.hora_inicio.strftime('%H:%M') }} - {{ c.hora_fin.strftime('%H:%M') }}
+                                            </span>
+                                        </td>
+                                        <td><span class="badge bg-light text-dark border fw-bold">{{ c.salon }}</span></td>
+                                        <td><strong class="text-dark">{{ c.nombre_profesor }}</strong></td>
+                                        <td>
+                                            <div>{{ c.materia }}</div>
+                                            <small class="text-muted">{{ c.programa or '--' }}</small>
+                                        </td>
+                                        <td>
+                                            {% if c.asistencia == 'Sí' %}
+                                            <span class="badge bg-success"><i class="bi bi-check-lg me-1"></i>Asistió</span>
+                                            {% else %}
+                                            <span class="badge bg-danger"><i class="bi bi-x-lg me-1"></i>No Asistió</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ c.num_estudiantes or '-' }}</td>
+                                        <td><span class="badge bg-info text-dark">{{ c.modalidad }}</span></td>
+                                        <td class="text-end">
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button" class="btn btn-success fw-semibold" 
+                                                        data-bs-toggle="modal" data-bs-target="#modalAsistencia{{ c.id_clase }}">
+                                                    <i class="bi bi-calendar-check me-1"></i> Asistencia
+                                                </button>
+                                                {% if session.rol in ('admin', 'superadmin') or mod_access.salas_computo.eliminar %}
+                                                <form action="{{ url_for('salas_computo.editar_clase', id_clase=c.id_clase) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar esta clase programada?');">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <input type="hidden" name="_method" value="DELETE">
+                                                    <button type="submit" class="btn btn-outline-danger" title="Eliminar"><i class="bi bi-trash"></i></button>
+                                                </form>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Modal de Asistencia Docente -->
+                                    <div class="modal fade" id="modalAsistencia{{ c.id_clase }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content shadow-lg border-0">
+                                                <form action="{{ url_for('salas_computo.actualizar_asistencia', id_clase=c.id_clase) }}" method="POST">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <div class="modal-header bg-primary text-white">
+                                                        <h5 class="modal-title"><i class="bi bi-check2-circle me-1"></i> Registro de Asistencia Docente</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="alert alert-light border mb-3">
+                                                            <div class="row g-2">
+                                                                <div class="col-6"><small class="text-muted d-block">Salón</small><strong>{{ c.salon }}</strong></div>
+                                                                <div class="col-6"><small class="text-muted d-block">Horario</small><strong>{{ c.hora_inicio.strftime('%H:%M') }} - {{ c.hora_fin.strftime('%H:%M') }}</strong></div>
+                                                                <div class="col-12 mt-2"><small class="text-muted d-block">Docente</small><strong>{{ c.nombre_profesor }}</strong> ({{ c.materia }})</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-bold">¿Asistió el docente a la clase?</label>
+                                                            <div class="d-flex gap-4">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="radio" name="asistencia" value="Sí" id="asisSi{{ c.id_clase }}" {% if c.asistencia == 'Sí' %}checked{% endif %}>
+                                                                    <label class="form-check-label text-success fw-bold" for="asisSi{{ c.id_clase }}">SÍ, Asistió</label>
+                                                                </div>
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="radio" name="asistencia" value="No" id="asisNo{{ c.id_clase }}" {% if c.asistencia == 'No' %}checked{% endif %}>
+                                                                    <label class="form-check-label text-danger fw-bold" for="asisNo{{ c.id_clase }}">NO Asistió</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-0">
+                                                            <label class="form-label small">Observaciones del Auxiliar:</label>
+                                                            <textarea class="form-control" name="observaciones" rows="2" placeholder="Ej: Docente llegó puntual, se encendieron 25 PCs...">{{ c.observaciones or '' }}</textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
+                                                        <button type="submit" class="btn btn-success fw-bold px-4"><i class="bi bi-save me-1"></i> Guardar Asistencia</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="9" class="text-center py-4 text-muted">
+                                            <i class="bi bi-calendar-x fs-3 d-block mb-2"></i> No se encontraron clases programadas con los filtros seleccionados.
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- PESTAÑA 5: PRÁCTICA LIBRE ESTUDIANTIL                         -->
+        <!-- ============================================================= -->
+        <div class="tab-pane fade {% if tab_activa == 'practica' %}show active{% endif %}" id="tab-practica" role="tabpanel">
+            
+            <div class="row g-3">
+                <!-- FORMULARIO DE ASIGNACIÓN DE PRÁCTICA LIBRE -->
+                <div class="col-lg-5">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-success text-white py-3">
+                            <h5 class="mb-0 fw-bold d-flex align-items-center gap-2">
+                                <i class="bi bi-person-workspace"></i> Asignar Práctica Libre
+                            </h5>
+                            <small class="text-white-50">Valida automáticamente que el salón esté libre y sin clases en curso.</small>
+                        </div>
+                        <div class="card-body p-4">
+                            <form action="{{ url_for('salas_computo.registrar_practica_libre') }}" method="POST" id="formPracticaLibre">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="estudiante_id" id="practica_estudiante_id">
+                                <input type="hidden" name="sede_id" id="practica_sede_id" value="{{ session.get('sede_id') or 1 }}">
+
+                                <!-- Búsqueda y Datos del Estudiante -->
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-dark">
+                                        <i class="bi bi-search me-1 text-primary"></i> ID Banner o Documento del Estudiante:
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="bi bi-card-text"></i></span>
+                                        <input type="text" class="form-control form-control-lg fw-bold" id="practica_codigo_banner" name="codigo_banner" 
+                                               placeholder="Ingrese ID Banner (ej: 1129759)..." autocomplete="off" required 
+                                               oninput="buscarEstudiantePractica(this.value)">
+                                    </div>
+                                    <!-- Contenedor flotante de sugerencias de estudiantes -->
+                                    <div id="sugerenciasEstudiantes" class="list-group shadow-sm mt-1 position-absolute w-100" style="z-index: 1050; max-height: 220px; overflow-y: auto; display: none;"></div>
+                                    <small class="text-muted">Escriba el ID Banner, Cédula o Nombre para autocompletar.</small>
+                                </div>
+
+                                <div class="row g-2 mb-3">
+                                    <div class="col-12">
+                                        <label class="form-label small fw-bold text-muted mb-1">Nombre Completo:</label>
+                                        <input type="text" class="form-control form-control-sm bg-light fw-semibold" id="practica_nombre_estudiante" name="nombre_estudiante" placeholder="Nombre del estudiante" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small fw-bold text-muted mb-1">Programa Académico:</label>
+                                        <input type="text" class="form-control form-control-sm bg-light" id="practica_programa_estudiante" name="programa_estudiante" placeholder="Programa académico">
+                                    </div>
+                                </div>
+
+                                <hr class="my-3 text-muted">
+
+                                <!-- Selección de Salón y Validación de Disponibilidad -->
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-dark">
+                                        <i class="bi bi-door-open-fill me-1 text-success"></i> Salón de Cómputo / Laboratorio:
+                                    </label>
+                                    <select class="form-select form-select-lg fw-bold" id="practica_recurso_id" name="recurso_id" required onchange="validarDisponibilidadPractica()">
+                                        <option value="">-- Seleccione un Salón --</option>
+                                        {% for sm in salas_metricas %}
+                                        <option value="{{ sm.sala.id }}" data-nombre="{{ sm.sala.nombre }}" data-sede="{{ sm.sede_nombre }}">
+                                            {{ sm.sala.nombre }} ({{ sm.sede_nombre }}) - {{ sm.operativos }} Puestos Libres
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                    <input type="hidden" name="salon" id="practica_salon_hidden">
+                                </div>
+
+                                <!-- Cuadro Informativo de Disponibilidad en Tiempo Real -->
+                                <div id="alertaDisponibilidadPractica" class="alert alert-light border d-flex align-items-center gap-2 mb-3 py-2 px-3">
+                                    <i class="bi bi-info-circle-fill text-muted fs-5"></i>
+                                    <span class="small text-muted" id="textoDisponibilidadPractica">Seleccione un salón para verificar si está libre y sin clases en curso.</span>
+                                </div>
+
+                                <div class="row g-2 mb-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold text-muted mb-1">Puesto (Opcional):</label>
+                                        <select class="form-select form-select-sm" name="numero_puesto" id="practica_numero_puesto">
+                                            <option value="">Cualquier puesto</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold text-muted mb-1">Hora Inicio:</label>
+                                        <input type="time" class="form-control form-control-sm" name="hora_inicio" id="practica_hora_inicio" value="{{ ahora_hora if ahora_hora else '' }}" onchange="validarDisponibilidadPractica()">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold text-muted mb-1">Hora Fin Estimada:</label>
+                                        <input type="time" class="form-control form-control-sm" name="hora_fin_estimada" id="practica_hora_fin_estimada" onchange="validarDisponibilidadPractica()">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-muted mb-1">Observaciones / Motivo:</label>
+                                    <input type="text" class="form-control form-control-sm" name="observaciones" placeholder="ej. Taller de programación, práctica individual, consulta...">
+                                </div>
+
+                                <div class="d-grid">
+                                    <button type="submit" id="btnAsignarPractica" class="btn btn-success btn-lg fw-bold shadow-sm">
+                                        <i class="bi bi-play-circle-fill me-2"></i> Registrar Ingreso a Práctica Libre
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LISTADO DE ESTUDIANTES EN PRÁCTICA LIBRE (ACTIVOS) -->
+                <div class="col-lg-7">
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <h5 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2">
+                                    <i class="bi bi-broadcast text-success animate-pulse"></i> Estudiantes en Práctica Ahora
+                                    <span class="badge bg-success rounded-pill fs-6">{{ practicas_activas|length }}</span>
+                                </h5>
+                                <small class="text-muted">Estudiantes actualmente ocupando puestos en salas de cómputo.</small>
+                            </div>
+                            <span class="badge bg-light text-dark border px-3 py-2">
+                                <i class="bi bi-clock me-1 text-primary"></i> <span id="relojVivoPractica">--:--:--</span>
+                            </span>
+                        </div>
+                        <div class="card-body p-0">
+                            {% if practicas_activas %}
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Estudiante</th>
+                                            <th>Programa</th>
+                                            <th>Salón / Puesto</th>
+                                            <th>Hora Ingreso</th>
+                                            <th class="text-end">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for p in practicas_activas %}
+                                        <tr>
+                                            <td>
+                                                <div class="fw-bold text-dark">{{ p.nombre_estudiante }}</div>
+                                                <small class="text-muted"><i class="bi bi-card-text me-1"></i>ID: <strong>{{ p.codigo_banner }}</strong></small>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-light text-dark border">{{ p.programa_estudiante }}</span>
+                                                <small class="d-block text-muted">{{ p.sede_nombre }}</small>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-primary-subtle text-primary fw-bold fs-6">
+                                                    <i class="bi bi-door-closed me-1"></i>{{ p.salon }}
+                                                </span>
+                                                {% if p.numero_puesto %}
+                                                <span class="badge bg-secondary-subtle text-secondary ms-1">Puesto #{{ p.numero_puesto }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <span class="fw-bold text-dark">{{ p.hora_inicio.strftime('%H:%M') }}</span>
+                                                {% if p.hora_fin_estimada %}
+                                                <small class="text-muted d-block">Hasta {{ p.hora_fin_estimada.strftime('%H:%M') }}</small>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-end">
+                                                <form action="{{ url_for('salas_computo.finalizar_practica_libre', id_practica=p.id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Confirmar salida y finalización de práctica para {{ p.nombre_estudiante }}?');">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <button type="submit" class="btn btn-sm btn-danger fw-bold shadow-xs">
+                                                        <i class="bi bi-box-arrow-right me-1"></i> Finalizar Salida
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-5 text-muted">
+                                <i class="bi bi-person-x fs-1 d-block mb-2 text-muted opacity-50"></i>
+                                <h6 class="fw-bold text-muted">No hay estudiantes en práctica libre en este momento</h6>
+                                <p class="small text-muted mb-0">Use el formulario a la izquierda para registrar el ingreso de un estudiante.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- HISTORIAL Y REPORTE DE PRÁCTICAS LIBRES -->
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <h6 class="mb-0 fw-bold text-dark">
+                                <i class="bi bi-clock-history me-1 text-primary"></i> Historial Reciente de Prácticas
+                            </h6>
+                            <a href="{{ url_for('salas_computo.exportar_practicas_libres', practica_fecha=filtros.practica_fecha, practica_salon=filtros.practica_salon, practica_busqueda=filtros.practica_busqueda, practica_estado=filtros.practica_estado, sede=filtros.sede) }}" class="btn btn-sm btn-outline-success fw-semibold shadow-xs">
+                                <i class="bi bi-file-earmark-excel me-1"></i> Exportar a Excel
+                            </a>
+                        </div>
+                        <div class="card-body p-3 bg-light border-bottom">
+                            <form method="GET" action="{{ url_for('salas_computo.dashboard_salas') }}" class="row g-2 align-items-center">
+                                <input type="hidden" name="tab" value="practica">
+                                <div class="col-md-3">
+                                    <input type="date" class="form-control form-control-sm" name="practica_fecha" value="{{ filtros.practica_fecha or '' }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control form-control-sm" name="practica_salon" value="{{ filtros.practica_salon or '' }}" placeholder="Filtrar por salón...">
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control form-control-sm" name="practica_busqueda" value="{{ filtros.practica_busqueda or '' }}" placeholder="Banner, Estudiante, Carrera...">
+                                </div>
+                                <div class="col-md-2 d-flex gap-1">
+                                    <button type="submit" class="btn btn-sm btn-primary w-100"><i class="bi bi-funnel"></i></button>
+                                    <a href="{{ url_for('salas_computo.dashboard_salas', tab='practica') }}" class="btn btn-sm btn-light border"><i class="bi bi-x"></i></a>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="table-responsive" style="max-height: 340px; overflow-y: auto;">
+                            <table class="table table-hover align-middle table-sm mb-0">
+                                <thead class="table-light sticky-top">
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Estudiante</th>
+                                        <th>Salón</th>
+                                        <th>Ingreso</th>
+                                        <th>Salida</th>
+                                        <th>Estado</th>
+                                        <th>Auxiliar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ph in practicas_historial %}
+                                    <tr>
+                                        <td><small class="fw-semibold">{{ ph.fecha.strftime('%Y-%m-%d') }}</small></td>
+                                        <td>
+                                            <span class="fw-bold text-dark d-block">{{ ph.nombre_estudiante }}</span>
+                                            <small class="text-muted">ID: {{ ph.codigo_banner }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark border">{{ ph.salon }}</span>
+                                            {% if ph.numero_puesto %}<small class="text-muted d-block">#{{ ph.numero_puesto }}</small>{% endif %}
+                                        </td>
+                                        <td><small>{{ ph.hora_inicio.strftime('%H:%M') }}</small></td>
+                                        <td>
+                                            {% if ph.hora_salida_real %}
+                                                <small class="text-success fw-bold">{{ ph.hora_salida_real.strftime('%H:%M') }}</small>
+                                            {% else %}
+                                                <small class="text-muted">--</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if ph.estado == 'En Curso' %}
+                                                <span class="badge bg-success">En Curso</span>
+                                            {% elif ph.estado == 'Finalizada' %}
+                                                <span class="badge bg-secondary">Finalizada</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Cancelada</span>
+                                            {% endif %}
+                                        </td>
+                                        <td><small class="text-muted">{{ ph.auxiliar_registro }}</small></td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4 text-muted">
+                                            <i class="bi bi-inbox fs-4 d-block mb-1"></i> No se encontraron registros de práctica libre.
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODALES GLOBALES DE ACCIÓN                                                -->
+<!-- ========================================================================= -->
+
+<!-- 1. Modal Reportar Nueva Novedad Técnica -->
+<div class="modal fade" id="modalNuevaNovedad" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <form action="{{ url_for('salas_computo.nueva_novedad') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill me-2"></i> Reportar Novedad Técnica</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Sala / Laboratorio:</label>
+                            <select class="form-select form-select-sm" name="recurso_id" id="novedad_recurso_id" required onchange="poblarPuestosParaNovedad(this.value)">
+                                <option value="">Seleccionar Sala...</option>
+                                {% for sm in salas_metricas %}
+                                <option value="{{ sm.sala.id }}">{{ sm.sala.nombre }} ({{ sm.sede_nombre }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Puesto Específico (Opcional):</label>
+                            <select class="form-select form-select-sm" name="puesto_id" id="novedad_puesto_id">
+                                <option value="">Toda la sala / General</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Tipo de Falla:</label>
+                            <select class="form-select form-select-sm" name="tipo_falla" required>
+                                <option value="Hardware">Hardware (Torre, Pantalla, Disco)</option>
+                                <option value="Periféricos">Periféricos (Teclado, Mouse, Audífonos)</option>
+                                <option value="Software">Software / Sistema Operativo</option>
+                                <option value="Red / Internet">Red / Sin Conexión</option>
+                                <option value="Proyector / Audio">Proyector / Sonido Sala</option>
+                                <option value="Eléctrico">Eléctrico / Toma de Corriente</option>
+                                <option value="Otro">Otro Incidente</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Prioridad:</label>
+                            <select class="form-select form-select-sm" name="prioridad" required>
+                                <option value="Media">Media (Falla no bloqueante)</option>
+                                <option value="Baja">Baja (Mantenimiento menor)</option>
+                                <option value="Alta">Alta (Puesto inoperativo)</option>
+                                <option value="Crítica">Crítica (Sala completa fuera)</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Descripción detallada de la falla:</label>
+                            <textarea class="form-control" name="descripcion" rows="3" placeholder="Ej: El monitor parpadea intermitentemente y el teclado no responde la barra espaciadora..." required></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger fw-bold px-4"><i class="bi bi-send me-1"></i> Registrar Incidente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 2. Modal Resolver Novedad Técnica -->
+<div class="modal fade" id="modalResolverNovedad" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <form id="formResolverNovedad" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-tools me-2"></i> Solucionar Incidencia Técnica</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-light border mb-3">
+                        <small class="text-muted d-block">Incidencia:</small>
+                        <strong id="resolverTituloSalaPuesto" class="text-dark">--</strong>
+                        <p id="resolverDescripcionProblema" class="small text-muted mb-0 mt-1">--</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Solución Aplicada / Mantenimiento Realizado:</label>
+                        <textarea class="form-control" name="solucion_aplicada" rows="3" placeholder="Ej: Se reemplazó el cable HDMI y se actualizó el controlador de pantalla. Equipo 100% operativo." required></textarea>
+                    </div>
+                    <small class="text-muted d-block">
+                        <i class="bi bi-info-circle me-1"></i> Al guardar la solución, el estado del puesto se reestablecerá automáticamente a <strong>Operativo</strong>.
+                    </small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success fw-bold px-4"><i class="bi bi-check-lg me-1"></i> Guardar Solución</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 3. Modal Agregar Nuevo Software al Catálogo -->
+<div class="modal fade" id="modalNuevoSoftware" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <form action="{{ url_for('salas_computo.nuevo_software') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-app-indicator me-2"></i> Nuevo Software en Catálogo</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label small fw-bold">Nombre del Software:</label>
+                            <input type="text" class="form-control form-control-sm" name="nombre" placeholder="ej: AutoCAD, SPSS, Adobe Photoshop" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Versión:</label>
+                            <input type="text" class="form-control form-control-sm" name="version" placeholder="ej: 2024, 29.0">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Categoría:</label>
+                            <select class="form-select form-select-sm" name="categoria" required>
+                                <option value="Diseño y Arquitectura">Diseño y Arquitectura</option>
+                                <option value="Programación y Software">Programación y Software</option>
+                                <option value="Estadística e Investigación">Estadística e Investigación</option>
+                                <option value="Redes y Telecomunicaciones">Redes y Telecomunicaciones</option>
+                                <option value="Ofimática">Ofimática y General</option>
+                                <option value="Bases de Datos">Bases de Datos</option>
+                                <option value="Cálculo e Ingeniería">Cálculo e Ingeniería</option>
+                                <option value="Multimedia">Multimedia y Video</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Tipo de Licencia:</label>
+                            <select class="form-select form-select-sm" name="licencia" required>
+                                <option value="Institucional">Institucional</option>
+                                <option value="Libre / Open Source">Libre / Open Source</option>
+                                <option value="Educativa">Educativa</option>
+                                <option value="Gratuita">Gratuita</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Descripción / Asignaturas que lo usan:</label>
+                            <textarea class="form-control form-control-sm" name="descripcion" rows="2" placeholder="Breve resumen del propósito del software"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4"><i class="bi bi-save me-1"></i> Guardar Software</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 4. Modal Asignar Salas a Software -->
+<div class="modal fade" id="modalAsignarSalas" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <form action="{{ url_for('salas_computo.asignar_software_salas') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="software_id" id="asignar_software_id">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-check-all me-2"></i> Asignar Salas para: <span id="asignar_software_nombre"></span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="small text-muted mb-2">Marca las salas de cómputo donde este programa se encuentra actualmente instalado:</p>
+                    <div class="row g-2" style="max-height: 280px; overflow-y: auto;" id="listaCheckboxesSalas">
+                        {% for sm in salas_metricas %}
+                        <div class="col-6">
+                            <div class="form-check p-2 border rounded bg-light">
+                                <input class="form-check-input" type="checkbox" name="salas_ids" value="{{ sm.sala.id }}" id="checkSala{{ sm.sala.id }}">
+                                <label class="form-check-label small fw-bold" for="checkSala{{ sm.sala.id }}">
+                                    {{ sm.sala.nombre }} ({{ sm.sede_nombre }})
+                                </label>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4"><i class="bi bi-save me-1"></i> Guardar Asignaciones</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 5. Modal Configurar Capacidad de Puestos de Sala -->
+<div class="modal fade" id="modalConfigurarPuestos" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <form action="{{ url_for('salas_computo.generar_puestos_sala') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="recurso_id" id="config_recurso_id">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-sliders me-2"></i> Configurar Capacidad de Puestos</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-light border mb-3">
+                        Sala seleccionada: <strong id="config_sala_nombre">--</strong>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Cantidad Total de Computadores / Puestos:</label>
+                        <input type="number" class="form-control form-control-lg text-center fw-bold" name="cantidad_puestos" id="config_cantidad_puestos" min="1" max="100" value="25" required>
+                        <small class="text-muted d-block mt-1">Generará los puestos numerados correlativamente (PC #1 al PC #N).</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-dark fw-bold px-4"><i class="bi bi-check-lg me-1"></i> Aplicar Capacidad</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================================================================= -->
+<!-- JAVASCRIPT DINÁMICO DEL MÓDULO                                            -->
+<!-- ========================================================================= -->
+<script>
+    let cacheSalasData = {};
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectorSala = document.getElementById('selectorSalaPuestos');
+        if (selectorSala && selectorSala.value) {
+            cargarPuestosDeSala(selectorSala.value);
+        }
+
+        // Sincronizar nombre de salón al seleccionar en form de clases
+        const formRecurso = document.getElementById('form_recurso_id');
+        const formSalonHidden = document.getElementById('form_salon_hidden');
+        if (formRecurso) {
+            formRecurso.addEventListener('change', function() {
+                if (this.value) {
+                    formSalonHidden.value = this.options[this.selectedIndex].text.split(' (')[0];
+                }
+            });
+        }
+    });
+
+    // 1. Cargar y renderizar puestos de una sala en el grid visual
+    async function cargarPuestosDeSala(recursoId) {
+        const grid = document.getElementById('gridPuestosContenedor');
+        grid.innerHTML = '<div class="col-12 text-center py-5 text-muted"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Cargando mapa de puestos...</p></div>';
+
+        try {
+            const resp = await fetch(`/salas-computo/api/sala/${recursoId}/puestos`);
+            const data = await resp.json();
+
+            if (!data.success) {
+                grid.innerHTML = `<div class="col-12 text-center text-danger py-4">${data.message || 'Error al cargar'}</div>`;
+                return;
+            }
+
+            cacheSalasData[recursoId] = data;
+
+            // Actualizar resumen superior
+            const total = data.total_puestos || 0;
+            const op = data.operativos || 0;
+            const pct = total > 0 ? Math.round((op / total) * 100) : 100;
+
+            const badgeOp = document.getElementById('badgeOperatividad');
+            badgeOp.textContent = `${pct}% Operativa`;
+            badgeOp.className = pct >= 90 ? 'badge bg-success fs-6' : (pct >= 70 ? 'badge bg-warning text-dark fs-6' : 'badge bg-danger fs-6');
+
+            document.getElementById('textoPuestosCount').textContent = `${op} de ${total} puestos disponibles`;
+            document.getElementById('textoSoftwareCount').textContent = `${data.software ? data.software.length : 0} programas`;
+
+            // Config modal button
+            document.getElementById('config_recurso_id').value = recursoId;
+            document.getElementById('config_sala_nombre').textContent = data.sala_nombre;
+            document.getElementById('config_cantidad_puestos').value = total || 25;
+
+            // Renderizar tarjetas de puestos
+            if (data.puestos.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="bi bi-pc-display text-muted fs-1 d-block mb-2"></i>
+                        <h6 class="text-dark fw-bold">Esta sala aún no tiene puestos configurados</h6>
+                        <p class="text-muted small">Haz clic en "Configurar Capacidad" para generar los puestos automáticamente.</p>
+                        <button type="button" class="btn btn-primary btn-sm fw-bold mt-2" onclick="abrirModalConfigurarPuestos()">
+                            <i class="bi bi-magic me-1"></i> Generar 25 Puestos
+                        </button>
+                    </div>`;
+                return;
+            }
+
+            let html = '';
+            data.puestos.forEach(p => {
+                let claseEstado = 'puesto-operativo';
+                let badgeText = 'Operativo';
+                let badgeClass = 'bg-success';
+                let icono = 'bi-pc-display';
+
+                if (p.estado === 'Falla Leve') {
+                    claseEstado = 'puesto-falla-leve';
+                    badgeText = 'Falla Leve';
+                    badgeClass = 'bg-warning text-dark';
+                    icono = 'bi-exclamation-triangle-fill text-warning';
+                } else if (p.estado === 'Fuera de Servicio') {
+                    claseEstado = 'puesto-fuera-servicio';
+                    badgeText = 'Inoperativo';
+                    badgeClass = 'bg-danger text-white';
+                    icono = 'bi-x-circle-fill text-danger';
+                } else if (p.estado === 'Mantenimiento') {
+                    claseEstado = 'puesto-mantenimiento';
+                    badgeText = 'Mantenimiento';
+                    badgeClass = 'bg-primary text-white';
+                    icono = 'bi-wrench text-primary';
+                }
+
+                html += `
+                <div class="col">
+                    <div class="card puesto-card ${claseEstado} p-3 text-center shadow-xs">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="badge bg-dark fw-bold" style="font-size: 0.75rem;">#${String(p.numero_puesto).padStart(2, '0')}</span>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-link text-muted p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                    <li><h6 class="dropdown-header small">Cambiar Estado</h6></li>
+                                    <li><a class="dropdown-item small text-success" href="javascript:void(0)" onclick="cambiarEstadoPuesto(${p.id}, 'Operativo')"><i class="bi bi-check-circle me-1"></i> Operativo</a></li>
+                                    <li><a class="dropdown-item small text-warning" href="javascript:void(0)" onclick="cambiarEstadoPuesto(${p.id}, 'Falla Leve')"><i class="bi bi-exclamation-triangle me-1"></i> Falla Leve</a></li>
+                                    <li><a class="dropdown-item small text-danger" href="javascript:void(0)" onclick="cambiarEstadoPuesto(${p.id}, 'Fuera de Servicio')"><i class="bi bi-x-circle me-1"></i> Fuera de Servicio</a></li>
+                                    <li><a class="dropdown-item small text-primary" href="javascript:void(0)" onclick="cambiarEstadoPuesto(${p.id}, 'Mantenimiento')"><i class="bi bi-wrench me-1"></i> Mantenimiento</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item small text-danger fw-bold" href="javascript:void(0)" onclick="reportarFallaDirecta(${recursoId}, ${p.id}, ${p.numero_puesto})"><i class="bi bi-flag-fill me-1"></i> Reportar Falla</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="my-2">
+                            <i class="bi ${icono} fs-1"></i>
+                        </div>
+                        <h6 class="mb-1 fw-bold text-dark text-truncate" style="font-size: 0.85rem;" title="${p.nombre_equipo}">${p.nombre_equipo}</h6>
+                        <span class="badge ${badgeClass} mb-1" style="font-size: 0.7rem;">${badgeText}</span>
+                        ${p.novedad_activa ? `<small class="text-danger d-block text-truncate" style="font-size: 0.65rem;" title="${p.novedad_activa.descripcion}"><i class="bi bi-exclamation-circle me-1"></i>${p.novedad_activa.tipo_falla}</small>` : ''}
+                    </div>
+                </div>`;
+            });
+
+            grid.innerHTML = html;
+        } catch (e) {
+            console.error(e);
+            grid.innerHTML = '<div class="col-12 text-center text-danger py-4">Error de conexión al cargar el mapa de puestos.</div>';
+        }
+    }
+
+    // 2. Cambiar estado rápido de un puesto
+    async function cambiarEstadoPuesto(puestoId, nuevoEstado) {
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            const resp = await fetch(`/salas-computo/puestos/${puestoId}/estado`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ estado: nuevoEstado })
+            });
+            const data = await resp.json();
+            if (data.success) {
+                const selectorSala = document.getElementById('selectorSalaPuestos');
+                if (selectorSala) cargarPuestosDeSala(selectorSala.value);
+            } else {
+                alert(data.message || 'Error al actualizar');
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Error de conexión');
+        }
+    }
+
+    // 3. Abrir modal para reportar falla directa en un puesto
+    function reportarFallaDirecta(recursoId, puestoId, numeroPuesto) {
+        const modalEl = document.getElementById('modalNuevaNovedad');
+        const modal = new bootstrap.Modal(modalEl);
+        
+        document.getElementById('novedad_recurso_id').value = recursoId;
+        poblarPuestosParaNovedad(recursoId, puestoId);
+        
+        modal.show();
+    }
+
+    // 4. Poblar puestos en el modal de novedad técnica
+    async function poblarPuestosParaNovedad(recursoId, puestoSeleccionadoId = null) {
+        const select = document.getElementById('novedad_puesto_id');
+        select.innerHTML = '<option value="">Cargando puestos...</option>';
+
+        if (!recursoId) {
+            select.innerHTML = '<option value="">Toda la sala / General</option>';
+            return;
+        }
+
+        try {
+            const resp = await fetch(`/salas-computo/api/sala/${recursoId}/puestos`);
+            const data = await resp.json();
+            select.innerHTML = '<option value="">Toda la sala / General</option>';
+
+            if (data.success && data.puestos) {
+                data.puestos.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.textContent = `Puesto #${p.numero_puesto} (${p.nombre_equipo})`;
+                    if (puestoSeleccionadoId && p.id == puestoSeleccionadoId) {
+                        opt.selected = true;
+                    }
+                    select.appendChild(opt);
+                });
+            }
+        } catch (e) {
+            console.error(e);
+            select.innerHTML = '<option value="">Toda la sala / General</option>';
+        }
+    }
+
+    // 5. Abrir modal para resolver novedad
+    function abrirModalResolverNovedad(novedadId, salaNombre, puestoNumero, descripcion) {
+        const form = document.getElementById('formResolverNovedad');
+        form.action = `/salas-computo/novedades/${novedadId}/resolver`;
+        
+        document.getElementById('resolverTituloSalaPuesto').textContent = `${salaNombre} ${puestoNumero ? '(Puesto #' + puestoNumero + ')' : '(Toda la sala)'}`;
+        document.getElementById('resolverDescripcionProblema').textContent = descripcion;
+
+        const modal = new bootstrap.Modal(document.getElementById('modalResolverNovedad'));
+        modal.show();
+    }
+
+    // 6. Abrir modal configurar puestos
+    function abrirModalConfigurarPuestos() {
+        const modal = new bootstrap.Modal(document.getElementById('modalConfigurarPuestos'));
+        modal.show();
+    }
+
+    // 7. Abrir modal asignar salas a software
+    function abrirModalAsignarSalas(softwareId, softwareNombre) {
+        document.getElementById('asignar_software_id').value = softwareId;
+        document.getElementById('asignar_software_nombre').textContent = softwareNombre;
+
+        // Desmarcar todos primero
+        document.querySelectorAll('#listaCheckboxesSalas input[type="checkbox"]').forEach(c => c.checked = false);
+
+        const modal = new bootstrap.Modal(document.getElementById('modalAsignarSalas'));
+        modal.show();
+    }
+
+    // 8. Filtrar catálogo de software
+    function filtrarTarjetasSoftware() {
+        const query = (document.getElementById('buscarSoftwareInput').value || '').toLowerCase();
+        const categoria = (document.getElementById('filtroCategoriaSoftware').value || '').toLowerCase();
+        const cards = document.querySelectorAll('.item-software-card');
+
+        cards.forEach(card => {
+            const nombre = card.getAttribute('data-nombre') || '';
+            const cat = card.getAttribute('data-categoria') || '';
+            const salas = card.getAttribute('data-salas') || '';
+
+            const matchQuery = !query || nombre.includes(query) || cat.includes(query) || salas.includes(query);
+            const matchCat = !categoria || cat.includes(categoria);
+
+            card.style.display = (matchQuery && matchCat) ? '' : 'none';
+        });
+    }
+
+    // 9. Filtrar tabla de novedades
+    function filtrarTablaNovedades(filtroEstado, btn) {
+        const btns = document.querySelectorAll('#filtrosEstadoNovedades button');
+        btns.forEach(b => {
+            b.classList.remove('btn-primary', 'btn-danger', 'btn-warning', 'btn-success', 'fw-bold', 'active');
+            b.classList.add('btn-outline-secondary');
+        });
+
+        btn.classList.remove('btn-outline-secondary');
+        btn.classList.add('btn-primary', 'fw-bold', 'active');
+
+        const rows = document.querySelectorAll('#tablaNovedadesTecnicas tbody tr');
+        rows.forEach(tr => {
+            const estado = tr.getAttribute('data-estado');
+            if (filtroEstado === 'todas' || estado === filtroEstado) {
+                tr.style.display = '';
+            } else {
+                tr.style.display = 'none';
+            }
+        });
+    }
+
+    // =========================================================================
+    // 10. FUNCIONES DE PRÁCTICA LIBRE ESTUDIANTIL
+    // =========================================================================
+    
+    let timerBusquedaEstudiante = null;
+
+    // Búsqueda en vivo de estudiante por Banner, Cédula o Nombre
+    function buscarEstudiantePractica(query) {
+        clearTimeout(timerBusquedaEstudiante);
+        const container = document.getElementById('sugerenciasEstudiantes');
+        
+        if (!query || query.trim().length < 2) {
+            container.style.display = 'none';
+            container.innerHTML = '';
+            return;
+        }
+
+        timerBusquedaEstudiante = setTimeout(async () => {
+            try {
+                const resp = await fetch(`/salas-computo/api/buscar-estudiante?q=${encodeURIComponent(query.trim())}`);
+                const data = await resp.json();
+
+                if (data.success && data.estudiantes && data.estudiantes.length > 0) {
+                    container.innerHTML = '';
+                    data.estudiantes.forEach(est => {
+                        const item = document.createElement('button');
+                        item.type = 'button';
+                        item.className = 'list-group-item list-group-item-action py-2 px-3 text-start';
+                        item.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong class="text-dark">${est.nombre_completo}</strong>
+                                <span class="badge bg-primary">ID: ${est.codigo_banner}</span>
+                            </div>
+                            <small class="text-muted d-block">${est.programa} - ${est.sede_nombre}</small>
+                        `;
+                        item.onclick = () => seleccionarEstudiantePractica(est);
+                        container.appendChild(item);
+                    });
+                    container.style.display = 'block';
+                } else {
+                    container.innerHTML = '<div class="list-group-item py-2 px-3 text-muted small text-center"><i class="bi bi-person-x me-1"></i> No se encontró el estudiante. Ingrese los datos manualmente.</div>';
+                    container.style.display = 'block';
+                }
+            } catch (e) {
+                console.error("Error buscando estudiante:", e);
+                container.style.display = 'none';
+            }
+        }, 250);
+    }
+
+    // Seleccionar estudiante de la lista
+    function seleccionarEstudiantePractica(est) {
+        document.getElementById('practica_estudiante_id').value = est.id || '';
+        document.getElementById('practica_codigo_banner').value = est.codigo_banner;
+        document.getElementById('practica_nombre_estudiante').value = est.nombre_completo;
+        document.getElementById('practica_programa_estudiante').value = est.programa || '';
+        if (est.sede_id) {
+            document.getElementById('practica_sede_id').value = est.sede_id;
+        }
+
+        const container = document.getElementById('sugerenciasEstudiantes');
+        container.style.display = 'none';
+        container.innerHTML = '';
+    }
+
+    // Ocultar lista al hacer click fuera
+    document.addEventListener('click', function(e) {
+        const input = document.getElementById('practica_codigo_banner');
+        const container = document.getElementById('sugerenciasEstudiantes');
+        if (container && input && !input.contains(e.target) && !container.contains(e.target)) {
+            container.style.display = 'none';
+        }
+    });
+
+    // Validar disponibilidad del salón en tiempo real
+    async function validarDisponibilidadPractica() {
+        const selectSala = document.getElementById('practica_recurso_id');
+        const recursoId = selectSala ? selectSala.value : '';
+        const opt = selectSala ? selectSala.options[selectSala.selectedIndex] : null;
+        const salonNombre = opt ? (opt.getAttribute('data-nombre') || opt.textContent.split('(')[0].trim()) : '';
+        
+        document.getElementById('practica_salon_hidden').value = salonNombre;
+
+        const horaInicio = document.getElementById('practica_hora_inicio').value;
+        const horaFin = document.getElementById('practica_hora_fin_estimada').value;
+        const alertBox = document.getElementById('alertaDisponibilidadPractica');
+        const textSpan = document.getElementById('textoDisponibilidadPractica');
+        const btnSubmit = document.getElementById('btnAsignarPractica');
+
+        if (!recursoId && !salonNombre) {
+            alertBox.className = 'alert alert-light border d-flex align-items-center gap-2 mb-3 py-2 px-3';
+            textSpan.innerHTML = '<i class="bi bi-info-circle-fill text-muted fs-5"></i> Seleccione un salón para verificar si está libre y sin clases en curso.';
+            btnSubmit.disabled = false;
+            return;
+        }
+
+        alertBox.className = 'alert alert-info border d-flex align-items-center gap-2 mb-3 py-2 px-3';
+        textSpan.innerHTML = '<div class="spinner-border spinner-border-sm text-info me-1" role="status"></div> Verificando programación de clases y disponibilidad...';
+
+        try {
+            const url = `/salas-computo/api/verificar-disponibilidad?recurso_id=${encodeURIComponent(recursoId)}&salon=${encodeURIComponent(salonNombre)}&hora_inicio=${encodeURIComponent(horaInicio)}&hora_fin=${encodeURIComponent(horaFin)}`;
+            const resp = await fetch(url);
+            const data = await resp.json();
+
+            if (data.success) {
+                if (data.disponible) {
+                    alertBox.className = 'alert alert-success border border-success d-flex align-items-center gap-2 mb-3 py-2 px-3';
+                    let extra = '';
+                    if (data.practicas_en_curso > 0) {
+                        extra = ` <strong class="badge bg-warning text-dark">${data.practicas_en_curso} estudiante(s) en práctica ahora</strong>`;
+                    }
+                    textSpan.innerHTML = `<i class="bi bi-check-circle-fill text-success fs-5"></i> <span><strong>Salón Libre:</strong> ${data.mensaje}${extra}</span>`;
+                    btnSubmit.disabled = false;
+                } else {
+                    alertBox.className = 'alert alert-danger border border-danger d-flex align-items-center gap-2 mb-3 py-2 px-3';
+                    textSpan.innerHTML = `<i class="bi bi-exclamation-octagon-fill text-danger fs-5"></i> <span><strong>No disponible:</strong> ${data.mensaje}</span>`;
+                    btnSubmit.disabled = true;
+                }
+            } else {
+                alertBox.className = 'alert alert-warning border d-flex align-items-center gap-2 mb-3 py-2 px-3';
+                textSpan.innerHTML = `<i class="bi bi-exclamation-triangle-fill text-warning fs-5"></i> <span>No se pudo verificar disponibilidad: ${data.error || 'Error'}</span>`;
+                btnSubmit.disabled = false;
+            }
+        } catch (e) {
+            console.error("Error verificando disponibilidad:", e);
+            alertBox.className = 'alert alert-light border d-flex align-items-center gap-2 mb-3 py-2 px-3';
+            textSpan.innerHTML = '<i class="bi bi-info-circle-fill text-muted fs-5"></i> Seleccione un salón para verificar disponibilidad.';
+            btnSubmit.disabled = false;
+        }
+
+        // Cargar puestos de esta sala
+        poblarPuestosParaPractica(recursoId);
+    }
+
+    // Poblar dropdown de puestos para práctica libre
+    async function poblarPuestosParaPractica(recursoId) {
+        const selectPuesto = document.getElementById('practica_numero_puesto');
+        if (!selectPuesto) return;
+        
+        selectPuesto.innerHTML = '<option value="">Cualquier puesto</option>';
+        if (!recursoId) return;
+
+        try {
+            const resp = await fetch(`/salas-computo/api/sala/${recursoId}/puestos`);
+            const data = await resp.json();
+            if (data.success && data.puestos) {
+                data.puestos.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.numero_puesto;
+                    opt.textContent = `Puesto #${p.numero_puesto} (${p.estado})`;
+                    if (p.estado !== 'Operativo') {
+                        opt.disabled = true;
+                        opt.textContent += ' [Falla]';
+                    }
+                    selectPuesto.appendChild(opt);
+                });
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    // Inicializar horas y reloj
+    function inicializarPracticaLibre() {
+        const inputInicio = document.getElementById('practica_hora_inicio');
+        const inputFin = document.getElementById('practica_hora_fin_estimada');
+
+        const ahora = new Date();
+        const horaStr = ahora.toTimeString().substring(0, 5);
+        if (inputInicio && !inputInicio.value) {
+            inputInicio.value = horaStr;
+        }
+
+        if (inputFin && !inputFin.value) {
+            const fin = new Date(ahora.getTime() + (2 * 60 * 60 * 1000)); // +2 horas
+            inputFin.value = fin.toTimeString().substring(0, 5);
+        }
+
+        // Reloj en vivo
+        function actualizarReloj() {
+            const el = document.getElementById('relojVivoPractica');
+            if (el) {
+                const now = new Date();
+                el.textContent = now.toLocaleTimeString();
+            }
+        }
+        setInterval(actualizarReloj, 1000);
+        actualizarReloj();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        inicializarPracticaLibre();
+    });
+</script>
+
+{% include 'components/footer.html' %}

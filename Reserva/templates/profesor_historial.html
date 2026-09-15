@@ -1,0 +1,126 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12 d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="mb-0">{{ profesor.nombre_completo }}</h2>
+                <small class="text-muted">{{ profesor.programa or 'Sin programa' }} | C.C. {{ profesor.cedula }}</small>
+            </div>
+            <a href="{{ url_for('profesores.profesores_main') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver a Profesores
+            </a>
+        </div>
+    </div>
+
+    <!-- Estadísticas del Profesor -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white text-center p-3 mb-3">
+                <h2 class="mb-0">{{ stats.total_prestamos }}</h2>
+                <small>Préstamos Totales</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white text-center p-3 mb-3">
+                <h2 class="mb-0">{{ stats.total_reservas }}</h2>
+                <small>Reservas Totales</small>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card p-3 mb-3 h-100">
+                <h5>Equipos más usados</h5>
+                {% for equipo, count in stats.equipos_mas_utilizados.items() %}
+                <span class="badge bg-light text-dark border me-1 mb-1">{{ equipo }} ({{ count }})</span>
+                {% else %}
+                <small class="text-muted">Sin datos de equipos</small>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Historial de Préstamos -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-clock-history"></i> Historial de Préstamos</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Equipo</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prestamo in prestamos %}
+                                <tr>
+                                    <td>{{ prestamo.fecha_prestamo }}</td>
+                                    <td>{{ prestamo.equipo_prestado }}</td>
+                                    <td>
+                                        <span
+                                            class="badge bg-{{ 'success' if prestamo.estado == 'devuelto' else 'primary' }}">
+                                            {{ prestamo.estado | capitalize }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center py-4 text-muted">Sin historial de préstamos</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Historial de Reservas -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Historial de Reservas</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Recurso</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reserva in reservas %}
+                                <tr>
+                                    <td>{{ reserva.fecha }}</td>
+                                    <td>{{ reserva.recurso_nombre }}</td>
+                                    <td>
+                                        <span
+                                            class="badge bg-{{ 'success' if reserva.estado == 'Confirmada' else 'secondary' }}">
+                                            {{ reserva.estado }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center py-4 text-muted">Sin historial de reservas</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'components/footer.html' %}

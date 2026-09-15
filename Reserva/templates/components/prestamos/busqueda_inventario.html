@@ -1,0 +1,69 @@
+<div class="row g-3 mb-3">
+    <div class="col-12">
+        <div class="card border-0" style="background:#f8f9fa;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <div class="fw-bold">Equipos Estándar</div>
+                        <div class="text-muted" style="font-size: 0.9rem;">Portátil, Cargador, HDMI y Control (Samsung/Panasonic según salón)</div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="btnStdPortatil"><i class="bi bi-laptop"></i> Portátil</button>
+                        <button type="button" class="btn btn-sm btn-outline-info" id="btnStdCargador"><i class="bi bi-lightning-charge"></i> Cargador</button>
+                        <button type="button" class="btn btn-sm btn-outline-warning" id="btnStdHdmi"><i class="bi bi-usb-c"></i> HDMI</button>
+                        <button type="button" class="btn btn-sm" id="btnStdControl" style="border:1px solid #6c757d;"><i class="bi bi-remote"></i> Control</button>
+                        <button type="button" class="btn btn-sm btn-outline-success" id="btnStdTeclado"><i class="bi bi-keyboard"></i> Teclado</button>
+                    </div>
+                </div>
+                <div class="mt-2 text-muted" style="font-size: 0.9rem;">
+                    <span>Control sugerido: </span>
+                    <span class="badge" id="badgeControlSugerido" style="background:#6c757d;">No definido</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row g-3">
+    <!-- Búsqueda por Número de Inventario -->
+    <div class="col-12">
+        <label class="form-label fw-bold">Buscar por Número de Inventario:</label>
+        <div class="input-group">
+            <input type="text" class="form-control" id="numero_inventario_busqueda"
+                placeholder="Escanear código o escribir número de inventario..."
+                list="lista-inventario-disponible">
+            <button class="btn btn-primary" type="button" id="btnBuscarInventario">
+                <i class="bi bi-search"></i> Buscar
+            </button>
+            <button class="btn btn-success" type="button" id="btnAgregarDirecto">
+                <i class="bi bi-plus-lg"></i> Agregar Directo
+            </button>
+        </div>
+        <datalist id="lista-inventario-disponible"></datalist>
+    </div>
+
+    <div class="col-12" id="resultados-inventario" style="display:none;">
+        <div class="border rounded p-2" style="background: #fbfbfb;">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <strong>Resultados del inventario</strong>
+                <small class="text-muted" id="resultados-inventario-count"></small>
+            </div>
+            <div class="table-responsive" style="max-height: 220px; overflow: auto;">
+                <table class="table table-sm table-hover mb-0">
+                    <thead class="table-light sticky-top">
+                        <tr>
+                            <th>Placa Activo</th>
+                            <th>N° Inventario</th>
+                            <th>Item</th>
+                            <th>Marca</th>
+                            <th>Serial</th>
+                            <th>Bodega</th>
+                            <th>Sede</th>
+                            <th class="text-end">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultados-inventario-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

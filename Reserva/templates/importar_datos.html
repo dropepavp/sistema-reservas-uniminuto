@@ -1,0 +1,940 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<style>
+  .import-hero {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2d6a9f 100%);
+    color: white;
+    padding: 2rem 0 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .import-hero h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+
+  .import-hero p {
+    opacity: .85;
+    margin-bottom: 0;
+  }
+
+  .section-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, .08);
+    transition: box-shadow .2s;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-card:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, .13);
+  }
+
+  .card-header-usuarios,
+  .card-header-inventario,
+  .card-header-profesores,
+  .card-header-salas {
+    background: var(--uniminuto-gradient-primary);
+    color: #fff;
+    border-radius: 12px 12px 0 0 !important;
+  }
+
+  .step-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .25);
+    font-weight: 700;
+    font-size: .85rem;
+    margin-right: .5rem;
+  }
+
+  /* Resultado */
+  .result-section {
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 1.5rem;
+  }
+
+  .result-header {
+    padding: .75rem 1.25rem;
+    font-weight: 600;
+    font-size: .95rem;
+  }
+
+  .result-body {
+    padding: 0;
+  }
+
+  .result-table {
+    margin: 0;
+    font-size: .875rem;
+  }
+
+  .result-table thead th {
+    background: rgba(0, 0, 0, .04);
+    border-top: none;
+    font-weight: 600;
+  }
+
+  .badge-ok {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .badge-skip {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .badge-err {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .pill {
+    display: inline-block;
+    padding: .25em .6em;
+    border-radius: 999px;
+    font-size: .8rem;
+    font-weight: 600;
+  }
+
+  .upload-zone {
+    border: 2px dashed #cbd5e1;
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all .2s;
+    cursor: pointer;
+    background: #f8fafc;
+  }
+
+  .upload-zone:hover,
+  .upload-zone.drag-over {
+    border-color: #3d9af1;
+    background: #eff6ff;
+  }
+
+  .upload-zone input[type=file] {
+    display: none;
+  }
+
+  .upload-zone .upload-icon {
+    font-size: 2rem;
+    color: #94a3b8;
+    margin-bottom: .5rem;
+  }
+
+  .upload-zone .file-chosen {
+    color: #2d6a9f;
+    font-weight: 600;
+    margin-top: .5rem;
+    font-size: .9rem;
+  }
+
+  /* Stats row */
+  .stat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    border-radius: 999px;
+    padding: .35rem .85rem;
+    font-size: .85rem;
+    font-weight: 600;
+  }
+
+  .stat-ok {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .stat-skip {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .stat-err {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+</style>
+
+<!-- Hero -->
+<div class="import-hero">
+  <div class="container">
+    <h1><i class="bi bi-cloud-arrow-up-fill me-2"></i>Importar Datos</h1>
+    <p>Carga usuarios e inventario desde archivos Excel o CSV. Los registros existentes <strong>no serán
+        reemplazados</strong>.</p>
+  </div>
+</div>
+
+<div class="container pb-5">
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  {% for category, message in messages %}
+  <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+    <i
+      class="bi bi-{% if category=='danger' %}exclamation-triangle{% elif category=='success' %}check-circle{% else %}info-circle{% endif %}-fill me-1"></i>
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
+
+  <!-- ==================== SECCIÓN USUARIOS ==================== -->
+  <div class="section-card card">
+    <div class="card-header card-header-usuarios p-3">
+      <h5 class="mb-0"><i class="bi bi-people-fill me-2"></i>Importar Usuarios</h5>
+    </div>
+    <div class="card-body p-4">
+
+      <div class="row g-4">
+        <!-- Paso 1: Descargar plantilla -->
+        <div class="col-md-4">
+          <div class="d-flex align-items-start gap-3">
+            <div class="step-badge bg-primary text-white flex-shrink-0" style="width:36px;height:36px;font-size:1rem;">1
+            </div>
+            <div>
+              <h6 class="fw-bold mb-1">Descargar plantilla</h6>
+              <p class="text-muted small mb-2">Usa el archivo Excel como base. Contiene columnas correctas e
+                instrucciones.</p>
+              <a href="{{ url_for('admin.plantilla_usuarios') }}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-download me-1"></i>Descargar plantilla_usuarios.xlsx
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 2: Completar archivo -->
+        <div class="col-md-4">
+          <div class="d-flex align-items-start gap-3">
+            <div class="step-badge bg-primary text-white flex-shrink-0" style="width:36px;height:36px;font-size:1rem;">2
+            </div>
+            <div>
+              <h6 class="fw-bold mb-1">Completar el archivo</h6>
+              <p class="text-muted small mb-0">Llena la hoja <code>Usuarios</code> con los datos. Columnas requeridas:
+              </p>
+              <ul class="text-muted small mt-1 mb-0 ps-3">
+                <li><code>documento</code> — cédula o ID</li>
+                <li><code>nombre_completo</code></li>
+                <li><code>correo</code></li>
+                <li><code>contrasena</code> — mín. 8 chars</li>
+                <li><code>rol</code> — <em>admin</em> o <em>auxiliar</em></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 3: Subir -->
+        <div class="col-md-4">
+          <div class="d-flex align-items-start gap-3">
+            <div class="step-badge bg-primary text-white flex-shrink-0" style="width:36px;height:36px;font-size:1rem;">3
+            </div>
+            <div class="w-100">
+              <h6 class="fw-bold mb-1">Subir archivo</h6>
+              <form action="{{ url_for('admin.importar_usuarios') }}" method="post" enctype="multipart/form-data"
+                id="form-usuarios">
+                <div class="upload-zone" id="zone-usuarios" onclick="document.getElementById('file-usuarios').click()">
+                  <div class="upload-icon"><i class="bi bi-file-earmark-spreadsheet"></i></div>
+                  <div class="small text-muted">Haz clic o arrastra tu archivo aquí</div>
+                  <div class="small text-muted">.xlsx, .xls o .csv</div>
+                  <div class="file-chosen d-none" id="chosen-usuarios"></div>
+                  <input type="file" id="file-usuarios" name="archivo_usuarios" accept=".xlsx,.xls,.csv"
+                    onchange="fileChosen(this,'chosen-usuarios')">
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mt-3" id="btn-usuarios" disabled>
+                  <i class="bi bi-upload me-1"></i>Importar usuarios
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTADO USUARIOS -->
+      {% if resultado_usuarios %}
+      {% set r = resultado_usuarios %}
+      <hr class="my-4">
+      <h6 class="fw-bold mb-3"><i class="bi bi-clipboard-data me-1"></i>Resultado de la importación</h6>
+
+      <!-- Resumen -->
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="stat-pill stat-ok"><i class="bi bi-check-circle-fill"></i> {{ r.insertados|length }}
+          insertados</span>
+        <span class="stat-pill stat-skip"><i class="bi bi-skip-forward-fill"></i> {{ r.omitidos|length }} omitidos (ya
+          existían)</span>
+        <span class="stat-pill stat-err"><i class="bi bi-x-circle-fill"></i> {{ r.errores|length }} con error</span>
+      </div>
+
+      {% if r.insertados %}
+      <div class="result-section border border-success mb-3">
+        <div class="result-header bg-success bg-opacity-10 text-success">
+          <i class="bi bi-check2-all me-1"></i>Registros insertados ({{ r.insertados|length }})
+        </div>
+        <div class="result-body">
+          <table class="table result-table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Fila</th>
+                <th>Documento</th>
+                <th>Nombre</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for u in r.insertados %}
+              <tr>
+                <td>{{ u.fila }}</td>
+                <td><code>{{ u.doc }}</code></td>
+                <td>{{ u.nombre }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if r.omitidos %}
+      <div class="result-section border border-warning mb-3">
+        <div class="result-header bg-warning bg-opacity-10 text-warning">
+          <i class="bi bi-skip-forward-fill me-1"></i>Registros omitidos ({{ r.omitidos|length }})
+        </div>
+        <div class="result-body">
+          <table class="table result-table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Fila</th>
+                <th>Documento</th>
+                <th>Motivo</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for u in r.omitidos %}
+              <tr>
+                <td>{{ u.fila }}</td>
+                <td><code>{{ u.doc }}</code></td>
+                <td><span class="pill badge-skip">{{ u.razon }}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if r.errores %}
+      <div class="result-section border border-danger mb-1">
+        <div class="result-header bg-danger bg-opacity-10 text-danger">
+          <i class="bi bi-exclamation-triangle-fill me-1"></i>Filas con errores ({{ r.errores|length }})
+        </div>
+        <div class="result-body">
+          <table class="table result-table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Fila</th>
+                <th>Documento</th>
+                <th>Errores encontrados</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for e in r.errores %}
+              <tr>
+                <td>{{ e.fila }}</td>
+                <td><code>{{ e.doc or '—' }}</code></td>
+                <td>
+                  {% for r2 in e.razones %}
+                  <span class="pill badge-err me-1">{{ r2 }}</span>
+                  {% endfor %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- ==================== SECCIÓN INVENTARIO ==================== -->
+  <div class="section-card card">
+    <div class="card-header card-header-inventario p-3">
+      <h5 class="mb-0"><i class="bi bi-archive-fill me-2"></i>Importar Inventario</h5>
+    </div>
+    <div class="card-body p-4">
+
+      <div class="row g-4">
+        <!-- Paso 1 -->
+        <div class="col-md-4">
+          <div class="d-flex align-items-start gap-3">
+            <div class="step-badge bg-success text-white flex-shrink-0" style="width:36px;height:36px;font-size:1rem;">1
+            </div>
+            <div>
+              <h6 class="fw-bold mb-1">Descargar plantilla</h6>
+              <p class="text-muted small mb-2">El archivo incluye un ejemplo y hoja de instrucciones con los estados
+                válidos.</p>
+              <a href="{{ url_for('admin.plantilla_inventario') }}" class="btn btn-outline-success btn-sm">
+                <i class="bi bi-download me-1"></i>Descargar plantilla_inventario.xlsx
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 2 -->
+        <div class="col-md-4">
+          <div class="d-flex align-items-start gap-3">
+            <div class="step-badge bg-success text-white flex-shrink-0" style="width:36px;height:36px;font-size:1rem;">2
+            </div>
+            <div>
+              <h6 class="fw-bold mb-1">Completar el archivo</h6>
+              <p class="text-muted small mb-0">Llena la hoja <code>Inventario</code>. Columnas requeridas:</p>
+              <ul class="text-muted small mt-1 mb-0 ps-3">
+                <li><code>item</code> — nombre del equipo</li>
+                <li><code>numero_inventario</code> — código único</li>
+                <li><code>estado</code> — Disponible, En Préstamo…</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 3 -->
+        <div class="col-md-4">
+          <div class="d-flex align-items-start gap-3">
+            <div class="step-badge bg-success text-white flex-shrink-0" style="width:36px;height:36px;font-size:1rem;">3
+            </div>
+            <div class="w-100">
+              <h6 class="fw-bold mb-1">Subir archivo</h6>
+              <form action="{{ url_for('admin.importar_inventario') }}" method="post" enctype="multipart/form-data"
+                id="form-inventario">
+                <div class="upload-zone" id="zone-inventario"
+                  onclick="document.getElementById('file-inventario').click()">
+                  <div class="upload-icon"><i class="bi bi-box-seam"></i></div>
+                  <div class="small text-muted">Haz clic o arrastra tu archivo aquí</div>
+                  <div class="small text-muted">.xlsx, .xls o .csv</div>
+                  <div class="file-chosen d-none" id="chosen-inventario"></div>
+                  <input type="file" id="file-inventario" name="archivo_inventario" accept=".xlsx,.xls,.csv"
+                    onchange="fileChosen(this,'chosen-inventario')">
+                </div>
+                <button type="submit" class="btn btn-success w-100 mt-3" id="btn-inventario" disabled>
+                  <i class="bi bi-upload me-1"></i>Importar inventario
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTADO INVENTARIO -->
+      {% if resultado_inventario %}
+      {% set ri = resultado_inventario %}
+      <hr class="my-4">
+      <h6 class="fw-bold mb-3"><i class="bi bi-clipboard-data me-1"></i>Resultado de la importación</h6>
+
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="stat-pill stat-ok"><i class="bi bi-check-circle-fill"></i> {{ ri.insertados|length }}
+          insertados</span>
+        <span class="stat-pill stat-skip"><i class="bi bi-skip-forward-fill"></i> {{ ri.omitidos|length }} omitidos (ya
+          existían)</span>
+        <span class="stat-pill stat-err"><i class="bi bi-x-circle-fill"></i> {{ ri.errores|length }} con error</span>
+      </div>
+
+      {% if ri.insertados %}
+      <div class="result-section border border-success mb-3">
+        <div class="result-header bg-success bg-opacity-10 text-success">
+          <i class="bi bi-check2-all me-1"></i>Registros insertados ({{ ri.insertados|length }})
+        </div>
+        <div class="result-body">
+          <table class="table result-table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Fila</th>
+                <th>N° Inventario</th>
+                <th>Equipo</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in ri.insertados %}
+              <tr>
+                <td>{{ item.fila }}</td>
+                <td><code>{{ item.num_inv }}</code></td>
+                <td>{{ item.item }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if ri.omitidos %}
+      <div class="result-section border border-warning mb-3">
+        <div class="result-header bg-warning bg-opacity-10 text-warning">
+          <i class="bi bi-skip-forward-fill me-1"></i>Registros omitidos ({{ ri.omitidos|length }})
+        </div>
+        <div class="result-body">
+          <table class="table result-table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Fila</th>
+                <th>N° Inventario</th>
+                <th>Motivo</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in ri.omitidos %}
+              <tr>
+                <td>{{ item.fila }}</td>
+                <td><code>{{ item.num_inv }}</code></td>
+                <td><span class="pill badge-skip">{{ item.razon }}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if ri.errores %}
+      <div class="result-section border border-danger mb-1">
+        <div class="result-header bg-danger bg-opacity-10 text-danger">
+          <i class="bi bi-exclamation-triangle-fill me-1"></i>Filas con errores ({{ ri.errores|length }})
+        </div>
+        <div class="result-body">
+          <table class="table result-table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Fila</th>
+                <th>N° Inventario</th>
+                <th>Errores encontrados</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for e in ri.errores %}
+              <tr>
+                <td>{{ e.fila }}</td>
+                <td><code>{{ e.num_inv or '—' }}</code></td>
+                <td>
+                  {% for r2 in e.razones %}
+                  <span class="pill badge-err me-1">{{ r2 }}</span>
+                  {% endfor %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- ==================== SECCIÓN PROFESORES ==================== -->
+  <div class="section-card card border-0 shadow-sm">
+    <div class="card-header card-header-profesores p-3">
+      <h5 class="mb-0 fw-bold"><i class="bi bi-person-badge-fill me-2"></i>Importar Profesores</h5>
+    </div>
+    <div class="card-body p-4">
+
+      <div class="row g-4">
+        <!-- Paso 1 -->
+        <div class="col-md-4">
+          <div class="d-flex align-items-start gap-3">
+            <div class="step-badge bg-warning text-dark flex-shrink-0" style="width:36px;height:36px;font-size:1rem;">1
+            </div>
+            <div>
+              <h6 class="fw-bold mb-1">Descargar plantilla</h6>
+              <p class="text-muted small mb-2">Descarga el archivo Excel de ejemplo para llenarlo correctamente.</p>
+              <a href="{{ url_for('admin.plantilla_profesores') }}" class="btn btn-outline-warning text-dark btn-sm">
+                <i class="bi bi-download me-1"></i>Descargar plantilla_profesores.xlsx
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 2 -->
+        <div class="col-md-4">
+          <div class="d-flex align-items-start gap-3">
+            <div class="step-badge bg-warning text-dark flex-shrink-0" style="width:36px;height:36px;font-size:1rem;">2
+            </div>
+            <div>
+              <h6 class="fw-bold mb-1">Completar el archivo</h6>
+              <p class="text-muted small mb-0">Llena la hoja <code>Profesores</code>. Columnas requeridas:</p>
+              <ul class="text-muted small mt-1 mb-0 ps-3">
+                <li><code>Cedula</code> — Identificación única</li>
+                <li><code>Nombre_Completo</code></li>
+                <li><code>Correo</code>, <code>Telefono</code>, <code>Programa</code></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 3 -->
+        <div class="col-md-4">
+          <div class="d-flex align-items-start gap-3">
+            <div class="step-badge bg-warning text-dark flex-shrink-0" style="width:36px;height:36px;font-size:1rem;">3
+            </div>
+            <div class="w-100">
+              <h6 class="fw-bold mb-1">Subir archivo</h6>
+              <form action="{{ url_for('admin.importar_profesores') }}" method="post" enctype="multipart/form-data"
+                id="form-profesores">
+                <div class="upload-zone" id="zone-profesores"
+                  onclick="document.getElementById('file-profesores').click()" style="border-color: #ffc107;">
+                  <div class="upload-icon"><i class="bi bi-people"></i></div>
+                  <div class="small text-muted">Haz clic o arrastra tu archivo aquí</div>
+                  <div class="small text-muted">.xlsx, .xls o .csv</div>
+                  <div class="file-chosen d-none" id="chosen-profesores"></div>
+                  <input type="file" id="file-profesores" name="archivo_profesores" accept=".xlsx,.xls,.csv"
+                    onchange="fileChosen(this,'chosen-profesores')">
+                </div>
+                <button type="submit" class="btn btn-warning text-dark fw-bold w-100 mt-3" id="btn-profesores" disabled>
+                  <i class="bi bi-upload me-1"></i>Importar profesores
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTADO PROFESORES -->
+      {% if resultado_profesores %}
+      {% set rp = resultado_profesores %}
+      <hr class="my-4">
+      <h6 class="fw-bold mb-3"><i class="bi bi-clipboard-data me-1"></i>Resultado de la importación</h6>
+
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="stat-pill stat-ok"><i class="bi bi-check-circle-fill"></i> {{ rp.insertados|length }}
+          insertados</span>
+        <span class="stat-pill stat-skip"><i class="bi bi-skip-forward-fill"></i> {{ rp.omitidos|length }} omitidos (ya
+          existían)</span>
+        <span class="stat-pill stat-err"><i class="bi bi-x-circle-fill"></i> {{ rp.errores|length }} con error</span>
+      </div>
+
+      {% if rp.insertados %}
+      <div class="result-section border border-success mb-3">
+        <div class="result-header bg-success bg-opacity-10 text-success">
+          <i class="bi bi-check2-all me-1"></i>Registros insertados ({{ rp.insertados|length }})
+        </div>
+        <div class="result-body">
+          <table class="table result-table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Fila</th>
+                <th>Cédula</th>
+                <th>Profesor</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in rp.insertados %}
+              <tr>
+                <td>{{ item.fila }}</td>
+                <td><code>{{ item.num_inv }}</code></td>
+                <td>{{ item.item }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if rp.omitidos %}
+      <div class="result-section border border-warning mb-3">
+        <div class="result-header bg-warning bg-opacity-10 text-warning">
+          <i class="bi bi-skip-forward-fill me-1"></i>Registros omitidos ({{ rp.omitidos|length }})
+        </div>
+        <div class="result-body">
+          <table class="table result-table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Fila</th>
+                <th>Cédula</th>
+                <th>Motivo</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in rp.omitidos %}
+              <tr>
+                <td>{{ item.fila }}</td>
+                <td><code>{{ item.num_inv }}</code></td>
+                <td><span class="pill badge-skip">{{ item.razon }}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if rp.errores %}
+      <div class="result-section border border-danger mb-1">
+        <div class="result-header bg-danger bg-opacity-10 text-danger">
+          <i class="bi bi-exclamation-triangle-fill me-1"></i>Filas con errores ({{ rp.errores|length }})
+        </div>
+        <div class="result-body">
+          <table class="table result-table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Fila</th>
+                <th>Cédula</th>
+                <th>Errores encontrados</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for e in rp.errores %}
+              <tr>
+                <td>{{ e.fila }}</td>
+                <td><code>{{ e.num_inv or '—' }}</code></td>
+                <td>
+                  {% for r2 in e.razones %}
+                  <span class="pill badge-err me-1">{{ r2 }}</span>
+                  {% endfor %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+      {% endif %}
+
+    </div>
+  </div>
+  <!-- ==================== SECCIÓN SALAS DE CÓMPUTO ==================== -->
+  <div class="section-card card border-0 shadow-sm mt-4">
+    <div class="card-header card-header-salas p-3">
+      <h5 class="mb-0 fw-bold"><i class="bi bi-pc-display me-2"></i>Importar Salas de Cómputo</h5>
+    </div>
+    <div class="card-body p-4">
+
+      <div class="row g-4">
+        <!-- Paso 1 -->
+        <div class="col-md-4">
+          <div class="d-flex align-items-start gap-3">
+            <div class="step-badge bg-info text-dark flex-shrink-0" style="width:36px;height:36px;font-size:1rem;">1
+            </div>
+            <div>
+              <h6 class="fw-bold mb-1">Descargar plantilla</h6>
+              <p class="text-muted small mb-2">Descarga el archivo Excel de ejemplo para llenarlo correctamente.</p>
+              <a href="{{ url_for('admin.plantilla_salas_computo') }}" class="btn btn-outline-info text-dark btn-sm">
+                <i class="bi bi-download me-1"></i>Descargar plantilla_salas_computo.xlsx
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 2 -->
+        <div class="col-md-4">
+          <div class="d-flex align-items-start gap-3">
+            <div class="step-badge bg-info text-dark flex-shrink-0" style="width:36px;height:36px;font-size:1rem;">2
+            </div>
+            <div>
+              <h6 class="fw-bold mb-1">Completar el archivo</h6>
+              <p class="text-muted small mb-0">Llena la hoja <code>SalasComputo</code>. Columnas requeridas:</p>
+              <ul class="text-muted small mt-1 mb-0 ps-3">
+                <li><code>Fecha</code>, <code>Hora_Inicio</code>, <code>Hora_Fin</code></li>
+                <li><code>Salon</code>, <code>Nombre_Profesor</code></li>
+                <li><code>Materia</code></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 3 -->
+        <div class="col-md-4">
+          <div class="d-flex align-items-start gap-3">
+            <div class="step-badge bg-info text-dark flex-shrink-0" style="width:36px;height:36px;font-size:1rem;">3
+            </div>
+            <div class="w-100">
+              <h6 class="fw-bold mb-1">Subir archivo</h6>
+              <form action="{{ url_for('admin.importar_salas_computo') }}" method="post" enctype="multipart/form-data"
+                id="form-salas">
+                <div class="upload-zone" id="zone-salas" onclick="document.getElementById('file-salas').click()"
+                  style="border-color: #0dcaf0;">
+                  <div class="upload-icon"><i class="bi bi-pc-display"></i></div>
+                  <div class="small text-muted">Haz clic o arrastra tu archivo aquí</div>
+                  <div class="small text-muted">.xlsx, .xls o .csv</div>
+                  <div class="file-chosen d-none" id="chosen-salas"></div>
+                  <input type="file" id="file-salas" name="archivo_alas_computo" accept=".xlsx,.xls,.csv"
+                    onchange="fileChosen(this,'chosen-salas')">
+                </div>
+                <button type="submit" class="btn btn-info text-dark fw-bold w-100 mt-3" id="btn-salas" disabled>
+                  <i class="bi bi-upload me-1"></i>Importar Salas
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTADO SALAS -->
+      {% if resultado_salas_computo %}
+      {% set rs = resultado_salas_computo %}
+      <hr class="my-4">
+      <h6 class="fw-bold mb-3"><i class="bi bi-clipboard-data me-1"></i>Resultado de la importación</h6>
+
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="stat-pill stat-ok"><i class="bi bi-check-circle-fill"></i> {{ rs.insertados|length }}
+          insertados</span>
+        <span class="stat-pill stat-skip"><i class="bi bi-skip-forward-fill"></i> {{ rs.omitidos|length }} omitidos (ya
+          existían)</span>
+        <span class="stat-pill stat-err"><i class="bi bi-x-circle-fill"></i> {{ rs.errores|length }} con error</span>
+      </div>
+
+      {% if rs.insertados %}
+      <div class="result-section border border-success mb-3">
+        <div class="result-header bg-success bg-opacity-10 text-success">
+          <i class="bi bi-check2-all me-1"></i>Registros insertados ({{ rs.insertados|length }})
+        </div>
+        <div class="result-body">
+          <table class="table result-table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Fila</th>
+                <th>Salón</th>
+                <th>Materia</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in rs.insertados %}
+              <tr>
+                <td>{{ item.fila }}</td>
+                <td><code>{{ item.num_inv }}</code></td>
+                <td>{{ item.item }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if rs.omitidos %}
+      <div class="result-section border border-warning mb-3">
+        <div class="result-header bg-warning bg-opacity-10 text-warning">
+          <i class="bi bi-skip-forward-fill me-1"></i>Registros omitidos ({{ rs.omitidos|length }})
+        </div>
+        <div class="result-body">
+          <table class="table result-table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Fila</th>
+                <th>Salón</th>
+                <th>Motivo</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in rs.omitidos %}
+              <tr>
+                <td>{{ item.fila }}</td>
+                <td><code>{{ item.num_inv }}</code></td>
+                <td><span class="pill badge-skip">{{ item.razon }}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if rs.errores %}
+      <div class="result-section border border-danger mb-1">
+        <div class="result-header bg-danger bg-opacity-10 text-danger">
+          <i class="bi bi-exclamation-triangle-fill me-1"></i>Filas con errores ({{ rs.errores|length }})
+        </div>
+        <div class="result-body">
+          <table class="table result-table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Fila</th>
+                <th>Salón</th>
+                <th>Errores encontrados</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for e in rs.errores %}
+              <tr>
+                <td>{{ e.fila }}</td>
+                <td><code>{{ e.num_inv or '—' }}</code></td>
+                <td>
+                  {% for r2 in e.razones %}
+                  <span class="pill badge-err me-1">{{ r2 }}</span>
+                  {% endfor %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+      {% endif %}
+
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+  function fileChosen(input, chosenId) {
+    const chosen = document.getElementById(chosenId);
+    if (input.files && input.files[0]) {
+      chosen.textContent = '📄 ' + input.files[0].name;
+      chosen.classList.remove('d-none');
+      // Habilitar botón correspondiente
+      const btnId = chosenId === 'chosen-usuarios' ? 'btn-usuarios'
+        : chosenId === 'chosen-inventario' ? 'btn-inventario'
+          : chosenId === 'chosen-salas' ? 'btn-salas'
+            : 'btn-profesores';
+      document.getElementById(btnId).disabled = false;
+    }
+  }
+
+  // Drag & drop para todas las zonas
+  ['zone-usuarios', 'zone-inventario', 'zone-profesores', 'zone-salas'].forEach(zoneId => {
+    const zone = document.getElementById(zoneId);
+    if (!zone) return;
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+
+      const fileInputId = zoneId === 'zone-usuarios' ? 'file-usuarios'
+        : zoneId === 'zone-inventario' ? 'file-inventario'
+          : zoneId === 'zone-salas' ? 'file-salas'
+            : 'file-profesores';
+
+      const chosenId = zoneId === 'zone-usuarios' ? 'chosen-usuarios'
+        : zoneId === 'zone-inventario' ? 'chosen-inventario'
+          : zoneId === 'zone-salas' ? 'chosen-salas'
+            : 'chosen-profesores';
+
+      const fileInput = document.getElementById(fileInputId);
+      fileInput.files = e.dataTransfer.files;
+      fileChosen(fileInput, chosenId);
+    });
+  });
+
+  // Auto-scroll al resultado si existe
+  window.addEventListener('DOMContentLoaded', () => {
+    const firstResult = document.querySelector('.result-section');
+    if (firstResult) {
+      firstResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
+</script>
+
+{% include 'components/footer.html' %}

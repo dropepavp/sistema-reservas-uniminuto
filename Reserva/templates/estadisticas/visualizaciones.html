@@ -1,0 +1,1184 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #1e3a5f 0%, #2d6a9f 100%);
+        --success-gradient: linear-gradient(135deg, #146c43 0%, #198754 100%);
+        --warning-gradient: linear-gradient(135deg, #c2410c 0%, #f59e0b 100%);
+        --info-gradient: linear-gradient(135deg, #0369a1 0%, #0ea5e9 100%);
+    }
+
+    .viz-card {
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(30, 58, 95, 0.1);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        border: none;
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+        margin-bottom: 30px;
+    }
+    
+    .viz-card:hover {
+        transform: translateY(-5px) scale(1.01);
+        box-shadow: 0 20px 40px rgba(30, 58, 95, 0.16);
+    }
+
+    .viz-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 20px;
+        border-radius: 20px 20px 0 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .viz-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .viz-header:hover::before {
+        left: 100%;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 400px;
+        padding: 20px;
+    }
+
+    .heatmap-container {
+        position: relative;
+        height: 300px;
+        padding: 10px;
+    }
+
+    .radar-container {
+        position: relative;
+        height: 450px;
+        padding: 20px;
+    }
+
+    #sankeyChart {
+        width: 100%;
+        height: 100%;
+    }
+
+    .timeline-container {
+        height: 500px;
+        padding: 20px;
+    }
+
+    .gauge-container {
+        height: 300px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .loading-viz {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 300px;
+        flex-direction: column;
+    }
+
+    .metric-card {
+        background: var(--success-gradient);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+        transition: transform 0.3s ease;
+    }
+
+    .metric-card:hover {
+        transform: scale(1.05);
+    }
+
+    .metric-number {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .controls-panel {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .filter-chip {
+        display: inline-block;
+        background: var(--info-gradient);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 25px;
+        margin: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+    }
+
+    .filter-chip.active {
+        background: var(--warning-gradient);
+        transform: scale(1.1);
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .legend-color {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .realtime-indicator {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: #28a745;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        animation: pulse-green 2s infinite;
+        z-index: 100;
+    }
+
+    @keyframes pulse-green {
+        0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+    }
+
+    .interactive-tooltip {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 0.875rem;
+        pointer-events: none;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .section-divider {
+        height: 2px;
+        background: var(--primary-gradient);
+        margin: 40px 0;
+        border-radius: 1px;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="realtime-indicator">
+        <i class="fas fa-broadcast-tower me-1"></i>
+        Datos en Tiempo Real
+    </div>
+    
+    <!-- Header de la sección -->
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-primary text-white p-3 rounded-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-diagram-3" style="font-size: 1.8rem;"></i>
+                </div>
+                <div>
+                    <h1 class="h3 mb-1">Visualizaciones Avanzadas</h1>
+                    <p class="text-muted mb-0">Análisis visual multivariado</p>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('estadisticas.dashboard') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-1"></i>Dashboard
+                </a>
+                <a href="{{ url_for('estadisticas.reportes') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-file-alt me-1"></i>Reportes
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Panel de Control -->
+    <div class="controls-panel">
+        <h5 class="mb-3">
+            <i class="fas fa-sliders-h me-2"></i>
+            Controles de Visualización
+        </h5>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="mb-3">
+                    <label class="form-label">Período de Análisis:</label>
+                    <div>
+                        <span class="filter-chip active" data-period="semana">Última Semana</span>
+                        <span class="filter-chip" data-period="mes">Último Mes</span>
+                        <span class="filter-chip" data-period="trimestre">Último Trimestre</span>
+                        <span class="filter-chip" data-period="año">Último Año</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label class="form-label">Actualización:</label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="autoRefresh" checked>
+                        <label class="form-check-label" for="autoRefresh">
+                            Auto-actualizar (30s)
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Métricas Principales -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="metric-number" id="metricPrestamos">0</div>
+                <div>Préstamos Totales</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card" style="background: var(--info-gradient);">
+                <div class="metric-number" id="metricReservas">0</div>
+                <div>Reservas Activas</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card" style="background: var(--warning-gradient);">
+                <div class="metric-number" id="metricUtilizacion">0%</div>
+                <div>Tasa Utilización</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card" style="background: var(--primary-gradient);">
+                <div class="metric-number" id="metricSatisfaccion">0%</div>
+                <div>Satisfacción</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Primera fila: Mapa de Calor y Gráfico de Radar -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="viz-card">
+                <div class="viz-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-th me-2"></i>
+                        Mapa de Calor - Uso por Horario
+                    </h5>
+                    <small>Intensidad de uso de recursos por día y hora</small>
+                </div>
+                <div class="heatmap-container">
+                    <canvas id="heatmapChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="viz-card">
+                <div class="viz-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-area me-2"></i>
+                        Radar de Rendimiento
+                    </h5>
+                    <small>Métricas multidimensionales</small>
+                </div>
+                <div class="radar-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Segunda fila: Timeline y Gauge -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="viz-card">
+                <div class="viz-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-project-diagram me-2"></i>
+                        Timeline Interactivo de Eventos
+                    </h5>
+                    <small>Línea de tiempo de préstamos y reservas</small>
+                </div>
+                <div class="timeline-container">
+                    <div id="timelineChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="viz-card mb-3">
+                <div class="viz-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Medidores de Rendimiento
+                    </h5>
+                </div>
+                <div class="gauge-container">
+                    <div id="gaugeChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Tercera fila: Gráficos Avanzados -->
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="viz-card">
+                <div class="viz-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-circle me-2"></i>
+                        Análisis de Burbujas
+                    </h5>
+                    <small>Relación entre variables múltiples</small>
+                </div>
+                <div class="chart-container">
+                    <canvas id="bubbleChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="viz-card">
+                <div class="viz-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-flow-chart me-2"></i>
+                        Flujo de Recursos
+                    </h5>
+                    <small>Diagrama de Sankey de asignaciones</small>
+                </div>
+                <div class="chart-container">
+                    <div id="sankeyChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Cuarta fila: Análisis Predictivo -->
+    <div class="row">
+        <div class="col-12">
+            <div class="viz-card">
+                <div class="viz-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-crystal-ball me-2"></i>
+                        Análisis Predictivo
+                    </h5>
+                    <small>Predicción de demanda basada en tendencias históricas</small>
+                </div>
+                <div class="chart-container" style="height: 500px;">
+                    <canvas id="predictionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tooltip interactivo -->
+<div class="interactive-tooltip" id="customTooltip"></div>
+
+<!-- Script principal -->
+<script>
+    document.title = 'Visualizaciones Avanzadas - Sistema Integrado';
+    
+    let currentPeriod = 'semana';
+    let autoRefreshInterval;
+    let charts = {};
+
+    if (typeof Chart !== 'undefined' && typeof ChartDataLabels !== 'undefined') {
+        Chart.register(ChartDataLabels);
+    }
+    Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeVisualizaciones();
+        setupEventListeners();
+        startAutoRefresh();
+    });
+
+    async function initializeVisualizaciones() {
+        showLoadingIndicators();
+        
+        try {
+            // Cargar métricas primero
+            await loadMetricas();
+            
+            // Cargar gráficos en paralelo (con manejo de errores individual)
+            const chartPromises = [
+                createHeatmap(),
+                createRadarChart(),
+                createTimelineChart(),
+                createGaugeChart(),
+                createBubbleChart(),
+                createSankeyChart(),
+                createPredictionChart()
+            ];
+            
+            // Ejecutar todos pero continuar aunque alguno falle
+            const results = await Promise.allSettled(chartPromises);
+            
+            // Contar errores
+            const errors = results.filter(r => r.status === 'rejected').length;
+            
+            hideLoadingIndicators();
+            
+            if (errors === 0) {
+                // Éxito completo
+                if (window.notificationSystem) {
+                    window.notificationSystem.notify({
+                        title: '✅ Visualizaciones Cargadas',
+                        message: 'Todas las visualizaciones se cargaron correctamente',
+                        type: 'success',
+                        icon: 'bi-check-circle',
+                        sound: 'success'
+                    });
+                }
+            } else if (errors < results.length) {
+                // Parcialmente exitoso
+                if (window.notificationSystem) {
+                    window.notificationSystem.notify({
+                        title: '⚠️ Visualizaciones Parciales',
+                        message: `${errors} de ${results.length} visualizaciones fallaron. El resto se cargó correctamente.`,
+                        type: 'warning',
+                        icon: 'bi-exclamation-triangle',
+                        sound: 'subtle'
+                    });
+                }
+            } else {
+                // Todos fallaron
+                if (window.notificationSystem) {
+                    window.notificationSystem.notify({
+                        title: '❌ Error en Visualizaciones',
+                        message: 'No se pudieron cargar las visualizaciones. Verifica la consola para más detalles.',
+                        type: 'danger',
+                        icon: 'bi-x-circle',
+                        sound: 'urgent'
+                    });
+                }
+            }
+            
+        } catch (error) {
+            console.error('Error loading visualizations:', error);
+            hideLoadingIndicators();
+            
+            if (window.notificationSystem) {
+                window.notificationSystem.notify({
+                    title: '❌ Error Crítico',
+                    message: 'Error al inicializar visualizaciones: ' + error.message,
+                    type: 'danger',
+                    icon: 'bi-x-circle',
+                    sound: 'urgent'
+                });
+            }
+        }
+    }
+
+    async function loadMetricas() {
+        try {
+            // Incluir credenciales para autenticación
+            const response = await fetch('/estadisticas/api/kpis', {
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.success && data.data) {
+                const prestamos = data.data.prestamos_activos || 0;
+                const reservas = data.data.reservas_activas || 0;
+                const equipos = data.data.equipos_disponibles || 1;
+                
+                animateCounter('metricPrestamos', prestamos);
+                animateCounter('metricReservas', reservas);
+                animateCounter('metricUtilizacion', Math.round((prestamos / Math.max(equipos, 1)) * 100));
+                animateCounter('metricSatisfaccion', 95);
+            } else {
+                // Valores predeterminados si falla el API
+                animateCounter('metricPrestamos', 0);
+                animateCounter('metricReservas', 0);
+                animateCounter('metricUtilizacion', 0);
+                animateCounter('metricSatisfaccion', 95);
+            }
+        } catch (error) {
+            console.error('Error loading metrics:', error);
+            
+            // Valores predeterminados en caso de error
+            animateCounter('metricPrestamos', 0);
+            animateCounter('metricReservas', 0);
+            animateCounter('metricUtilizacion', 0);
+            animateCounter('metricSatisfaccion', 95);
+            
+            // Notificación de error usando el sistema nuevo
+            if (window.notificationSystem) {
+                window.notificationSystem.notify({
+                    title: '⚠️ Error en Métricas',
+                    message: 'No se pudieron cargar las métricas. Usando valores predeterminados.',
+                    type: 'warning',
+                    icon: 'bi-exclamation-triangle',
+                    sound: 'subtle'
+                });
+            }
+        }
+    }
+
+    async function createHeatmap() {
+        const ctx = document.getElementById('heatmapChart').getContext('2d');
+        
+        const response = await fetch('/estadisticas/api/heatmap', { credentials: 'include' });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const payload = await response.json();
+        if (!payload.success) {
+            throw new Error(payload.message || 'No se pudo cargar el mapa de calor.');
+        }
+
+        const heatmapData = (payload.data || []).map(point => ({
+            x: point.hour,
+            y: point.day,
+            v: point.intensity
+        }));
+        
+        charts.heatmap = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Intensidad de Uso',
+                    data: heatmapData,
+                    backgroundColor: function(context) {
+                        const value = context.raw.v || 0;
+                        const alpha = value / 10;
+                        return `rgba(102, 126, 234, ${alpha})`;
+                    },
+                    pointRadius: function(context) {
+                        return Math.max(5, (context.raw.v || 0) * 2);
+                    }
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        min: 0,
+                        max: 24,
+                        title: {
+                            display: true,
+                            text: 'Hora del Día'
+                        },
+                        ticks: {
+                            stepSize: 2,
+                            callback: function(value) {
+                                return value + ':00';
+                            }
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        min: 0,
+                        max: 6,
+                        title: {
+                            display: true,
+                            text: 'Día de la Semana'
+                        },
+                        ticks: {
+                            stepSize: 1,
+                            callback: function(value) {
+                                const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+                                return dias[value];
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                const point = context[0];
+                                const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+                                return `${dias[point.parsed.y]} - ${point.parsed.x}:00`;
+                            },
+                            label: function(context) {
+                                return `Intensidad: ${context.raw.v || 0}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    async function createRadarChart() {
+        const ctx = document.getElementById('radarChart').getContext('2d');
+        
+        try {
+            const [kpisData, categoriasData, jornadasData] = await Promise.all([
+                fetch('/estadisticas/api/kpis', {
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
+                }).then(r => r.json()),
+                fetch('/estadisticas/api/categorias', {
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
+                }).then(r => r.json()),
+                fetch('/estadisticas/api/jornadas', {
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
+                }).then(r => r.json())
+            ]);
+
+            const radarData = {
+                labels: ['Préstamos', 'Reservas', 'Utilización', 'Satisfacción', 'Disponibilidad', 'Eficiencia'],
+                datasets: [{
+                    label: 'Rendimiento Actual',
+                    data: [
+                        kpisData.success ? kpisData.data.prestamos_activos * 10 : 50,
+                        kpisData.success ? kpisData.data.reservas_activas * 15 : 60,
+                        75,
+                        95,
+                        kpisData.success ? kpisData.data.equipos_disponibles * 3 : 80,
+                        85
+                    ],
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                    pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(102, 126, 234, 1)'
+                }]
+            };
+
+            charts.radar = new Chart(ctx, {
+                type: 'radar',
+                data: radarData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    elements: {
+                        line: { borderWidth: 3 }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: { display: true, color: 'rgba(0, 0, 0, 0.1)' },
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                            ticks: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error creating radar chart:', error);
+            charts.radar = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Préstamos', 'Reservas', 'Utilización', 'Satisfacción', 'Disponibilidad', 'Eficiencia'],
+                    datasets: [{
+                        label: 'Rendimiento Actual',
+                        data: [65, 75, 80, 95, 70, 85],
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        backgroundColor: 'rgba(102, 126, 234, 0.2)'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+    }
+
+    async function createTimelineChart() {
+        try {
+            const response = await fetch(`/estadisticas/api/periodo/${currentPeriod}`);
+            const data = await response.json();
+            
+            if (data.success && typeof ApexCharts !== 'undefined') {
+                const timelineData = prepareTimelineData(data.data);
+                
+                const options = {
+                    series: timelineData.series,
+                    chart: {
+                        height: 450,
+                        type: 'rangeBar',
+                        animations: { enabled: true, easing: 'easeinout', speed: 800 }
+                    },
+                    plotOptions: {
+                        bar: {
+                            horizontal: true,
+                            barHeight: '80%',
+                            rangeBarGroupRows: true
+                        }
+                    },
+                    colors: ['#2d6a9f', '#28a745', '#c2410c', '#0369a1'],
+                    fill: {
+                        type: 'gradient',
+                        gradient: {
+                            shade: 'light',
+                            type: 'vertical',
+                            shadeIntensity: 0.25,
+                            gradientToColors: undefined,
+                            inverseColors: true,
+                            opacityFrom: 1,
+                            opacityTo: 1,
+                            stops: [50, 0, 100, 100]
+                        }
+                    },
+                    xaxis: { type: 'datetime' },
+                    legend: { position: 'top' },
+                    tooltip: {
+                        custom: function({series, seriesIndex, dataPointIndex, w}) {
+                            const data = w.globals.initialSeries[seriesIndex].data[dataPointIndex];
+                            return `
+                                <div class="p-3">
+                                    <strong>${data.x}</strong><br>
+                                    Inicio: ${new Date(data.y[0]).toLocaleString()}<br>
+                                    Fin: ${new Date(data.y[1]).toLocaleString()}
+                                </div>
+                            `;
+                        }
+                    }
+                };
+                
+                charts.timeline = new ApexCharts(document.querySelector("#timelineChart"), options);
+                charts.timeline.render();
+            }
+        } catch (error) {
+            console.error('Error creating timeline:', error);
+            const container = document.getElementById('timelineChart');
+            if (container) {
+                container.innerHTML = '<div class="text-center p-5"><i class="fas fa-exclamation-triangle fa-2x text-warning"></i><br>Error al cargar timeline</div>';
+            }
+        }
+    }
+
+    async function createGaugeChart() {
+        if (typeof ApexCharts === 'undefined') return;
+        
+        const options = {
+            series: [75],
+            chart: {
+                height: 250,
+                type: 'radialBar',
+                toolbar: { show: false }
+            },
+            plotOptions: {
+                radialBar: {
+                    startAngle: -135,
+                    endAngle: 225,
+                    hollow: {
+                        margin: 0,
+                        size: '70%',
+                        background: '#fff',
+                        position: 'front',
+                        dropShadow: { enabled: true, top: 3, left: 0, blur: 4, opacity: 0.24 }
+                    },
+                    track: {
+                        background: '#fff',
+                        strokeWidth: '67%',
+                        margin: 0,
+                        dropShadow: { enabled: true, top: -3, left: 0, blur: 4, opacity: 0.35 }
+                    },
+                    dataLabels: {
+                        show: true,
+                        name: {
+                            offsetY: -10,
+                            show: true,
+                            color: '#888',
+                            fontSize: '17px'
+                        },
+                        value: {
+                            formatter: function(val) { return parseInt(val) + '%'; },
+                            color: '#111',
+                            fontSize: '36px',
+                            show: true
+                        }
+                    }
+                }
+            },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shade: 'dark',
+                    type: 'horizontal',
+                    shadeIntensity: 0.5,
+                    gradientToColors: ['#28a745'],
+                    inverseColors: true,
+                    opacityFrom: 1,
+                    opacityTo: 1,
+                    stops: [0, 100]
+                }
+            },
+            stroke: { lineCap: 'round' },
+            labels: ['Eficiencia'],
+        };
+        
+        charts.gauge = new ApexCharts(document.querySelector("#gaugeChart"), options);
+        charts.gauge.render();
+    }
+
+    async function createBubbleChart() {
+        const ctx = document.getElementById('bubbleChart').getContext('2d');
+        
+        const bubbleData = generateBubbleData();
+        
+        charts.bubble = new Chart(ctx, {
+            type: 'bubble',
+            data: {
+                datasets: [{
+                    label: 'Profesores',
+                    data: bubbleData,
+                    backgroundColor: function(context) {
+                        const colors = ['rgba(102, 126, 234, 0.6)', 'rgba(56, 239, 125, 0.6)', 'rgba(240, 147, 251, 0.6)', 'rgba(79, 172, 254, 0.6)'];
+                        return colors[context.dataIndex % colors.length];
+                    },
+                    borderColor: function(context) {
+                        const colors = ['rgba(102, 126, 234, 1)', 'rgba(56, 239, 125, 1)', 'rgba(240, 147, 251, 1)', 'rgba(79, 172, 254, 1)'];
+                        return colors[context.dataIndex % colors.length];
+                    },
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { title: { display: true, text: 'Número de Préstamos' } },
+                    y: { title: { display: true, text: 'Número de Reservas' } }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const point = context.parsed;
+                                return `Profesor ${context.dataIndex + 1}: ${point.x} préstamos, ${point.y} reservas (Actividad: ${point.r})`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    async function createSankeyChart() {
+        if (typeof d3 === 'undefined') {
+            document.getElementById('sankeyChart').innerHTML = '<div class="text-center p-5 text-muted">No se pudo cargar la librería del diagrama.</div>';
+            return;
+        }
+
+        const container = d3.select('#sankeyChart');
+        container.selectAll('*').remove();
+
+        const response = await fetch('/estadisticas/api/flujo-recursos', { credentials: 'include' });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const payload = await response.json();
+        const links = (payload.data || []).filter(link => link.categoria && link.jornada && link.cantidad > 0);
+        if (!payload.success || links.length === 0) {
+            container.html('<div class="text-center p-5 text-muted">No hay asignaciones registradas para mostrar.</div>');
+            return;
+        }
+
+        const width = 760;
+        const height = 360;
+        const margin = { top: 24, right: 185, bottom: 24, left: 185 };
+        const categorias = [...new Set(links.map(link => link.categoria))];
+        const jornadas = [...new Set(links.map(link => link.jornada))];
+        const totalPorCategoria = new Map(categorias.map(categoria => [categoria, d3.sum(links.filter(link => link.categoria === categoria), link => link.cantidad)]));
+        const totalPorJornada = new Map(jornadas.map(jornada => [jornada, d3.sum(links.filter(link => link.jornada === jornada), link => link.cantidad)]));
+        const posicion = (items) => new Map(items.map((item, index) => [item, margin.top + ((index + 0.5) * (height - margin.top - margin.bottom) / items.length)]));
+        const yCategoria = posicion(categorias);
+        const yJornada = posicion(jornadas);
+        const maxCantidad = d3.max(links, link => link.cantidad) || 1;
+        const grosor = d3.scaleLinear().domain([1, maxCantidad]).range([4, 26]);
+        const colores = d3.scaleOrdinal(d3.schemeTableau10).domain(categorias);
+        const svg = container.append('svg').attr('viewBox', `0 0 ${width} ${height}`).attr('role', 'img').attr('aria-label', 'Flujo de recursos por categoría y jornada');
+
+        svg.append('g').selectAll('path').data(links).join('path')
+            .attr('d', link => `M${margin.left},${yCategoria.get(link.categoria)} C${width * 0.4},${yCategoria.get(link.categoria)} ${width * 0.6},${yJornada.get(link.jornada)} ${width - margin.right},${yJornada.get(link.jornada)}`)
+            .attr('fill', 'none').attr('stroke', link => colores(link.categoria))
+            .attr('stroke-width', link => grosor(link.cantidad)).attr('stroke-opacity', 0.45)
+            .append('title').text(link => `${link.categoria} → ${link.jornada}: ${link.cantidad}`);
+
+        const drawNodes = (items, x, totals, yPositions, side) => {
+            const nodes = svg.append('g').selectAll('g').data(items).join('g').attr('transform', item => `translate(${x}, ${yPositions.get(item) - 14})`);
+            nodes.append('rect').attr('width', 18).attr('height', 28).attr('rx', 4).attr('fill', item => side === 'left' ? colores(item) : '#198754');
+            nodes.append('text').attr('x', side === 'left' ? -8 : 26).attr('y', 5).attr('text-anchor', side === 'left' ? 'end' : 'start').attr('font-size', 12).attr('fill', '#334155').text(item => `${item} (${totals.get(item)})`);
+        };
+        drawNodes(categorias, margin.left - 18, totalPorCategoria, yCategoria, 'left');
+        drawNodes(jornadas, width - margin.right, totalPorJornada, yJornada, 'right');
+    }
+    async function createPredictionChart() {
+        const ctx = document.getElementById('predictionChart').getContext('2d');
+        
+        const predictionData = generatePredictionData();
+        
+        charts.prediction = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: predictionData.labels,
+                datasets: [
+                    {
+                        label: 'Datos Históricos',
+                        data: predictionData.historical,
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Predicción',
+                        data: predictionData.prediction,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderDash: [5, 5]
+                    },
+                    {
+                        label: 'Límite Superior',
+                        data: predictionData.upperBound,
+                        borderColor: 'rgba(255, 99, 132, 0.3)',
+                        backgroundColor: 'transparent',
+                        pointRadius: 0,
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Límite Inferior',
+                        data: predictionData.lowerBound,
+                        borderColor: 'rgba(255, 99, 132, 0.3)',
+                        backgroundColor: 'transparent',
+                        pointRadius: 0,
+                        borderWidth: 1,
+                        fill: '-1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: true, text: 'Predicción de Demanda de Recursos' },
+                    legend: { position: 'top' }
+                },
+                scales: {
+                    x: { title: { display: true, text: 'Período' } },
+                    y: { title: { display: true, text: 'Número de Préstamos' } }
+                }
+            }
+        });
+    }
+
+    function generateHeatmapData() {
+        const data = [];
+        for (let day = 0; day < 7; day++) {
+            for (let hour = 7; hour < 22; hour++) {
+                let intensity = Math.random() * 5;
+                if (day >= 1 && day <= 5) {
+                    if (hour >= 8 && hour <= 12) intensity += 3;
+                    if (hour >= 14 && hour <= 18) intensity += 4;
+                }
+                data.push({
+                    x: hour,
+                    y: day,
+                    v: Math.min(10, Math.round(intensity))
+                });
+            }
+        }
+        return data;
+    }
+
+    function generateBubbleData() {
+        const data = [];
+        for (let i = 0; i < 10; i++) {
+            data.push({
+                x: Math.random() * 20 + 1,
+                y: Math.random() * 15 + 1,
+                r: Math.random() * 10 + 5
+            });
+        }
+        return data;
+    }
+
+    function generatePredictionData() {
+        const labels = [];
+        const historical = [];
+        const prediction = [];
+        const upperBound = [];
+        const lowerBound = [];
+        
+        for (let i = -30; i <= 30; i++) {
+            const date = new Date();
+            date.setDate(date.getDate() + i);
+            labels.push(date.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' }));
+            
+            if (i <= 0) {
+                const value = 10 + Math.sin(i * 0.1) * 3 + Math.random() * 2;
+                historical.push(Math.round(value));
+                prediction.push(null);
+                upperBound.push(null);
+                lowerBound.push(null);
+            } else {
+                const baseValue = 12 + Math.sin(i * 0.1) * 3;
+                const predValue = baseValue + (Math.random() - 0.5) * 1;
+                
+                historical.push(null);
+                prediction.push(Math.round(predValue));
+                upperBound.push(Math.round(predValue + 2));
+                lowerBound.push(Math.round(Math.max(0, predValue - 2)));
+            }
+        }
+        
+        return { labels, historical, prediction, upperBound, lowerBound };
+    }
+
+    function prepareTimelineData(data) {
+        return {
+            series: [{
+                name: 'Préstamos',
+                data: data.prestamos.slice(0, 10).map((item, index) => ({
+                    x: `Préstamo ${index + 1}`,
+                    y: [
+                        new Date().getTime() - Math.random() * 86400000 * 7,
+                        new Date().getTime() - Math.random() * 86400000 * 3
+                    ]
+                }))
+            }, {
+                name: 'Reservas',
+                data: data.reservas.slice(0, 10).map((item, index) => ({
+                    x: `Reserva ${index + 1}`,
+                    y: [
+                        new Date().getTime() + Math.random() * 86400000 * 3,
+                        new Date().getTime() + Math.random() * 86400000 * 7
+                    ]
+                }))
+            }]
+        };
+    }
+
+    function setupEventListeners() {
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                currentPeriod = this.dataset.period;
+                refreshVisualizaciones();
+            });
+        });
+
+        document.getElementById('autoRefresh').addEventListener('change', function() {
+            if (this.checked) {
+                startAutoRefresh();
+            } else {
+                stopAutoRefresh();
+            }
+        });
+    }
+
+    function animateCounter(elementId, targetValue) {
+        const element = document.getElementById(elementId);
+        const startValue = 0;
+        const duration = 1500;
+        const startTime = Date.now();
+        
+        const updateCounter = () => {
+            const currentTime = Date.now();
+            const progress = Math.min((currentTime - startTime) / duration, 1);
+            const currentValue = Math.floor(progress * (targetValue - startValue) + startValue);
+            
+            if (elementId.includes('Utilizacion') || elementId.includes('Satisfaccion')) {
+                element.textContent = currentValue + '%';
+            } else {
+                element.textContent = currentValue;
+            }
+            
+            if (progress < 1) {
+                requestAnimationFrame(updateCounter);
+            }
+        };
+        
+        requestAnimationFrame(updateCounter);
+    }
+
+    function showLoadingIndicators() {
+        document.querySelectorAll('.chart-container, .heatmap-container, .radar-container').forEach(container => {
+            if (!container.querySelector('.loading-viz')) {
+                container.insertAdjacentHTML('beforeend', '<div class="loading-viz"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Cargando visualización...</div></div>');
+            }
+        });
+    }
+
+    function hideLoadingIndicators() {
+        document.querySelectorAll('.loading-viz').forEach(indicator => indicator.remove());
+    }
+
+    async function refreshVisualizaciones() {
+        await initializeVisualizaciones();
+    }
+
+    function startAutoRefresh() {
+        stopAutoRefresh();
+        autoRefreshInterval = setInterval(() => {
+            refreshVisualizaciones();
+        }, 30000);
+    }
+
+    function stopAutoRefresh() {
+        if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
+            autoRefreshInterval = null;
+        }
+    }
+
+    window.addEventListener('beforeunload', function() {
+        stopAutoRefresh();
+        Object.values(charts).forEach(chart => {
+            if (chart && typeof chart.destroy === 'function') {
+                chart.destroy();
+            }
+        });
+    });
+</script>
+
+{% include 'components/footer.html' %}

@@ -1,0 +1,619 @@
+<style>
+    /* CSS Variables */
+    :root {
+        --sidebar-width-expanded: 250px;
+        --sidebar-width-collapsed: 70px;
+        --topbar-height: 60px;
+        --sidebar-bg: #1e3a5f; /* UNIMINUTO 800 - azul institucional oscuro */
+        --sidebar-hover: rgba(255, 255, 255, 0.12);
+        --sidebar-active: #2d6a9f; /* UNIMINUTO 600 - azul institucional claro */
+        --sidebar-active-bg: rgba(45, 106, 159, 0.18);
+    }
+
+    body {
+        padding-top: var(--topbar-height) !important;
+        background-color: #f5f7fa; /* Default app background */
+    }
+    
+    /* Layout global */
+    #app-layout {
+        display: flex;
+        min-height: calc(100vh - var(--topbar-height));
+    }
+    
+    #app-content {
+        flex: 1;
+        width: 100%;
+        margin-left: var(--sidebar-width-expanded);
+        transition: margin-left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        padding: 20px;
+    }
+
+    body.sidebar-collapsed #app-content {
+        margin-left: var(--sidebar-width-collapsed);
+    }
+
+    /* Topbar Fija */
+    .app-topbar {
+        position: fixed;
+        top: 0;
+        left: var(--sidebar-width-expanded);
+        right: 0;
+        height: var(--topbar-height);
+        background-color: #1e3a5f;
+        z-index: 1030;
+        transition: left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        padding: 0 1.5rem;
+        color: white;
+    }
+
+    body.sidebar-collapsed .app-topbar {
+        left: var(--sidebar-width-collapsed);
+    }
+    
+    /* Simulacion Banner Overlay - Adjust top if present */
+    .simulacion-banner {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1060;
+    }
+
+    body.has-simulacion {
+        padding-top: calc(var(--topbar-height) + 30px) !important;
+    }
+    body.has-simulacion .app-topbar,
+    body.has-simulacion .app-sidebar {
+        top: 30px;
+        height: calc(100vh - 30px);
+    }
+    body.has-simulacion .app-topbar {
+        height: var(--topbar-height);
+    }
+
+    /* Sidebar Fijo */
+    .app-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: var(--sidebar-width-expanded);
+        background-color: var(--sidebar-bg);
+        z-index: 1040;
+        transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        color: white;
+    }
+
+    body.sidebar-collapsed .app-sidebar {
+        width: var(--sidebar-width-collapsed);
+    }
+
+    /* Sidebar Header */
+    .sidebar-header {
+        height: var(--topbar-height);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 1.25rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        min-width: 250px;
+    }
+
+    .sidebar-brand-text {
+        font-weight: 600;
+        color: rgba(255,255,255,0.7);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.85rem;
+        transition: opacity 0.2s;
+    }
+
+    body.sidebar-collapsed .sidebar-brand-text {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .sidebar-toggle {
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        margin-left: auto;
+    }
+    
+    .sidebar-toggle:hover {
+        background-color: rgba(255,255,255,0.1);
+    }
+
+    body.sidebar-collapsed .sidebar-header {
+        justify-content: center;
+        padding: 0;
+    }
+    body.sidebar-collapsed .sidebar-toggle {
+        margin: 0 auto;
+    }
+
+    /* Sidebar Menu */
+    .sidebar-menu {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 1rem 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+    
+    .sidebar-menu::-webkit-scrollbar {
+        width: 6px;
+    }
+    .sidebar-menu::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 3px;
+    }
+
+    .sidebar-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1.25rem;
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        white-space: nowrap;
+        transition: all 0.2s;
+        border-left: 4px solid transparent;
+        position: relative;
+    }
+
+    .sidebar-item:hover {
+        background-color: var(--sidebar-hover);
+        color: white;
+    }
+
+    .sidebar-item.active {
+        background-color: var(--sidebar-active-bg);
+        color: white;
+        border-left-color: var(--sidebar-active);
+    }
+
+    .sidebar-item i {
+        font-size: 1.25rem;
+        min-width: 30px;
+        text-align: center;
+    }
+
+    .sidebar-item-text {
+        margin-left: 10px;
+        opacity: 1;
+        transition: opacity 0.2s;
+        font-weight: 500;
+    }
+
+    body.sidebar-collapsed .sidebar-item-text {
+        opacity: 0;
+        display: none;
+    }
+    
+    body.sidebar-collapsed .sidebar-item {
+        justify-content: center;
+        padding: 0.75rem 0;
+    }
+    body.sidebar-collapsed .sidebar-item i {
+        margin: 0;
+    }
+
+    /* Tooltips */
+    .sidebar-tooltip {
+        position: absolute;
+        left: calc(var(--sidebar-width-collapsed) + 10px);
+        background: #343a40;
+        color: #fff;
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s;
+        z-index: 1050;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
+    body.sidebar-collapsed .sidebar-item:hover .sidebar-tooltip {
+        opacity: 1;
+    }
+
+    /* Topbar elements */
+    .topbar-brand {
+        color: white;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1.25rem;
+        display: flex;
+        align-items: center;
+    }
+    .topbar-brand:hover {
+        color: rgba(255,255,255,0.9);
+    }
+
+    /* Responsive Drawer */
+    .mobile-toggle {
+        display: none;
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        margin-right: 1rem;
+        padding: 0;
+    }
+    
+    .drawer-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1035;
+    }
+
+    @media (max-width: 768px) {
+        body {
+            padding-left: 0 !important;
+        }
+        
+        #app-content {
+            margin-left: 0 !important;
+            padding: 15px;
+        }
+
+        .app-topbar {
+            left: 0 !important;
+        }
+
+        .app-sidebar {
+            transform: translateX(-100%);
+        }
+
+        .app-sidebar.drawer-open {
+            transform: translateX(0);
+            width: var(--sidebar-width-expanded);
+        }
+        
+        body.sidebar-collapsed .app-sidebar.drawer-open {
+            width: var(--sidebar-width-expanded); /* Force expand on mobile */
+        }
+        body.sidebar-collapsed .app-sidebar.drawer-open .sidebar-item-text {
+            display: inline-block;
+            opacity: 1;
+        }
+        body.sidebar-collapsed .app-sidebar.drawer-open .sidebar-item {
+            justify-content: flex-start;
+            padding: 0.75rem 1.25rem;
+        }
+        body.sidebar-collapsed .app-sidebar.drawer-open .sidebar-item i {
+            margin-right: 0;
+        }
+        
+        .drawer-overlay.show {
+            display: block;
+        }
+        
+        .mobile-toggle {
+            display: block;
+        }
+        
+        /* Hide regular toggle on mobile */
+        .sidebar-toggle {
+            display: none;
+        }
+    }
+</style>
+
+<!-- Modo Simulación Banner -->
+{% if session.admin_original_doc %}
+<div class="simulacion-banner w-100 bg-warning text-dark text-center py-1 fw-bold small">
+    <i class="bi bi-exclamation-triangle-fill me-1"></i> MODO SIMULACIÓN: Viendo como {{ session.nombre_completo }}
+    <a href="{{ url_for('admin.revert_impersonation') }}" class="btn btn-dark btn-sm py-0 ms-2" style="font-size: 0.7rem;">
+        Volver a mi sesión de Admin
+    </a>
+</div>
+<script>
+    document.body.classList.add('has-simulacion');
+</script>
+{% endif %}
+
+<!-- Topbar -->
+<div class="app-topbar">
+    <button class="mobile-toggle" id="mobileToggle" aria-label="Abrir menú">
+        <i class="bi bi-list"></i>
+    </button>
+    
+    <a class="topbar-brand me-auto" href="{{ url_for('index') }}">
+        <i class="bi bi-box-seam me-2"></i> Sistema Integrado
+    </a>
+    
+    <div class="d-flex align-items-center">
+        <!-- Admin Menu (moved to Topbar) -->
+        {% if session.rol in ('admin', 'superadmin') %}
+        <div class="dropdown me-3 d-none d-md-block">
+            <a class="nav-link dropdown-toggle text-white d-flex align-items-center {% if 'admin' in request.path %}fw-bold{% endif %}" href="#" id="navbarDropdownAdmin" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none;">
+                <i class="bi bi-shield-lock me-1"></i> Admin
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="navbarDropdownAdmin">
+                <li><a class="dropdown-item" href="{{ url_for('admin.usuarios_main') }}"><i class="bi bi-people"></i> Usuarios</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('admin.sedes_bodegas_main') }}"><i class="bi bi-gear"></i> Configuración Global</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ url_for('admin.backup_sistema') }}"><i class="bi bi-download"></i> Backup Sistema</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('admin.importar_datos') }}"><i class="bi bi-cloud-arrow-up-fill"></i> Importar Datos</a></li>
+            </ul>
+        </div>
+        {% endif %}
+        
+        <!-- Indicador de sede activa -->
+        {% if session.get('sede_id') or session.get('sede_nombre') %}
+        <div class="d-flex align-items-center me-3 d-none d-sm-flex">
+            <span class="badge bg-secondary d-flex align-items-center gap-1">
+                <i class="bi bi-geo-alt-fill"></i>
+                {{ session.get('sede_nombre') or 'Sede' }}
+            </span>
+            {% if session.get('puede_cambiar_sede') %}
+            <a href="{{ url_for('sedes.seleccionar_sede_get') }}" class="btn btn-outline-light btn-sm ms-1 py-0 px-2" title="Cambiar sede" style="font-size: 0.75rem;">
+                <i class="bi bi-arrow-left-right"></i> Cambiar
+            </a>
+            {% endif %}
+        </div>
+        {% elif session.get('puede_cambiar_sede') %}
+        <div class="d-flex align-items-center me-3 d-none d-sm-flex">
+            <a href="{{ url_for('sedes.seleccionar_sede_get') }}" class="btn btn-outline-warning btn-sm py-0 px-2" title="Seleccionar sede" style="font-size: 0.75rem;">
+                <i class="bi bi-geo-alt"></i> Seleccionar sede
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- Dark Mode Toggle -->
+        <button id="themeToggle" title="Cambiar tema" aria-label="Cambiar modo oscuro/claro"
+            style="background:transparent; border:1px solid rgba(255,255,255,0.25); color:white;
+                   border-radius:50%; width:36px; height:36px; display:flex; align-items:center;
+                   justify-content:center; margin-right:0.75rem; cursor:pointer; transition:all 0.2s;
+                   flex-shrink:0;">
+            <i class="bi bi-moon-stars-fill" id="themeIcon" style="font-size:1rem;"></i>
+        </button>
+
+        <!-- Menú de usuario -->
+        <div class="dropdown">
+            <a href="#" class="nav-link text-white dropdown-toggle d-flex align-items-center gap-1" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none;">
+                <i class="bi bi-person-circle fs-5"></i>
+                <span class="d-none d-md-inline ms-1">¡Hola, {{ (session.nombre_completo or '').split(' ')[0] }}!</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="userMenu">
+                <li><a class="dropdown-item" href="{{ url_for('auth.perfil') }}"><i class="bi bi-person-fill me-1"></i> Mi Perfil</a></li>
+                <!-- Sede options for mobile -->
+                <li class="d-block d-sm-none"><hr class="dropdown-divider"></li>
+                {% if session.get('sede_id') or session.get('sede_nombre') %}
+                <li class="d-block d-sm-none px-3 py-1 text-muted small"><i class="bi bi-geo-alt-fill"></i> {{ session.get('sede_nombre') or 'Sede' }}</li>
+                {% if session.get('puede_cambiar_sede') %}
+                <li class="d-block d-sm-none"><a class="dropdown-item" href="{{ url_for('sedes.seleccionar_sede_get') }}"><i class="bi bi-arrow-left-right me-1"></i> Cambiar sede</a></li>
+                {% endif %}
+                {% elif session.get('puede_cambiar_sede') %}
+                <li class="d-block d-sm-none"><a class="dropdown-item text-warning" href="{{ url_for('sedes.seleccionar_sede_get') }}"><i class="bi bi-geo-alt me-1"></i> Seleccionar sede</a></li>
+                {% endif %}
+                
+                <!-- Admin menu for mobile -->
+                {% if session.rol in ('admin', 'superadmin') %}
+                <li class="d-block d-md-none"><hr class="dropdown-divider"></li>
+                <li class="d-block d-md-none px-3 py-1 text-muted small">Admin</li>
+                <li class="d-block d-md-none"><a class="dropdown-item" href="{{ url_for('admin.usuarios_main') }}"><i class="bi bi-people me-1"></i> Usuarios</a></li>
+                <li class="d-block d-md-none"><a class="dropdown-item" href="{{ url_for('admin.sedes_bodegas_main') }}"><i class="bi bi-gear me-1"></i> Configuración</a></li>
+                {% endif %}
+
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right me-1"></i> Cerrar sesión</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Sidebar Overlay para Móviles -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+
+<!-- Sidebar -->
+<div class="app-sidebar" id="appSidebar">
+    <div class="sidebar-header">
+        <span class="sidebar-brand-text">Navegación</span>
+        <button class="sidebar-toggle" id="sidebarToggle" title="Colapsar/Expandir menú">
+            <i class="bi bi-list"></i>
+        </button>
+    </div>
+    
+    <div class="sidebar-menu">
+        <a class="sidebar-item {% if request.path == url_for('index') %}active{% endif %}" href="{{ url_for('index') }}">
+            <i class="bi bi-house-door"></i>
+            <span class="sidebar-item-text">Inicio</span>
+            <span class="sidebar-tooltip">Inicio</span>
+        </a>
+
+        {% if session.rol in ('admin', 'superadmin') or mod_access.prestamos.ver %}
+        <a class="sidebar-item {% if 'prestamos' in request.path %}active{% endif %}" href="{{ url_for('prestamos.prestamos_equipos') }}">
+            <i class="bi bi-laptop"></i>
+            <span class="sidebar-item-text">Préstamos</span>
+            <span class="sidebar-tooltip">Préstamos</span>
+        </a>
+        {% endif %}
+
+        {% if session.rol in ('admin', 'superadmin') or mod_access.reservas.ver %}
+        <a class="sidebar-item {% if 'reservas' in request.path %}active{% endif %}" href="{{ url_for('reservas.reservas_main') }}">
+            <i class="bi bi-calendar-check"></i>
+            <span class="sidebar-item-text">Reservas</span>
+            <span class="sidebar-tooltip">Reservas</span>
+        </a>
+        {% endif %}
+
+        {% if session.rol in ('admin', 'superadmin') or mod_access.salas_computo.ver %}
+        <a class="sidebar-item {% if 'salas-computo' in request.path %}active{% endif %}" href="{{ url_for('salas_computo.dashboard_salas') }}">
+            <i class="bi bi-pc-display"></i>
+            <span class="sidebar-item-text">Salas Cómputo</span>
+            <span class="sidebar-tooltip">Salas Cómputo</span>
+        </a>
+        {% endif %}
+
+        {% if session.rol in ('admin', 'superadmin') or mod_access.inventario.ver %}
+        <a class="sidebar-item {% if 'inventario' in request.path %}active{% endif %}" href="{{ url_for('inventario.inventario_main') }}">
+            <i class="bi bi-archive"></i>
+            <span class="sidebar-item-text">Inventario</span>
+            <span class="sidebar-tooltip">Inventario</span>
+        </a>
+        {% endif %}
+
+        {% if session.rol in ('admin', 'superadmin') or mod_access.profesores.ver %}
+        <a class="sidebar-item {% if 'profesores' in request.path %}active{% endif %}" href="{{ url_for('profesores.profesores_main') }}">
+            <i class="bi bi-people"></i>
+            <span class="sidebar-item-text">Profesores</span>
+            <span class="sidebar-tooltip">Profesores</span>
+        </a>
+        <a class="sidebar-item {% if 'estudiantes' in request.path %}active{% endif %}" href="{{ url_for('estudiantes.estudiantes_main') }}">
+            <i class="bi bi-person-badge"></i>
+            <span class="sidebar-item-text">Estudiantes</span>
+            <span class="sidebar-tooltip">Estudiantes</span>
+        </a>
+        <a class="sidebar-item {% if 'programas' in request.path %}active{% endif %}" href="{{ url_for('programas.programas_main') }}">
+            <i class="bi bi-mortarboard"></i>
+            <span class="sidebar-item-text">Programas</span>
+            <span class="sidebar-tooltip">Programas</span>
+        </a>
+        {% endif %}
+
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('colaboradores') %}
+        <a class="sidebar-item {% if 'colaboradores' in request.path %}active{% endif %}" href="{{ url_for('colaboradores.colaboradores_main') }}">
+            <i class="bi bi-person-vcard"></i>
+            <span class="sidebar-item-text">Colaboradores</span>
+            <span class="sidebar-tooltip">Colaboradores</span>
+        </a>
+        {% endif %}
+
+        {% if session.rol in ('admin', 'superadmin') or mod_access.estadisticas.ver %}
+        <a class="sidebar-item {% if 'estadisticas' in request.path %}active{% endif %}" href="{{ url_for('estadisticas.dashboard') }}">
+            <i class="bi bi-graph-up"></i>
+            <span class="sidebar-item-text">Estadísticas</span>
+            <span class="sidebar-tooltip">Estadísticas</span>
+        </a>
+        {% endif %}
+
+        {% if session.rol in ('admin', 'superadmin') %}
+        <a class="sidebar-item {% if 'bitacora' in request.path %}active{% endif %}" href="{{ url_for('bitacora.dashboard_bitacora') }}">
+            <i class="bi bi-journal-text"></i>
+            <span class="sidebar-item-text">Bitácora</span>
+            <span class="sidebar-tooltip">Bitácora</span>
+        </a>
+        <a class="sidebar-item {% if 'admin/usuarios' in request.path %}active{% endif %}" href="{{ url_for('admin.usuarios_main') }}">
+            <i class="bi bi-shield-lock"></i>
+            <span class="sidebar-item-text">Usuarios & Roles</span>
+            <span class="sidebar-tooltip">Usuarios & Roles</span>
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const body = document.body;
+        const toggleBtn = document.getElementById('sidebarToggle');
+        const mobileToggle = document.getElementById('mobileToggle');
+        const sidebar = document.getElementById('appSidebar');
+        const overlay = document.getElementById('drawerOverlay');
+        
+        // Restore state from localStorage
+        const sidebarState = localStorage.getItem('sidebarState');
+        if (sidebarState === 'collapsed') {
+            body.classList.add('sidebar-collapsed');
+        } else if (sidebarState === 'expanded') {
+            body.classList.remove('sidebar-collapsed');
+        } else {
+            // Collapse by default on small screens
+            if (window.innerWidth < 1200) {
+                 body.classList.add('sidebar-collapsed');
+            }
+        }
+        
+        // Desktop Toggle
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function() {
+                body.classList.toggle('sidebar-collapsed');
+                if (body.classList.contains('sidebar-collapsed')) {
+                    localStorage.setItem('sidebarState', 'collapsed');
+                } else {
+                    localStorage.setItem('sidebarState', 'expanded');
+                }
+            });
+        }
+        
+        // Mobile Toggle (Drawer)
+        if (mobileToggle) {
+            mobileToggle.addEventListener('click', function() {
+                sidebar.classList.add('drawer-open');
+                overlay.classList.add('show');
+            });
+        }
+        
+        // Close Drawer on overlay click
+        if (overlay) {
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('drawer-open');
+                overlay.classList.remove('show');
+            });
+        }
+
+        // ── Dark Mode Toggle ──────────────────────────────────────
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon   = document.getElementById('themeIcon');
+        const htmlEl      = document.documentElement;
+
+        function applyTheme(theme) {
+            htmlEl.setAttribute('data-bs-theme', theme);
+            localStorage.setItem('appTheme', theme);
+            if (themeIcon) {
+                if (theme === 'dark') {
+                    themeIcon.className = 'bi bi-sun-fill';
+                    themeToggle.style.borderColor = 'rgba(255,220,60,0.6)';
+                    themeToggle.style.color = '#ffd93d';
+                } else {
+                    themeIcon.className = 'bi bi-moon-stars-fill';
+                    themeToggle.style.borderColor = 'rgba(255,255,255,0.25)';
+                    themeToggle.style.color = 'white';
+                }
+            }
+        }
+
+        // Init: sincronizar ícono con el tema ya aplicado por el anti-FOUC
+        var currentTheme = localStorage.getItem('appTheme') || 'light';
+        applyTheme(currentTheme);
+
+        if (themeToggle) {
+            themeToggle.addEventListener('click', function() {
+                var next = htmlEl.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+                applyTheme(next);
+            });
+        }
+        // ─────────────────────────────────────────────────────────
+    });
+</script>
+
+<!-- INICIO DEL CONTENEDOR ESTRUCTURAL GLOBAL -->
+<div id="app-layout">
+    <div id="app-content">

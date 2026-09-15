@@ -1,0 +1,942 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<style>
+    :root {
+        --dash-primary: #1e3a5f;
+        --dash-primary-light: #2d6a9f;
+        --dash-primary-hover: #265087;
+        --dash-success: #198754;
+        --dash-success-light: #28a745;
+        --dash-warning: #c2410c;
+        --dash-warning-light: #f59e0b;
+        --dash-info: #0369a1;
+        --dash-info-light: #0ea5e9;
+        --dash-secondary: #475569;
+        --dash-secondary-light: #2d6a9f;
+    }
+
+    .dashboard-card {
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(30, 58, 95, 0.1);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        border: none;
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(30, 58, 95, 0.16);
+    }
+    
+    .kpi-card {
+        background: linear-gradient(135deg, var(--dash-primary) 0%, var(--dash-primary-light) 100%);
+        color: white;
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .kpi-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .kpi-card:hover::before {
+        left: 100%;
+    }
+    
+    .kpi-card.success {
+        background: linear-gradient(135deg, #146c43 0%, var(--dash-success) 100%);
+    }
+    
+    .kpi-card.warning {
+        background: linear-gradient(135deg, var(--dash-warning) 0%, var(--dash-warning-light) 100%);
+    }
+    
+    .kpi-card.info {
+        background: linear-gradient(135deg, var(--dash-info) 0%, var(--dash-info-light) 100%);
+    }
+    
+    .kpi-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        animation: countUp 1s ease-out;
+    }
+    
+    @keyframes countUp {
+        from { transform: scale(0.8); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 400px;
+        margin: 20px 0;
+    }
+    
+    .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 200px;
+        flex-direction: column;
+    }
+    
+    .loading-text {
+        margin-top: 15px;
+        color: #666;
+        font-weight: 500;
+    }
+    
+    .navbar-brand {
+        font-weight: 800;
+        background: linear-gradient(45deg, var(--dash-primary), var(--dash-primary-light));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .period-selector {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    .btn-outline-primary {
+        border-radius: 25px;
+        font-weight: 600;
+        padding: 8px 20px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-outline-primary:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .btn-outline-primary:hover:before {
+        left: 100%;
+    }
+    
+    .tooltip-inner {
+        background: linear-gradient(135deg, var(--dark-color) 0%, #4a5568 100%);
+        border-radius: 8px;
+        font-size: 14px;
+    }
+    
+    .card-header {
+        border-radius: 20px 20px 0 0 !important;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+        border-bottom: 2px solid #dee2e6;
+    }
+    
+    .list-group-item {
+        border: none;
+        border-bottom: 1px solid #f1f3f4;
+        transition: background-color 0.2s ease;
+    }
+    
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+    }
+    
+    .badge {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+    
+    .refresh-indicator {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50px;
+        padding: 10px 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: none;
+    }
+    
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .slide-in {
+        animation: slideIn 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateX(-30px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+</style>
+
+<div class="container-fluid py-4">
+    
+    <!-- Indicador de actualización -->
+    <div id="refresh-indicator" class="refresh-indicator">
+        <i class="fas fa-sync-alt fa-spin me-2"></i>
+        <span>Actualizando datos...</span>
+    </div>
+
+    <!-- Header de la sección -->
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-primary text-white p-3 rounded-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-bar-chart-line" style="font-size: 1.8rem;"></i>
+                </div>
+                <div>
+                    <h1 class="h3 mb-1">Dashboard de Estadísticas</h1>
+                    <p class="text-muted mb-0">Visualización general de métricas y tendencias</p>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('estadisticas.visualizaciones') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-chart-area me-1"></i>Visualizaciones
+                </a>
+                <a href="{{ url_for('estadisticas.reportes') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-file-alt me-1"></i>Reportes
+                </a>
+                <a href="{{ url_for('estadisticas.metricas') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-tachometer-alt me-1"></i>Métricas
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Selector de Período -->
+    <div class="period-selector dashboard-card">
+        <h5 class="mb-3"><i class="fas fa-calendar-alt me-2"></i>Período de Análisis</h5>
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-outline-primary" onclick="cambiarPeriodo('semana')">
+                <i class="fas fa-calendar-week me-1"></i>Semana
+            </button>
+            <button type="button" class="btn btn-outline-primary active" onclick="cambiarPeriodo('mes')">
+                <i class="fas fa-calendar-day me-1"></i>Mes
+            </button>
+            <button type="button" class="btn btn-outline-primary" onclick="cambiarPeriodo('año')">
+                <i class="fas fa-calendar me-1"></i>Año
+            </button>
+        </div>
+    </div>
+
+    <!-- KPIs Principales -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card dashboard-card kpi-card">
+                <div class="card-body text-center">
+                    <div id="loading-kpis" class="loading-spinner">
+                        <div class="spinner-border text-light" role="status"></div>
+                        <div class="loading-text text-light">Cargando KPIs...</div>
+                    </div>
+                    <div id="kpi-prestamos" style="display: none;" 
+                         data-bs-toggle="tooltip" data-bs-placement="top" 
+                         title="Número total de préstamos de equipos que están actualmente en curso">
+                        <i class="fas fa-handshake fa-2x mb-3"></i>
+                        <h3 class="kpi-number">0</h3>
+                        <p class="card-text">Préstamos Activos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card dashboard-card kpi-card success">
+                <div class="card-body text-center">
+                    <div id="kpi-equipos" style="display: none;"
+                         data-bs-toggle="tooltip" data-bs-placement="top"
+                         title="Cantidad de equipos disponibles para préstamo en este momento">
+                        <i class="fas fa-laptop fa-2x mb-3"></i>
+                        <h3 class="kpi-number">0</h3>
+                        <p class="card-text">Equipos Disponibles</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card dashboard-card kpi-card info">
+                <div class="card-body text-center">
+                    <div id="kpi-reservas" style="display: none;"
+                         data-bs-toggle="tooltip" data-bs-placement="top"
+                         title="Reservas confirmadas para fechas futuras y del día actual">
+                        <i class="fas fa-calendar-check fa-2x mb-3"></i>
+                        <h3 class="kpi-number">0</h3>
+                        <p class="card-text">Reservas Activas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card dashboard-card kpi-card warning">
+                <div class="card-body text-center">
+                    <div id="kpi-vencidos" style="display: none;"
+                         data-bs-toggle="tooltip" data-bs-placement="top"
+                         title="Préstamos que han superado su fecha de devolución programada">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                        <h3 class="kpi-number">0</h3>
+                        <p class="card-text">Préstamos Vencidos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos Principales -->
+    <div class="row g-4 mb-4">
+        <!-- Gráfico de Tendencias -->
+        <div class="col-lg-8">
+            <div class="card dashboard-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Tendencias por Período
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico de Distribución por Jornadas -->
+        <div class="col-lg-4">
+            <div class="card dashboard-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-pie-chart me-2"></i>
+                        Uso por Jornadas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="jornadaChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fila de Análisis Detallado -->
+    <div class="row g-4 mb-4">
+        <!-- Equipos Más Populares -->
+        <div class="col-lg-6">
+            <div class="card dashboard-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-trophy me-2"></i>
+                        Equipos Más Populares
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="equipos-populares-loading" class="loading-spinner">
+                        <div class="spinner-border text-primary"></div>
+                        <div class="loading-text">Cargando equipos populares...</div>
+                    </div>
+                    <div id="equipos-populares-list" class="list-group list-group-flush">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Distribución por Categorías -->
+        <div class="col-lg-6">
+            <div class="card dashboard-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-donut me-2"></i>
+                        Distribución por Categorías
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="categoriasChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profesores Más Activos -->
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-graduate me-2"></i>
+                        Top 10 Profesores Más Activos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Por Préstamos</h6>
+                            <div id="profesores-prestamos-loading" class="loading-spinner">
+                                <div class="spinner-border text-primary"></div>
+                                <div class="loading-text">Cargando profesores activos...</div>
+                            </div>
+                            <div id="profesores-prestamos-list">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Por Reservas</h6>
+                            <div id="profesores-reservas-loading" class="loading-spinner">
+                                <div class="spinner-border text-primary"></div>
+                                <div class="loading-text">Cargando datos de reservas...</div>
+                            </div>
+                            <div id="profesores-reservas-list">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- JavaScript del Dashboard -->
+<script>
+    document.title = 'Dashboard de Estadísticas - Sistema Integrado';
+
+    // Variables globales
+    let trendChart, jornadaChart, categoriasChart;
+    let currentPeriod = 'mes';
+
+    // Configuración de Toastr
+    if (typeof toastr !== 'undefined') {
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": true,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "4000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+    }
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeDashboard();
+        initializeTooltips();
+        
+        // Mostrar mensaje de bienvenida
+        setTimeout(() => {
+            if (typeof toastr !== 'undefined') {
+                toastr.success('Dashboard cargado correctamente', '¡Bienvenido!');
+            }
+        }, 1000);
+    });
+
+    function initializeTooltips() {
+        // Inicializar todos los tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    }
+
+    async function initializeDashboard() {
+        showRefreshIndicator();
+        
+        try {
+            await Promise.all([
+                loadKPIs(),
+                loadTrendData(),
+                loadJornadaData(),
+                loadCategoriasData(),
+                loadProfesoresActivos()
+            ]);
+            
+            hideRefreshIndicator();
+            addFadeInAnimation();
+            
+        } catch (error) {
+            hideRefreshIndicator();
+            if (typeof toastr !== 'undefined') {
+                toastr.error('Error al cargar algunos datos del dashboard', 'Error');
+            }
+            console.error('Error initializing dashboard:', error);
+        }
+    }
+
+    function showRefreshIndicator() {
+        document.getElementById('refresh-indicator').style.display = 'block';
+    }
+
+    function hideRefreshIndicator() {
+        document.getElementById('refresh-indicator').style.display = 'none';
+    }
+
+    function addFadeInAnimation() {
+        // Agregar animación fade-in a todas las tarjetas
+        document.querySelectorAll('.dashboard-card').forEach((card, index) => {
+            setTimeout(() => {
+                card.classList.add('fade-in');
+            }, index * 100);
+        });
+    }
+
+    // Función para cambiar período
+    function cambiarPeriodo(periodo) {
+        currentPeriod = periodo;
+        
+        // Actualizar botones
+        document.querySelectorAll('.btn-group .btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        event.target.classList.add('pulse');
+        
+        // Remover animación después de un tiempo
+        setTimeout(() => {
+            event.target.classList.remove('pulse');
+        }, 2000);
+        
+        // Mostrar notificación
+        if (typeof toastr !== 'undefined') {
+            toastr.info(`Cambiando a vista de ${periodo.toUpperCase()}`, 'Período actualizado');
+        }
+        
+        // Recargar datos con animación
+        showRefreshIndicator();
+        loadTrendData().then(() => {
+            hideRefreshIndicator();
+            if (typeof toastr !== 'undefined') {
+                toastr.success(`Datos de ${periodo} actualizados`, 'Completado');
+            }
+        }).catch(error => {
+            hideRefreshIndicator();
+            if (typeof toastr !== 'undefined') {
+                toastr.error('Error al actualizar datos', 'Error');
+            }
+        });
+    }
+
+    // Cargar KPIs principales
+    async function loadKPIs() {
+        try {
+            console.log('Iniciando carga de KPIs...'); // Debug
+            
+            // Incluir credenciales para autenticación
+            const response = await fetch('/estadisticas/api/kpis', {
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            console.log('Respuesta HTTP:', response.status); // Debug
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log('Datos KPIs recibidos:', data); // Debug
+            
+            // Ocultar loading spinner
+            document.getElementById('loading-kpis').style.display = 'none';
+            
+            // Procesar datos incluso si hay error parcial
+            const kpis = data.data || {};
+            
+            // Mostrar KPIs con valores predeterminados si faltan
+            updateKPI('kpi-prestamos', kpis.prestamos_activos || 0);
+            updateKPI('kpi-equipos', kpis.equipos_disponibles || 0);
+            updateKPI('kpi-reservas', kpis.reservas_activas || 0);
+            updateKPI('kpi-vencidos', kpis.prestamos_vencidos || 0);
+            
+            // Mostrar equipos populares
+            mostrarEquiposPopulares(kpis.equipos_populares || []);
+            
+            if (data.success) {
+                console.log('KPIs cargados exitosamente');
+            } else {
+                console.warn('KPIs cargados con advertencia:', data.message);
+            }
+            
+        } catch (error) {
+            console.error('Error cargando KPIs:', error);
+            
+            // Ocultar loading spinner
+            const loadingElement = document.getElementById('loading-kpis');
+            if (loadingElement) {
+                loadingElement.style.display = 'none';
+            }
+            
+            // Mostrar KPIs con valores predeterminados
+            updateKPI('kpi-prestamos', 0);
+            updateKPI('kpi-equipos', 0);
+            updateKPI('kpi-reservas', 0);
+            updateKPI('kpi-vencidos', 0);
+            mostrarEquiposPopulares([]);
+            
+            // Mostrar mensaje de error discreto
+            if (typeof toastr !== 'undefined') {
+                toastr.warning('Usando datos en caché. Error: ' + error.message, 'KPIs');
+            }
+        }
+    }
+
+    function updateKPI(elementId, value) {
+        const element = document.getElementById(elementId);
+        const numberElement = element.querySelector('.kpi-number');
+        
+        // Animación de conteo
+        animateValue(numberElement, 0, value, 1000);
+        
+        element.style.display = 'block';
+        element.classList.add('slide-in');
+    }
+
+    function animateValue(element, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const currentValue = Math.floor(progress * (end - start) + start);
+            element.textContent = currentValue;
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // Mostrar equipos populares
+    function mostrarEquiposPopulares(equipos) {
+        const container = document.getElementById('equipos-populares-list');
+        const loading = document.getElementById('equipos-populares-loading');
+        
+        loading.style.display = 'none';
+        
+        if (!equipos || equipos.length === 0) {
+            container.innerHTML = '<p class="text-muted text-center">No hay datos disponibles</p>';
+            return;
+        }
+        
+        container.innerHTML = equipos.slice(0, 5).map((equipo, index) => `
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="fw-bold">${equipo.nombre}</div>
+                    <small class="text-muted">${equipo.categoria}</small>
+                </div>
+                <span class="badge bg-primary rounded-pill">${equipo.total_prestamos}</span>
+            </div>
+        `).join('');
+    }
+
+    // Cargar datos de tendencias
+    async function loadTrendData() {
+        try {
+            const response = await fetch(`/estadisticas/api/periodo/${currentPeriod}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                createTrendChart(data.data);
+            }
+        } catch (error) {
+            console.error('Error cargando tendencias:', error);
+        }
+    }
+
+    // Crear gráfico de tendencias
+    function createTrendChart(data) {
+        const ctx = document.getElementById('trendChart').getContext('2d');
+        
+        if (trendChart) {
+            trendChart.destroy();
+        }
+        
+        trendChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.prestamos.map(p => p.periodo),
+                datasets: [
+                    {
+                        label: 'Préstamos',
+                        data: data.prestamos.map(p => p.total),
+                        borderColor: '#2d6a9f',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Reservas',
+                        data: data.reservas.map(r => r.total),
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(56, 239, 125, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: `Tendencias - ${currentPeriod.toUpperCase()}`
+                    },
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    // Cargar datos de jornadas
+    async function loadJornadaData() {
+        try {
+            const response = await fetch('/estadisticas/api/jornadas');
+            const data = await response.json();
+            
+            if (data.success) {
+                createJornadaChart(data.data);
+            }
+        } catch (error) {
+            console.error('Error cargando jornadas:', error);
+        }
+    }
+
+    // Crear gráfico de jornadas
+    function createJornadaChart(data) {
+        const ctx = document.getElementById('jornadaChart').getContext('2d');
+        
+        if (jornadaChart) {
+            jornadaChart.destroy();
+        }
+        
+        jornadaChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: data.map(j => j.jornada),
+                datasets: [{
+                    data: data.map(j => j.total),
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    // Cargar datos de categorías
+    async function loadCategoriasData() {
+        try {
+            const response = await fetch('/estadisticas/api/categorias');
+            const data = await response.json();
+            
+            if (data.success) {
+                createCategoriasChart(data.data);
+            }
+        } catch (error) {
+            console.error('Error cargando categorías:', error);
+        }
+    }
+
+    // Crear gráfico de categorías
+    function createCategoriasChart(data) {
+        const ctx = document.getElementById('categoriasChart').getContext('2d');
+        
+        if (categoriasChart) {
+            categoriasChart.destroy();
+        }
+        
+        categoriasChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(c => c.categoria),
+                datasets: [{
+                    label: 'Préstamos',
+                    data: data.map(c => c.total_prestamos),
+                    backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                    borderColor: '#2d6a9f',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    // Cargar profesores más activos
+    async function loadProfesoresActivos() {
+        try {
+            const response = await fetch('/estadisticas/api/profesores-activos');
+            const data = await response.json();
+            
+            if (data.success) {
+                mostrarProfesoresActivos(data.data);
+            }
+        } catch (error) {
+            console.error('Error cargando profesores activos:', error);
+        }
+    }
+
+    function mostrarProfesoresActivos(data) {
+        // Ocultar spinners
+        document.getElementById('profesores-prestamos-loading').style.display = 'none';
+        document.getElementById('profesores-reservas-loading').style.display = 'none';
+        
+        // Profesores por préstamos
+        const prestamosList = document.getElementById('profesores-prestamos-list');
+        prestamosList.innerHTML = data.por_prestamos.slice(0, 5).map((prof, index) => `
+            <div class="d-flex justify-content-between align-items-center py-2 ${index < data.por_prestamos.length - 1 ? 'border-bottom' : ''}">
+                <div>
+                    <div class="fw-bold">${prof.nombre}</div>
+                    <small class="text-muted">${prof.programa}</small>
+                </div>
+                <span class="badge bg-success">${prof.total_prestamos}</span>
+            </div>
+        `).join('');
+        
+        // Profesores por reservas
+        const reservasList = document.getElementById('profesores-reservas-list');
+        reservasList.innerHTML = data.por_reservas.slice(0, 5).map((prof, index) => `
+            <div class="d-flex justify-content-between align-items-center py-2 ${index < data.por_reservas.length - 1 ? 'border-bottom' : ''}">
+                <div>
+                    <div class="fw-bold">${prof.nombre}</div>
+                    <small class="text-muted">${prof.programa}</small>
+                </div>
+                <span class="badge bg-info">${prof.total_reservas}</span>
+            </div>
+        `).join('');
+    }
+
+    // Función para mostrar errores
+    function showError(message) {
+        if (typeof toastr !== 'undefined') {
+            toastr.error(message, 'Error');
+        }
+        console.error(message);
+    }
+
+    // Función para mostrar éxito
+    function showSuccess(message, title = 'Éxito') {
+        if (typeof toastr !== 'undefined') {
+            toastr.success(message, title);
+        }
+    }
+
+    // Función para mostrar información
+    function showInfo(message, title = 'Información') {
+        if (typeof toastr !== 'undefined') {
+            toastr.info(message, title);
+        }
+    }
+
+    // Actualización automática cada 5 minutos
+    setInterval(() => {
+        showRefreshIndicator();
+        
+        Promise.all([
+            loadKPIs(),
+            loadTrendData(),
+            loadJornadaData(),
+            loadCategoriasData(),
+            loadProfesoresActivos()
+        ]).then(() => {
+            hideRefreshIndicator();
+            if (typeof toastr !== 'undefined') {
+                toastr.info('Datos actualizados automáticamente', 'Actualización');
+            }
+        }).catch(error => {
+            hideRefreshIndicator();
+            if (typeof toastr !== 'undefined') {
+                toastr.warning('Algunos datos no se pudieron actualizar', 'Actualización parcial');
+            }
+        });
+    }, 300000); // 5 minutos
+
+    // Función para refrescar manualmente
+    window.refreshDashboard = function() {
+        initializeDashboard();
+        if (typeof toastr !== 'undefined') {
+            toastr.info('Refrescando dashboard...', 'Actualización manual');
+        }
+    };
+</script>
+
+{% include 'components/footer.html' %}

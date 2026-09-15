@@ -1,0 +1,2376 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Librería para Códigos de Barras y QR -->
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+    /* Estilos para impresión de etiquetas */
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        #seccionImpresionEtiquetas, #seccionImpresionEtiquetas * {
+            visibility: visible;
+        }
+        #seccionImpresionEtiquetas {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+    }
+    .etiqueta-item-card {
+        border: 2px dashed #0284c7;
+        border-radius: 8px;
+        background: #ffffff;
+        padding: 12px;
+        page-break-inside: avoid;
+    }
+    .col-hidden {
+        display: none !important;
+    }
+
+    /* Estilos para el scroll suave */
+    #table-scroll-container::-webkit-scrollbar {
+        height: 10px;
+        width: 10px;
+    }
+
+    #table-scroll-container::-webkit-scrollbar-thumb {
+        background: #0dcaf0;
+        border-radius: 6px;
+    }
+
+    #table-scroll-container::-webkit-scrollbar-thumb:hover {
+        background: #0aa2c0;
+    }
+
+    #table-scroll-container::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 6px;
+    }
+
+    /* Cabecera pegajosa (Sticky Header) */
+    .table-responsive {
+        position: relative;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        background: #ffffff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .table thead th {
+        position: sticky;
+        top: 0;
+        background-color: #f8fafc !important;
+        color: #1e293b !important;
+        z-index: 5;
+        box-shadow: inset 0 -1px 0 #cbd5e1;
+        white-space: nowrap;
+        vertical-align: middle;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        padding: 0.75rem 0.85rem !important;
+    }
+
+    #inventarioTable {
+        width: 100% !important;
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    #inventarioTable td {
+        padding: 0.65rem 0.85rem !important;
+        vertical-align: middle;
+        font-size: 0.875rem;
+        color: #334155;
+    }
+
+    /* Anchos por columna mediante clases dedicadas (evita conflicto con col-hidden) */
+    .col-0 { width: 44px; min-width: 44px; max-width: 44px; text-align: center; }
+    .col-1 { min-width: 120px; }
+    .col-2 { min-width: 130px; }
+    .col-3 { min-width: 160px; }
+    .col-4 { min-width: 130px; }
+    .col-5 { min-width: 120px; }
+    .col-6 { min-width: 140px; }
+    .col-7 { min-width: 100px; text-align: center; }
+    .col-8 { min-width: 135px; }
+    .col-9 { min-width: 100px; text-align: center; }
+
+    #inventarioTable tbody tr:hover {
+        background-color: #f0f9ff !important;
+        transition: background-color 0.15s ease;
+    }
+
+    /* Indicador lateral por estado */
+    #inventarioTable tbody tr.row-disponible {
+        border-left: 3px solid #10b981;
+    }
+    #inventarioTable tbody tr.row-en-prestamo {
+        border-left: 3px solid #f59e0b;
+    }
+    #inventarioTable tbody tr.row-en-mantenimiento,
+    #inventarioTable tbody tr.row-en-reparacion {
+        border-left: 3px solid #06b6d4;
+    }
+    #inventarioTable tbody tr.row-de-baja {
+        border-left: 3px solid #ef4444;
+        opacity: 0.75;
+    }
+
+    /* Filas alternas suaves */
+    #inventarioTable.table-striped > tbody > tr:nth-of-type(odd) > * {
+        background-color: #f8fafc;
+    }
+    #inventarioTable.table-striped > tbody > tr:nth-of-type(even) > * {
+        background-color: #ffffff;
+    }
+
+    #inventarioTable.table-size-compact td,
+    #inventarioTable.table-size-compact th {
+        padding: 0.35rem 0.5rem !important;
+        font-size: 0.75rem;
+    }
+
+    #inventarioTable.table-size-normal td,
+    #inventarioTable.table-size-normal th {
+        padding: 0.65rem 0.85rem !important;
+        font-size: 0.875rem;
+    }
+
+    #inventarioTable.table-size-comfort td,
+    #inventarioTable.table-size-comfort th {
+        padding: 0.95rem 1.1rem !important;
+        font-size: 0.95rem;
+    }
+
+    #inventarioTable tbody tr.row-selected {
+        background: rgba(13, 110, 253, 0.12) !important;
+        box-shadow: inset 0 0 0 1px rgba(13, 110, 253, 0.25);
+    }
+</style>
+
+<div class="inventario-ui container-fluid py-4" id="inventarioRoot" data-force-delete="{{ '1' if session.rol == 'admin' else '0' }}" data-user-role="{{ session.rol }}">
+    <!-- Header principal al estilo de Préstamos -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-primary text-white p-3 rounded-3"
+                    style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-box-seam" style="font-size: 1.8rem;"></i>
+                </div>
+                <div>
+                    <h1 class="section-title mb-1 h3 fw-bold">Gestión de Inventario</h1>
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-geo-alt"></i> {{ current_user.sede.nombre if current_user and current_user.sede else 'Todas las Sedes y Bodegas' }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 d-flex gap-2 flex-wrap align-items-center justify-content-end">
+            <button type="button" class="btn btn-outline-primary shadow-xs fw-semibold" onclick="abrirModalEtiquetasSeleccionados()">
+                <i class="bi bi-upc-scan me-1"></i> Etiquetas
+            </button>
+            <button type="button" class="btn btn-outline-info shadow-xs fw-semibold" data-bs-toggle="modal" data-bs-target="#modalImportarExcel">
+                <i class="bi bi-file-earmark-excel me-1"></i> Importar
+            </button>
+            <a href="#collapseInventarioForm" class="btn btn-success fw-semibold shadow-xs" data-bs-toggle="collapse">
+                <i class="bi bi-plus-circle me-1"></i> Nuevo Item
+            </a>
+            <div class="dropdown">
+                <button class="btn btn-outline-success dropdown-toggle shadow-sm fw-semibold" type="button" id="btnExportarInv" data-bs-toggle="dropdown">
+                    <i class="bi bi-download"></i> Exportar
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="btnExportarInv">
+                    <li>
+                        <a class="dropdown-item" id="export-excel-link" href="{{ url_for('inventario.exportar_inventario', formato='excel') }}">
+                            <i class="bi bi-file-earmark-excel text-success me-1"></i> Excel
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" id="export-csv-link" href="{{ url_for('inventario.exportar_inventario', formato='csv') }}">
+                            <i class="bi bi-filetype-csv text-primary me-1"></i> CSV
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <a href="{{ url_for('index') }}" class="btn btn-light border shadow-xs">
+                <i class="bi bi-house-door"></i> Inicio
+            </a>
+        </div>
+    </div>
+
+    <!-- Estadísticas Detalladas del Inventario -->
+    <div class="row mb-4">
+        <!-- Resumen General -->
+        <div class="col-lg-8 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-bar-chart-fill"></i> Resumen General</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3 col-6">
+                            <div class="text-center p-3 bg-light rounded">
+                                <i class="bi bi-box-seam text-primary" style="font-size: 2rem;"></i>
+                                <h3 class="mb-0 mt-2">{{ stats.total or 0 }}</h3>
+                                <small class="text-muted">Total Registros</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="text-center p-3 bg-success bg-opacity-10 rounded">
+                                <i class="bi bi-check-circle-fill text-success" style="font-size: 2rem;"></i>
+                                <h3 class="mb-0 mt-2">{{ disponibles_count | default(0) }}</h3>
+                                <small class="text-muted">Disponibles</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="text-center p-3 bg-warning bg-opacity-10 rounded">
+                                <i class="bi bi-arrow-repeat text-warning" style="font-size: 2rem;"></i>
+                                <h3 class="mb-0 mt-2">{{ prestados_count | default(0) }}</h3>
+                                <small class="text-muted">En Préstamo</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="text-center p-3 bg-info bg-opacity-10 rounded">
+                                <i class="bi bi-tools text-info" style="font-size: 2rem;"></i>
+                                <h3 class="mb-0 mt-2">{{ reparacion_count | default(0) }}</h3>
+                                <small class="text-muted">Mantenimiento</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conteo por Categoría -->
+        <div class="col-lg-4 mb-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-tags-fill"></i> Por Categoría</h5>
+                </div>
+                <div class="card-body" style="max-height: 250px; overflow-y: auto;">
+                    {% if stats.por_categoria %}
+                        <ul class="list-group list-group-flush">
+                            {% for categoria, count in stats.por_categoria.items()|sort(attribute='1', reverse=True) %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span class="text-truncate" style="max-width: 70%;">{{ categoria }}</span>
+                                <span class="badge bg-primary rounded-pill">{{ count }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted mb-0">No hay datos disponibles</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock de Items por Cantidad (Cables HDMI, Controles, etc.) -->
+    {% if stats.stock_por_tipo %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-stack"></i> Stock de Items por Cantidad</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        {% for tipo, info in stats.stock_por_tipo.items() %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card border-0 shadow-sm h-100 border-start border-4 border-primary">
+                                <div class="card-body">
+                                    <h6 class="card-title text-primary fw-bold">
+                                        <i class="bi bi-box-seam"></i> {{ tipo }}
+                                    </h6>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div class="text-center flex-fill">
+                                            <div class="fs-4 fw-bold text-dark">{{ info.total }}</div>
+                                            <small class="text-muted">Total</small>
+                                        </div>
+                                        <div class="text-center flex-fill">
+                                            <div class="fs-4 fw-bold text-success">{{ info.disponible }}</div>
+                                            <small class="text-muted">Disponible</small>
+                                        </div>
+                                        <div class="text-center flex-fill">
+                                            <div class="fs-4 fw-bold text-warning">{{ info.total - info.disponible }}</div>
+                                            <small class="text-muted">En Uso</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Barra de progreso -->
+                                    {% set porcentaje_disponible = (info.disponible / info.total * 100) | int if info.total > 0 else 0 %}
+                                    <div class="progress mb-2" style="height: 8px;">
+                                        <div class="progress-bar bg-success" role="progressbar" 
+                                             style="width: {{ porcentaje_disponible }}%"
+                                             aria-valuenow="{{ porcentaje_disponible }}" 
+                                             aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">{{ porcentaje_disponible }}% disponible</small>
+                                    
+                                    <!-- Detalles por marca -->
+                                    {% if info.detalles|length > 1 %}
+                                    <hr class="my-2">
+                                    <div class="mt-2">
+                                        <small class="text-muted fw-bold">Por marca:</small>
+                                        <ul class="list-unstyled mb-0 mt-1">
+                                            {% for item in info.detalles %}
+                                            <li class="small">
+                                                <i class="bi bi-dot"></i> {{ item.marca }}: 
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle">{{ item.disponible }}/{{ item.total }}</span>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+
+    <div class="row">
+        <!-- Formulario de Item -->
+        <div class="col-12 mb-4">
+            <div class="card border-0 shadow-sm">
+                <a class="card-header bg-primary text-white text-decoration-none d-flex justify-content-between align-items-center"
+                    data-bs-toggle="collapse" href="#collapseInventarioForm" role="button" aria-expanded="false"
+                    aria-controls="collapseInventarioForm">
+                    <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Registrar Nuevo Item</h5>
+                    <i class="bi bi-chevron-down"></i>
+                </a>
+                <div class="collapse show" id="collapseInventarioForm">
+                    <div class="card-body">
+                        <form id="formInventario">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="categoria">Categoría:</label>
+                                    <select class="form-select" id="categoria" name="categoria" required>
+                                        <option value="">Seleccionar...</option>
+                                        {% for categoria in categorias %}
+                                        <option value="{{ categoria }}">{{ categoria }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="item">Nombre del Item:</label>
+                                    <input type="text" class="form-control" id="item" name="item"
+                                        placeholder="Ej: Laptop, Cable HDMI, Trípode" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="sede_id">Sede:</label>
+                                    <select class="form-select" id="sede_id" name="sede_id" required>
+                                        <option value="">Seleccione Sede...</option>
+                                        {% for sede in sedes %}
+                                        <option value="{{ sede.id }}">{{ sede.nombre }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="bodega_id">Bodega:</label>
+                                    <select class="form-select" id="bodega_id" name="bodega_id" required disabled>
+                                        <option value="">Seleccione Sede primero...</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" for="ubicacion_permanente">Ubicación Específica (Opcional):</label>
+                                    <input type="text" class="form-control" id="ubicacion_permanente"
+                                        name="ubicacion_permanente" placeholder="Ej: Estante A-1, Oficina 201">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="marca_modelo">Marca / Modelo:</label>
+                                    <input type="text" class="form-control" id="marca_modelo" name="marca_modelo"
+                                        placeholder="(Opcional)">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="numero_inventario">Número de Inventario:</label>
+                                    <input type="text" class="form-control" id="numero_inventario"
+                                        name="numero_inventario" placeholder="ID de inventario (Opcional)">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="serial">Serial:</label>
+                                    <input type="text" class="form-control" id="serial" name="serial"
+                                        placeholder="(Opcional)">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="activo_fijo">Activo Fijo:</label>
+                                    <input type="text" class="form-control" id="activo_fijo" name="activo_fijo"
+                                        placeholder="(Opcional)">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" for="observaciones_inventario">Observaciones:</label>
+                                    <textarea class="form-control" id="observaciones_inventario" name="observaciones"
+                                        rows="2"></textarea>
+                                </div>
+                                <!-- GESTIÓN POR CANTIDAD -->
+                                <div class="col-12">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="esPorCantidad"
+                                            name="es_por_cantidad" value="true" onchange="toggleCantidadFields('add')">
+                                        <label class="form-check-label fw-bold" for="esPorCantidad">
+                                            <i class="bi bi-stack"></i> Gestionar por cantidad (Stock) — Para cables
+                                            HDMI, controles, etc.
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" id="cantidadTotalWrapper" style="display:none">
+                                    <label class="form-label" for="cantidad_total">Cantidad Total en Stock:</label>
+                                    <input type="number" class="form-control" id="cantidad_total" name="cantidad_total"
+                                        min="1" value="1" placeholder="Ej: 10">
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-success w-100">
+                                        <i class="bi bi-check-circle"></i> Registrar Item
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Inventario -->
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <!-- Filtros Avanzados -->
+                    <div class="card mb-4 border-info">
+                        <div class="card-header bg-light">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0"><i class="bi bi-funnel"></i> Filtros Avanzados</h6>
+                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#filtrosAvanzados" aria-expanded="false">
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="collapse" id="filtrosAvanzados">
+                            <div class="card-body">
+                                <form id="formFiltros">
+                                    <div class="row g-3">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Categoría:</label>
+                                            <select class="form-select" id="filtroCategoriaSelect">
+                                                <option value="">Todas las categorías</option>
+                                                {% for categoria in categorias %}
+                                                <option value="{{ categoria }}">{{ categoria }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Estado:</label>
+                                            <select class="form-select" id="filtroEstadoSelect">
+                                                <option value="">Todos los estados</option>
+                                                {% for estado in estados %}
+                                                <option value="{{ estado }}">{{ estado }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Sede:</label>
+                                            <select class="form-select" id="filtroSedeSelect">
+                                                <option value="">Todas las sedes</option>
+                                                {% for sede in sedes %}
+                                                <option value="{{ sede.id }}">{{ sede.nombre }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Bodega:</label>
+                                            <select class="form-select" id="filtroBodegaSelect" disabled>
+                                                <option value="">Todas las bodegas</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Buscar Item:</label>
+                                            <input type="text" class="form-control" id="filtroItemInput" 
+                                                placeholder="Nombre del item...">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Marca/Modelo:</label>
+                                            <input type="text" class="form-control" id="filtroMarcaInput" 
+                                                placeholder="Marca o modelo...">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Serial:</label>
+                                            <input type="text" class="form-control" id="filtroSerialInput" 
+                                                placeholder="Número de serial...">
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="d-flex gap-2">
+                                                <button type="button" class="btn btn-primary" id="btnAplicarFiltros">
+                                                    <i class="bi bi-check-circle"></i> Aplicar Filtros
+                                                </button>
+                                                <button type="button" class="btn btn-outline-secondary" id="btnLimpiarFiltros">
+                                                    <i class="bi bi-x-circle"></i> Limpiar Filtros
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Herramientas de Gestión (Búsqueda, Exportar, Columnas) -->
+                    <div class="row g-3 mb-4 align-items-center">
+                        <div class="col-lg-5">
+                            <label class="form-label visually-hidden" for="buscarInventario">Buscar Inventario</label>
+                            <div class="input-group shadow-sm border rounded">
+                                <span class="input-group-text bg-white border-0"><i
+                                        class="bi bi-search text-muted"></i></span>
+                                <input type="text" class="form-control border-0" id="buscarInventario"
+                                    placeholder="Buscar por item, categoría, marca, serial...">
+                                <button class="btn btn-outline-light border-0 text-muted" type="button"
+                                    id="limpiarBusquedaInventario">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-7">
+                            <div class="d-flex gap-2 justify-content-lg-end flex-wrap">
+                                <!-- Botón Importar Excel -->
+                                <button class="btn btn-outline-primary shadow-sm" type="button"
+                                    data-bs-toggle="modal" data-bs-target="#modalImportarExcel">
+                                    <i class="bi bi-file-earmark-arrow-up"></i> Importar
+                                </button>
+
+                                <!-- Botón Generar Etiquetas Masivas -->
+                                <button class="btn btn-outline-dark shadow-sm" type="button"
+                                    onclick="abrirModalEtiquetasSeleccionados()">
+                                    <i class="bi bi-upc-scan"></i> Etiquetas
+                                </button>
+
+                                <!-- Botones de Exportación -->
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-success dropdown-toggle shadow-sm" type="button"
+                                        id="btnExportarInv" data-bs-toggle="dropdown">
+                                        <i class="bi bi-download"></i> Exportar
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="btnExportarInv">
+                                        <li>
+                                            <a class="dropdown-item" id="export-excel-link"
+                                                href="{{ url_for('inventario.exportar_inventario', formato='excel') }}">
+                                                <i class="bi bi-file-earmark-excel text-success me-1"></i> Excel
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" id="export-csv-link"
+                                                href="{{ url_for('inventario.exportar_inventario', formato='csv') }}">
+                                                <i class="bi bi-filetype-csv text-primary me-1"></i> CSV
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- Personalizar Columnas -->
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary dropdown-toggle shadow-sm" type="button"
+                                        id="dropdownColumns" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                        <i class="bi bi-sliders"></i> Columnas
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow p-3" style="min-width: 200px;">
+                                        <li>
+                                            <h6 class="dropdown-header">Mostrar Columnas</h6>
+                                        </li>
+                                        <li>
+                                            <div class="form-check mb-1"><input class="form-check-input col-toggle"
+                                                    type="checkbox" value="1" id="col_num_inv" checked><label
+                                                    class="form-check-label" for="col_num_inv">N° Inventario</label></div>
+                                        </li>
+                                        <li>
+                                            <div class="form-check mb-1"><input class="form-check-input col-toggle"
+                                                    type="checkbox" value="2" id="col_cat" checked><label
+                                                    class="form-check-label" for="col_cat">Categoría</label></div>
+                                        </li>
+                                        <li>
+                                            <div class="form-check mb-1"><input class="form-check-input col-toggle"
+                                                    type="checkbox" value="3" id="col_item" checked><label
+                                                    class="form-check-label" for="col_item">Item</label></div>
+                                        </li>
+                                        <li>
+                                            <div class="form-check mb-1"><input class="form-check-input col-toggle"
+                                                    type="checkbox" value="4" id="col_marca" checked><label
+                                                    class="form-check-label" for="col_marca">Marca</label></div>
+                                        </li>
+                                        <li>
+                                            <div class="form-check mb-1"><input class="form-check-input col-toggle"
+                                                    type="checkbox" value="5" id="col_serial" checked><label
+                                                    class="form-check-label" for="col_serial">Serial</label></div>
+                                        </li>
+                                        <li>
+                                            <div class="form-check mb-1"><input class="form-check-input col-toggle"
+                                                    type="checkbox" value="6" id="col_sede" checked><label
+                                                    class="form-check-label" for="col_sede">Ubicación</label></div>
+                                        </li>
+                                        <li>
+                                            <div class="form-check mb-1"><input class="form-check-input col-toggle"
+                                                    type="checkbox" value="7" id="col_prestamos" checked><label
+                                                    class="form-check-label" for="col_prestamos">Préstamos</label></div>
+                                        </li>
+                                        <li>
+                                            <div class="form-check mb-1"><input class="form-check-input col-toggle"
+                                                    type="checkbox" value="8" id="col_stock" checked><label
+                                                    class="form-check-label" for="col_stock">Estado/Stock</label></div>
+                                        </li>
+                                        <li>
+                                            <div class="form-check mb-0"><input class="form-check-input col-toggle"
+                                                    type="checkbox" value="9" id="col_acciones" checked><label
+                                                    class="form-check-label" for="col_acciones">Acciones</label></div>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary dropdown-toggle shadow-sm" type="button"
+                                        id="dropdownRowSize" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                        <i class="bi bi-arrows-vertical"></i> Tamaño
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow p-2" aria-labelledby="dropdownRowSize" style="min-width: 220px;">
+                                        <li class="px-2 py-1">
+                                            <label class="form-label mb-1" for="rowSizeSelect"><strong>Filas</strong></label>
+                                            <select class="form-select form-select-sm" id="rowSizeSelect">
+                                                <option value="compact">Compacto</option>
+                                                <option value="normal" selected>Normal</option>
+                                                <option value="comfort">Grande</option>
+                                            </select>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li class="px-2">
+                                            <small class="text-muted">Tip: arrastra el borde del encabezado para ajustar columnas.</small>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container position-relative">
+                        <div class="data-table-container table-responsive" id="table-scroll-container"
+                            style="max-height: 75vh; overflow-x: auto; overflow-y: auto;">
+                            <table id="inventarioTable" class="table table-striped table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center col-0">
+                                            <label class="form-label visually-hidden" for="selectAllItems">Seleccionar Todos</label>
+                                            <input class="form-check-input" type="checkbox" id="selectAllItems">
+                                        </th>
+                                        <th class="col-1">N° Inventario</th>
+                                        <th class="col-2">Categoría</th>
+                                        <th class="col-3">Item</th>
+                                        <th class="col-4">Marca/Modelo</th>
+                                        <th class="col-5">Serial</th>
+                                        <th class="col-6">Sede/Bodega</th>
+                                        <th class="col-7 text-center">Préstamos</th>
+                                        <th class="col-8">Stock / Estado</th>
+                                        <th class="col-9 text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventario-table-body">
+                                    {% for item in inventario %}
+                                    <tr class="item-row row-{{ (item.estado or 'disponible') | lower | replace(' ', '-') | replace('é', 'e') | replace('ó', 'o') | replace('á', 'a') }}" data-id="{{ item.id }}">
+                                        <td class="text-center col-0">
+                                            <input class="form-check-input select-item" type="checkbox"
+                                                id="select-item-{{ item.id }}" value="{{ item.id }}"
+                                                aria-label="Seleccionar Item {{ item.id }}">
+                                        </td>
+                                        <td class="col-1"><span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle fw-semibold px-2">{{ item.numero_inventario }}</span></td>
+                                        <td class="col-2">{{ item.categoria }}</td>
+                                        <td class="col-3">
+                                            {{ item.item }}
+                                            {% if item.es_por_cantidad %}
+                                            <span class="badge bg-info ms-1" title="Gestionado por cantidad"><i
+                                                    class="bi bi-stack"></i> Stock</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="col-4">{{ item.marca_modelo or '--' }}</td>
+                                        <td class="col-5">{{ item.serial or '--' }}</td>
+                                        <td class="col-6">
+                                            {% if item.bodega %}
+                                            <small class="d-block"><strong>{{ item.bodega.sede.nombre }}</strong></small>
+                                            <small class="text-muted">{{ item.bodega.nombre }}</small>
+                                            {% else %}
+                                            <span class="text-muted">No asignada</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="col-7 text-center">
+                                            {% set pc = 'danger' if item.veces_prestado > 20 else ('warning' if item.veces_prestado > 10 else ('primary' if item.veces_prestado > 0 else 'secondary')) %}
+                                            <span class="badge bg-{{ pc }}{% if pc == 'warning' %} text-dark{% endif %}">
+                                                <i class="bi bi-arrow-left-right me-1"></i>{{ item.veces_prestado }}
+                                            </span>
+                                        </td>
+                                        <td class="col-8">
+                                            {% if item.es_por_cantidad %}
+                                            {% set disp = item.cantidad_disponible or 0 %}{% set total =
+                                            item.cantidad_total
+                                            or 1 %}{% set pct = ((disp / total) * 100) | int %}{% set bc = 'success' if
+                                            pct
+                                            > 50 else ('warning' if pct > 0 else 'danger') %}
+                                            <div class="d-flex align-items-center gap-1">
+                                                <small class="fw-bold text-{{ bc }}">{{ disp }}/{{ total }}</small>
+                                                <div class="progress flex-grow-1" style="height:8px;min-width:50px">
+                                                    <div class="progress-bar bg-{{ bc }}" style="width:{{ pct }}%">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% else %}
+                                            {% set sc = {
+                                            'Disponible': 'success',
+                                            'En Préstamo': 'warning',
+                                            'En Mantenimiento': 'info',
+                                            'En Reparación': 'info',
+                                            'De Baja': 'danger'
+                                            } %}
+                                            {% set si = {
+                                            'Disponible': 'bi-check-circle-fill',
+                                            'En Préstamo': 'bi-arrow-repeat',
+                                            'En Mantenimiento': 'bi-tools',
+                                            'En Reparación': 'bi-wrench-adjustable',
+                                            'De Baja': 'bi-x-circle-fill'
+                                            } %}
+                                            <span class="badge bg-{{ sc.get(item.estado, 'secondary') }}{% if sc.get(item.estado) == 'warning' %} text-dark{% endif %}">
+                                                <i class="bi {{ si.get(item.estado, 'bi-question-circle') }} me-1"></i>{{ item.estado }}
+                                            </span>
+                                            {% endif %}
+                                             <td class="col-9 text-center">
+                                            <div class="btn-group btn-group-sm" role="group" aria-label="Acciones">
+                                                <button class="btn btn-outline-info" title="Trazabilidad 360°" onclick="verTrazabilidadItem({{ item.id }})">
+                                                    <i class="bi bi-clock-history"></i>
+                                                </button>
+                                                <button class="btn btn-outline-secondary" title="Etiqueta / Código de Barras" onclick="generarEtiquetaItem({{ item.id }}, '{{ item.numero_inventario or '' }}', '{{ (item.item or '') | replace('\'', '\\\'') }}', '{{ (item.marca_modelo or '') | replace('\'', '\\\'') }}', '{{ (item.serial or '') | replace('\'', '\\\'') }}', '{{ (item.activo_fijo or '') | replace('\'', '\\\'') }}', '{{ (item.categoria or '') | replace('\'', '\\\'') }}')">
+                                                    <i class="bi bi-upc-scan"></i>
+                                                </button>
+                                                {% if item.estado == 'En Mantenimiento' %}
+                                                <button class="btn btn-success" title="Retornar a Disponible" onclick="abrirModalRetornoMantenimiento({{ item.id }}, '{{ (item.item or '') | replace('\'', '\\\'') }}')">
+                                                    <i class="bi bi-box-arrow-in-down-left"></i>
+                                                </button>
+                                                {% elif not item.es_por_cantidad and item.estado != 'De Baja' %}
+                                                <button class="btn btn-outline-warning text-dark" title="Enviar a Mantenimiento" onclick="abrirModalEnviarMantenimiento({{ item.id }}, '{{ (item.item or '') | replace('\'', '\\\'') }}')">
+                                                    <i class="bi bi-tools"></i>
+                                                </button>
+                                                {% endif %}
+                                                <button class="btn btn-outline-primary btn-edit" title="Editar"
+                                                    data-bs-toggle="modal" data-bs-target="#editModal"
+                                                    data-id="{{ item.id }}">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </button>
+                                                {% if not item.es_por_cantidad and item.estado != 'De Baja' and session.rol == 'admin' %}
+                                                <button class="btn btn-outline-secondary text-danger" title="Dar de Baja" onclick="abrirModalBaja({{ item.id }}, '{{ (item.item or '') | replace('\'', '\\\'') }}')">
+                                                    <i class="bi bi-slash-circle"></i>
+                                                </button>
+                                                {% endif %}
+                                                {% set name_l = (item.item or '')|lower %}
+                                                {% set cat_l = (item.categoria or '')|lower %}
+                                                {% set es_accesorio = ('control' in name_l) or ('cable' in name_l) or
+                                                ('hdmi' in
+                                                 name_l) or ('vga' in name_l) or ('displayport' in name_l) or ('dp' in
+                                                 name_l) or
+                                                ('usb' in name_l) or ('aux' in name_l) or ('audio' in name_l) or ('parlante'
+                                                 in
+                                                 name_l) or ('adaptador' in name_l) or ('convertidor' in name_l) or
+                                                ('control' in
+                                                 cat_l) or ('cable' in cat_l) %}
+                                                {% if session.rol == 'admin' or es_accesorio %}
+                                                <button class="btn btn-outline-danger btn-delete" title="Eliminar"
+                                                    data-id="{{ item.id }}">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr id="no-items-row">
+                                        <td colspan="11" class="text-center text-muted">No hay items en el inventario
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para Editar Item -->
+        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Editar Item del Inventario</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formEditInventario">
+                            <input type="hidden" id="editItemId" name="id" aria-label="ID del Item a Editar">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="editCategoria">Categoría:</label>
+                                    <select class="form-select" id="editCategoria" name="categoria" required>
+                                        {% for categoria in categorias %}
+                                        <option value="{{ categoria }}">{{ categoria }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="editItem">Nombre del Item:</label>
+                                    <input type="text" class="form-control" id="editItem" name="item" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="editSede">Sede:</label>
+                                    <select class="form-select" id="editSede" name="sede_id" required>
+                                        <option value="">Seleccione Sede...</option>
+                                        {% for sede in sedes %}
+                                        <option value="{{ sede.id }}">{{ sede.nombre }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="editBodega">Bodega:</label>
+                                    <select class="form-select" id="editBodega" name="bodega_id" required>
+                                        <option value="">Seleccione Sede primero...</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" for="editUbicacionPermanente">Ubicación Específica (Opcional):</label>
+                                    <input type="text" class="form-control" id="editUbicacionPermanente"
+                                        name="ubicacion_permanente" placeholder="Ej: Estante A-1, Oficina 201">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" for="editMarcaModelo">Marca / Modelo:</label>
+                                    <input type="text" class="form-control" id="editMarcaModelo" name="marca_modelo">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="editSerial">Serial:</label>
+                                    <input type="text" class="form-control" id="editSerial" name="serial">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="editActivoFijo">Activo Fijo:</label>
+                                    <input type="text" class="form-control" id="editActivoFijo" name="activo_fijo">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="editNumeroInventario">Número de Inventario:</label>
+                                    <input type="text" class="form-control" id="editNumeroInventario"
+                                        name="numero_inventario" placeholder="ID de inventario (Opcional)">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="editEstado">Estado:</label>
+                                    <select class="form-select" id="editEstado" name="estado" required>
+                                        <option value="Disponible">Disponible</option>
+                                        <option value="En Préstamo">En Préstamo</option>
+                                        <option value="En Mantenimiento">En Mantenimiento</option>
+                                        <option value="En Reparación">En Reparación</option>
+                                        <option value="De Baja">De Baja</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" for="editObservaciones">Observaciones:</label>
+                                    <textarea class="form-control" id="editObservaciones" name="observaciones"
+                                        rows="2"></textarea>
+                                </div>
+                                <!-- GESTIÓN POR CANTIDAD -->
+                                <div class="col-12">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="editEsPorCantidad"
+                                            name="es_por_cantidad" value="true" onchange="toggleCantidadFields('edit')">
+                                        <label class="form-check-label fw-bold" for="editEsPorCantidad">
+                                            <i class="bi bi-stack"></i> Gestionar por cantidad (Stock) — Para cables
+                                            HDMI,
+                                            controles, etc.
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" id="editCantidadTotalWrapper" style="display:none">
+                                    <label class="form-label" for="editCantidadTotal">Cantidad Total en Stock:</label>
+                                    <input type="number" class="form-control" id="editCantidadTotal"
+                                        name="cantidad_total" min="1" value="1">
+                                </div>
+                                <div class="col-md-6" id="editCantidadDispWrapper" style="display:none">
+                                    <label class="form-label" for="editCantidadDisponible">Cantidad Disponible Ahora:</label>
+                                    <input type="number" class="form-control" id="editCantidadDisponible"
+                                        name="cantidad_disponible" min="0" value="0" readonly>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="btnGuardarCambios">Guardar Cambios</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para Actualización Masiva -->
+        <div class="modal fade" id="bulkModal" tabindex="-1" aria-labelledby="bulkModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="bulkModalLabel"><i class="bi bi-layers"></i> Actualización Masiva
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-3">Seleccione la nueva ubicación para los <strong><span
+                                    id="bulkItemsCount">0</span></strong> items seleccionados:</p>
+                        <div class="mb-3">
+                            <label class="form-label" for="bulkSede">Sede Destino:</label>
+                            <select class="form-select" id="bulkSede" required>
+                                <option value="">Seleccione Sede...</option>
+                                {% for sede in sedes %}
+                                <option value="{{ sede.id }}">{{ sede.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="bulkBodega">Bodega Destino:</label>
+                            <select class="form-select" id="bulkBodega" required disabled>
+                                <option value="">Seleccione Sede primero...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="btnProcesarMasivo">Procesar
+                            Actualización</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barra de acciones masivas flotante -->
+        <div id="bulkActionBar"
+            class="position-fixed bottom-0 start-50 translate-middle-x mb-4 shadow-lg border rounded bg-white p-3 d-none"
+            style="z-index: 1050; min-width: 320px;">
+            <div class="d-flex justify-content-between align-items-center gap-3">
+                <div>
+                    <span class="badge bg-primary fs-6" id="bulkSelectedText">0</span> items seleccionados
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-dark" id="btnBulkEtiquetas" onclick="abrirModalEtiquetasSeleccionados()">
+                        <i class="bi bi-upc-scan"></i> Etiquetas
+                    </button>
+                    <button class="btn btn-danger" id="btnBulkDelete" style="display:none;">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                    <button class="btn btn-primary" id="btnOpenBulkModal">
+                        <i class="bi bi-geo-alt"></i> Asignar Sede/Bodega
+                    </button>
+                    <button class="btn btn-outline-secondary" id="btnCancelBulk">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Trazabilidad 360° -->
+        <div class="modal fade" id="modalTrazabilidad" tabindex="-1" aria-labelledby="modalTrazabilidadLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark text-white">
+                        <h5 class="modal-title" id="modalTrazabilidadLabel">
+                            <i class="bi bi-clock-history me-2 text-info"></i>Trazabilidad 360° del Equipo
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4" id="trazabilidadContenido">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p class="mt-2 text-muted">Cargando ciclo de vida e historial completo...</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Etiqueta Individual -->
+        <div class="modal fade" id="modalEtiqueta" tabindex="-1" aria-labelledby="modalEtiquetaLabel" aria-hidden="true">
+            <div class="modal-dialog modal-md">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="modalEtiquetaLabel">
+                            <i class="bi bi-upc-scan me-2"></i>Etiqueta de Activo Institucional
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center p-4">
+                        <div id="etiquetaPrintPreview" class="border rounded p-3 bg-white shadow-sm text-start mx-auto" style="max-width: 360px; font-family: 'Inter', system-ui, sans-serif; border: 2px dashed #0284c7 !important;">
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                                <span class="fw-bold text-primary" style="font-size: 0.95rem; letter-spacing: 0.5px;">CORPORACIÓN UNIVERSITARIA MINUTO DE DIOS</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="badge bg-secondary" id="lblEtiquetaCategoria">Activo</span>
+                                <span class="small text-muted" id="lblEtiquetaSede">Sede</span>
+                            </div>
+                            <div class="fw-bold text-dark fs-6" id="lblEtiquetaNombre">Equipo</div>
+                            <div class="small text-muted mb-2" id="lblEtiquetaMarcaSerial">Marca / Serial</div>
+                            <div class="text-center my-2 p-2 bg-light rounded">
+                                <svg id="barcodeCanvas"></svg>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center border-top pt-2 mt-2">
+                                <div>
+                                    <small class="text-muted d-block" style="font-size: 0.7rem;">N° INVENTARIO</small>
+                                    <strong class="text-dark" id="lblEtiquetaNumero" style="font-size: 0.85rem;">--</strong>
+                                </div>
+                                <div class="text-end">
+                                    <small class="text-muted d-block" style="font-size: 0.7rem;">ACTIVO FIJO</small>
+                                    <strong class="text-dark" id="lblEtiquetaActivoFijo" style="font-size: 0.85rem;">--</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary" onclick="imprimirEtiquetaIndividual()">
+                            <i class="bi bi-printer me-1"></i>Imprimir Etiqueta
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Etiquetas Masivas -->
+        <div class="modal fade" id="modalEtiquetasMasivas" tabindex="-1" aria-labelledby="modalEtiquetasMasivasLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark text-white">
+                        <h5 class="modal-title" id="modalEtiquetasMasivasLabel">
+                            <i class="bi bi-grid-3x3-gap me-2 text-warning"></i>Impresión Masiva de Etiquetas
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="alert alert-info d-flex align-items-center mb-3">
+                            <i class="bi bi-info-circle-fill fs-5 me-2"></i>
+                            <div>Se generaron <strong id="lblTotalEtiquetasMasivas">0</strong> etiquetas con código de barras listas para impresión.</div>
+                        </div>
+                        <div id="contenedorEtiquetasMasivas" class="d-flex flex-wrap gap-3 justify-content-center">
+                            <!-- Tarjetas dinámicas -->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary" onclick="imprimirEtiquetasMasivas()">
+                            <i class="bi bi-printer me-1"></i>Imprimir Todas
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Enviar a Mantenimiento -->
+        <div class="modal fade" id="modalEnviarMantenimiento" tabindex="-1" aria-labelledby="modalEnviarMantenimientoLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title" id="modalEnviarMantenimientoLabel"><i class="bi bi-tools me-2"></i>Enviar a Mantenimiento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="formEnviarMantenimiento" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="modal-body">
+                            <p>Registrar orden de mantenimiento para: <strong id="mantItemNombre">--</strong></p>
+                            <div class="mb-3">
+                                <label class="form-label" for="mantTipo">Tipo de Mantenimiento:</label>
+                                <select class="form-select" id="mantTipo" name="tipo" required>
+                                    <option value="Correctivo">Correctivo (Reparación de falla)</option>
+                                    <option value="Preventivo">Preventivo (Limpieza y calibración)</option>
+                                    <option value="Garantía">Garantía de Fábrica</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="mantProveedor">Proveedor / Técnico Asignado:</label>
+                                <input type="text" class="form-control" id="mantProveedor" name="proveedor_tecnico" placeholder="Ej: Soporte TI UNIMINUTO / Proveedor Autorizado" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="mantFechaRetorno">Fecha Estimada de Retorno (Opcional):</label>
+                                <input type="date" class="form-control" id="mantFechaRetorno" name="fecha_estimada_retorno">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="mantMotivo">Diagnóstico Inicial / Motivo:</label>
+                                <textarea class="form-control" id="mantMotivo" name="motivo" rows="3" placeholder="Detalle la falla presentada o el protocolo a realizar..." required></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-warning"><i class="bi bi-send me-1"></i>Confirmar Envío</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Retornar de Mantenimiento -->
+        <div class="modal fade" id="modalRetornoMantenimiento" tabindex="-1" aria-labelledby="modalRetornoMantenimientoLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title" id="modalRetornoMantenimientoLabel"><i class="bi bi-box-arrow-in-down-left me-2"></i>Retorno de Mantenimiento</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="formRetornoMantenimiento" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="modal-body">
+                            <p>Reincorporar al inventario disponible el equipo: <strong id="retornoItemNombre">--</strong></p>
+                            <div class="mb-3">
+                                <label class="form-label" for="retornoDiagnostico">Diagnóstico y Solución Aplicada:</label>
+                                <textarea class="form-control" id="retornoDiagnostico" name="diagnostico_solucion" rows="3" placeholder="Detalle los arreglos efectuados, cambio de repuestos o pruebas realizadas..." required></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-success"><i class="bi bi-check-circle me-1"></i>Reincorporar a Disponible</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Dar de Baja -->
+        <div class="modal fade" id="modalDarDeBaja" tabindex="-1" aria-labelledby="modalDarDeBajaLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="modalDarDeBajaLabel"><i class="bi bi-slash-circle me-2"></i>Dar de Baja Oficial</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="formDarDeBaja" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="modal-body">
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                                Esta acción retirará definitivamente el equipo del inventario operativo y registrará la constancia de baja institucional.
+                            </div>
+                            <p>Equipo a dar de baja: <strong id="bajaItemNombre">--</strong></p>
+                            <div class="mb-3">
+                                <label class="form-label" for="bajaMotivo">Motivo / Causal de Baja:</label>
+                                <textarea class="form-control" id="bajaMotivo" name="motivo_baja" rows="3" placeholder="Ej: Daño irreparable / Obsolescencia técnica / Pérdida..." required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="bajaSoporte">Soporte o N° de Acta / Resolución (Opcional):</label>
+                                <input type="text" class="form-control" id="bajaSoporte" name="soporte_resolucion" placeholder="Ej: Acta N° 2026-04 TI / Radicado #12345">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-danger"><i class="bi bi-slash-circle me-1"></i>Confirmar Baja Oficial</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Importar Excel -->
+        <div class="modal fade" id="modalImportarExcel" tabindex="-1" aria-labelledby="modalImportarExcelLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="modalImportarExcelLabel"><i class="bi bi-file-earmark-arrow-up me-2"></i>Importación Masiva de Inventario</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="{{ url_for('inventario.importar_excel') }}" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="modal-body p-4">
+                            <div class="card border-primary-subtle bg-primary bg-opacity-10 mb-3 p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="fw-bold mb-1"><i class="bi bi-file-earmark-spreadsheet me-1"></i>Plantilla Oficial de Carga</h6>
+                                        <small class="text-muted">Descargue el formato estructurado para evitar inconsistencias en columnas.</small>
+                                    </div>
+                                    <a href="{{ url_for('inventario.descargar_plantilla_excel') }}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-download me-1"></i>Descargar Plantilla (.xlsx)
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold" for="archivo_excel">Seleccione el archivo (.xlsx, .xls, .csv):</label>
+                                <input type="file" class="form-control" id="archivo_excel" name="archivo_excel" accept=".xlsx,.xls,.csv" required>
+                            </div>
+                            <div class="small text-muted">
+                                <strong>Nota:</strong> Si el número de inventario ya existe en el sistema, se actualizarán los datos del registro. Si no existe, se creará un nuevo registro en estado Disponible.
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-upload me-1"></i>Iniciar Importación</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor Oculto para Impresión Exclusiva de Etiquetas -->
+        <div id="seccionImpresionEtiquetas" class="d-none"></div>
+
+        <script>
+            function toggleCantidadFields(mode) {
+                if (mode === 'add') {
+                    const checked = document.getElementById('esPorCantidad').checked;
+                    document.getElementById('cantidadTotalWrapper').style.display = checked ? '' : 'none';
+                    document.getElementById('cantidad_total').required = checked;
+                    // Mostrar/ocultar campos de identificación cuando se gestionan por cantidad
+                    const niWrap = document.getElementById('numero_inventario').closest('.col-md-6');
+                    const afWrap = document.getElementById('activo_fijo').closest('.col-md-6');
+                    niWrap.style.display = checked ? 'none' : '';
+                    afWrap.style.display = checked ? 'none' : '';
+                    document.getElementById('numero_inventario').required = !checked;
+                    document.getElementById('activo_fijo').required = false;
+                } else {
+                    const checked = document.getElementById('editEsPorCantidad').checked;
+                    document.getElementById('editCantidadTotalWrapper').style.display = checked ? '' : 'none';
+                    document.getElementById('editCantidadDispWrapper').style.display = checked ? '' : 'none';
+                    document.getElementById('editCantidadTotal').required = checked;
+                    const niWrap = document.getElementById('editNumeroInventario').closest('.col-md-6');
+                    const afWrap = document.getElementById('editActivoFijo').closest('.col-md-6');
+                    niWrap.style.display = checked ? 'none' : '';
+                    afWrap.style.display = checked ? 'none' : '';
+                    document.getElementById('editNumeroInventario').required = !checked;
+                    document.getElementById('editActivoFijo').required = false;
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const rootInv = document.getElementById('inventarioRoot');
+                const ES_ADMIN = !!(rootInv && rootInv.dataset && rootInv.dataset.forceDelete === '1');
+                const tableBody = document.getElementById('inventario-table-body');
+                const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+                const itemInput = document.getElementById('item');
+                const editItemInput = document.getElementById('editItem');
+
+                // --- REGISTRAR NUEVO ITEM ---
+                const formInventario = document.getElementById('formInventario');
+                if (formInventario) {
+                    formInventario.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    const data = Object.fromEntries(formData.entries());
+                    // Convertir checkbox
+                    data.es_por_cantidad = document.getElementById('esPorCantidad').checked;
+
+                    LoadingUI.show('Registrando item...');
+                    const response = await fetch('/inventario/agregar', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    const result = await response.json();
+                    LoadingUI.hide();
+                    LoadingUI.toast(result.message, result.success ? 'success' : 'danger');
+                    if (result.success) location.reload();
+                    });
+                }
+
+                function esAccesorioNombre(nombre) {
+                    if (!nombre) return false;
+                    const n = nombre.toLowerCase();
+                    return ['control', 'cable', 'hdmi', 'vga', 'displayport', 'dp', 'usb', 'parlante', 'adaptador', 'convertidor'].some(k => n.includes(k));
+                }
+
+                // Auto-configurar para accesorios (controles/cables): activar gestión por cantidad y ocultar Nº Inv / Activo Fijo
+                itemInput.addEventListener('input', function () {
+                    const activar = esAccesorioNombre(this.value);
+                    document.getElementById('esPorCantidad').checked = activar || document.getElementById('esPorCantidad').checked;
+                    if (activar) {
+                        toggleCantidadFields('add');
+                    }
+                });
+
+                // Evento delegado para la tabla (incluye filas de búsqueda)
+                const inventarioTableBody = document.getElementById('inventario-table-body');
+                if (inventarioTableBody) {
+                    inventarioTableBody.addEventListener('click', function (e) {
+                    const button = e.target.closest('button');
+                    if (!button) return;
+
+                    const itemId = button.dataset.id;
+                    const row = button.closest('tr');
+
+                    if (button.classList.contains('btn-edit')) {
+                        // Populate modal
+                        document.getElementById('editItemId').value = itemId;
+                        document.getElementById('editCategoria').value = row.cells[2].textContent;
+                        document.getElementById('editItem').value = row.cells[3].textContent;
+                        document.getElementById('editMarcaModelo').value = row.cells[4].textContent.replace('--', '');
+                        document.getElementById('editSerial').value = row.cells[5].textContent.replace('--', '');
+                        // Sede/Bodega se cargan en el fetch al final
+
+                        const estadoActualArea = row.cells[8].textContent.trim();
+                        const editEstadoSelect = document.getElementById('editEstado');
+                        editEstadoSelect.value = estadoActualArea;
+                        // Prevenir que el estado se cambie manualmente si el item está 'En Préstamo'
+                        editEstadoSelect.disabled = (estadoActualArea === 'En Préstamo');
+                    }
+
+                    if (button.classList.contains('btn-delete')) {
+                        if (confirm(`¿Estás seguro de eliminar el item con ID ${itemId}?`)) {
+                            const root = document.getElementById('inventarioRoot');
+                            const useForce = root && root.dataset && root.dataset.forceDelete === '1';
+                            const forceParam = useForce ? '?force=1' : '';
+                            fetch(`/inventario/eliminar/${itemId}${forceParam}`, { method: 'DELETE' })
+                                .then(res => res.json())
+                                .then(result => {
+                                    alert(result.message);
+                                    if (result.success) {
+                                        // Recargar página para actualizar
+                                        window.location.reload();
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    alert('Error al eliminar el item');
+                                });
+                        }
+                    }
+                });
+                }
+
+                // Guardar cambios del modal de edición
+                const btnGuardarCambios = document.getElementById('btnGuardarCambios');
+                if (btnGuardarCambios) {
+                    btnGuardarCambios.addEventListener('click', function () {
+                    const itemId = document.getElementById('editItemId').value;
+                    const form = document.getElementById('formEditInventario');
+                    const data = Object.fromEntries(new FormData(form).entries());
+
+                    fetch(`/inventario/editar/${itemId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    })
+                        .then(res => res.json())
+                    .then(result => {
+                            alert(result.message);
+                            if (result.success) location.reload();
+                        });
+                    });
+                }
+
+                // Auto-ocultar identificadores en edición si el nombre del item indica accesorio
+                if (editItemInput) {
+                    editItemInput.addEventListener('input', function () {
+                    const activar = esAccesorioNombre(this.value);
+                    document.getElementById('editEsPorCantidad').checked = activar || document.getElementById('editEsPorCantidad').checked;
+                    if (activar) {
+                        toggleCantidadFields('edit');
+                    }
+                });
+                }
+
+                // --- VALIDACIÓN DINÁMICA PARA NÚMERO DE INVENTARIO ---
+                const categoriaSelect = document.querySelector('#formInventario select[name="categoria"]');
+                const numeroInventarioInput = document.querySelector('#formInventario input[name="numero_inventario"]');
+
+                const editCategoriaSelect = document.getElementById('editCategoria');
+                const editNumeroInventarioInput = document.getElementById('editNumeroInventario');
+
+                function toggleNumeroInventarioRequired(categoria, input) {
+                    if (categoria === 'Equipos Portátiles') {
+                        input.required = true;
+                        input.placeholder = 'ID de inventario (Requerido)';
+                    } else {
+                        input.required = false;
+                        input.placeholder = 'ID de inventario (Opcional)';
+                    }
+                }
+
+                function syncFilaSeleccionadaDesdeCheckbox(cb) {
+                    if (!cb) return;
+                    const tr = cb.closest('tr');
+                    if (!tr) return;
+                    if (cb.checked) tr.classList.add('row-selected');
+                    else tr.classList.remove('row-selected');
+                }
+
+                function syncTodasFilasSeleccionadas() {
+                    document.querySelectorAll('#inventario-table-body .select-item').forEach(cb => {
+                        syncFilaSeleccionadaDesdeCheckbox(cb);
+                    });
+                }
+
+                if (categoriaSelect) {
+                    categoriaSelect.addEventListener('change', function () {
+                        toggleNumeroInventarioRequired(this.value, numeroInventarioInput);
+                    });
+                }
+
+                if (editCategoriaSelect) {
+                    editCategoriaSelect.addEventListener('change', function () {
+                        toggleNumeroInventarioRequired(this.value, editNumeroInventarioInput);
+                    });
+                }
+
+                // --- GESTIÓN DE SEDES Y BODEGAS DINÁMICAS ---
+                function loadBodegas(sedeId, targetSelect, selectedBodegaId = null) {
+                    if (!sedeId) {
+                        targetSelect.innerHTML = '<option value="">Seleccione Sede primero...</option>';
+                        targetSelect.disabled = true;
+                        return;
+                    }
+
+                    fetch(`/admin/api/bodegas/${sedeId}`)
+                        .then(res => res.json())
+                        .then(bodegas => {
+                            targetSelect.innerHTML = '<option value="">Seleccione Bodega...</option>';
+                            bodegas.forEach(b => {
+                                const option = document.createElement('option');
+                                option.value = b.id;
+                                option.textContent = b.nombre;
+                                if (selectedBodegaId && b.id == selectedBodegaId) option.selected = true;
+                                targetSelect.appendChild(option);
+                            });
+                            targetSelect.disabled = false;
+                        });
+                }
+
+                const sedeId = document.getElementById('sede_id');
+                if (sedeId) {
+                    sedeId.addEventListener('change', function () {
+                        loadBodegas(this.value, document.getElementById('bodega_id'));
+                    });
+                }
+
+                const editSede = document.getElementById('editSede');
+                if (editSede) {
+                    editSede.addEventListener('change', function () {
+                        loadBodegas(this.value, document.getElementById('editBodega'));
+                    });
+                }
+
+                const filterSede = document.getElementById('filter_sede');
+                if (filterSede) {
+                    filterSede.addEventListener('change', function () {
+                        loadBodegas(this.value, document.getElementById('filter_bodega'));
+                    });
+                }
+
+                // Al abrir el modal de edición
+                document.querySelectorAll('.btn-edit').forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const itemId = this.getAttribute('data-id');
+                        fetch(`/inventario/editar/${itemId}`)
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                    const item = data.item;
+                                    document.getElementById('editItemId').value = item.id;
+                                    document.getElementById('editCategoria').value = item.categoria;
+                                    document.getElementById('editItem').value = item.item;
+                                    document.getElementById('editMarcaModelo').value = item.marca_modelo || '';
+                                    document.getElementById('editSerial').value = item.serial || '';
+                                    document.getElementById('editActivoFijo').value = item.activo_fijo || '';
+                                    document.getElementById('editNumeroInventario').value = item.numero_inventario || '';
+                                    document.getElementById('editUbicacionPermanente').value = item.ubicacion_permanente || '';
+                                    document.getElementById('editEstado').value = item.estado;
+                                    document.getElementById('editObservaciones').value = item.observaciones || '';
+
+                                    // Bloquear cambio de estado si está 'En Préstamo'
+                                    document.getElementById('editEstado').disabled = (item.estado === 'En Préstamo');
+
+                                    // Campos de cantidad
+                                    const esPorCantidad = !!item.es_por_cantidad;
+                                    document.getElementById('editEsPorCantidad').checked = esPorCantidad;
+                                    document.getElementById('editCantidadTotalWrapper').style.display = esPorCantidad ? '' : 'none';
+                                    document.getElementById('editCantidadDispWrapper').style.display = esPorCantidad ? '' : 'none';
+                                    if (esPorCantidad) {
+                                        document.getElementById('editCantidadTotal').value = item.cantidad_total || 1;
+                                        document.getElementById('editCantidadDisponible').value = item.cantidad_disponible || 0;
+                                    }
+
+                                    // Cargar sedes y luego bodegas
+                                    if (item.sede_id) {
+                                        document.getElementById('editSede').value = item.sede_id;
+                                        loadBodegas(item.sede_id, document.getElementById('editBodega'), item.bodega_id);
+                                    } else {
+                                        document.getElementById('editSede').value = "";
+                                        document.getElementById('editBodega').innerHTML = '<option value="">Seleccione Sede primero...</option>';
+                                        document.getElementById('editBodega').disabled = true;
+                                    }
+                                }
+                            });
+                    });
+                });
+
+                // === BÚSQUEDA GENERAL EN TIEMPO REAL ===
+                const searchInput = document.getElementById('buscarInventario');
+                const clearSearchBtn = document.getElementById('limpiarBusquedaInventario');
+
+                function filtrarTablaGeneral(termino) {
+                    const term = (termino || '').toLowerCase().trim();
+                    const rows = document.querySelectorAll('#inventario-table-body tr.item-row');
+                    let visibles = 0;
+
+                    rows.forEach(row => {
+                        const texto = row.textContent.toLowerCase();
+                        if (!term || texto.includes(term)) {
+                            row.style.display = '';
+                            visibles++;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+
+                    let noRow = document.getElementById('no-search-results-row');
+                    if (visibles === 0 && rows.length > 0) {
+                        if (!noRow) {
+                            noRow = document.createElement('tr');
+                            noRow.id = 'no-search-results-row';
+                            noRow.innerHTML = '<td colspan="10" class="text-center text-muted py-4"><i class="bi bi-search me-2"></i>No se encontraron resultados para la búsqueda</td>';
+                            document.getElementById('inventario-table-body').appendChild(noRow);
+                        }
+                    } else if (noRow) {
+                        noRow.remove();
+                    }
+                }
+
+                if (searchInput) {
+                    searchInput.addEventListener('input', function () {
+                        filtrarTablaGeneral(this.value);
+                    });
+                }
+                if (clearSearchBtn) {
+                    clearSearchBtn.addEventListener('click', function () {
+                        if (searchInput) {
+                            searchInput.value = '';
+                            filtrarTablaGeneral('');
+                        }
+                    });
+                }
+
+                // --- EXPORTAR INVENTARIO CON FILTROS ---
+                const btnExcel = document.getElementById('export-excel-link');
+                const btnCsv = document.getElementById('export-csv-link');
+                if (btnExcel && btnCsv && window.location.search) {
+                    btnExcel.href += window.location.search;
+                    btnCsv.href += window.location.search;
+                }
+
+                // --- ACCIONES MASIVAS ---
+                const selectAllCheckbox = document.getElementById('selectAllItems');
+                const bulkActionBar = document.getElementById('bulkActionBar');
+                const bulkSelectedText = document.getElementById('bulkSelectedText');
+                const bulkModal = new bootstrap.Modal(document.getElementById('bulkModal'));
+                const btnBulkDelete = document.getElementById('btnBulkDelete');
+
+                const invRoot = document.getElementById('inventarioRoot');
+                const isSuperadmin = !!(invRoot && invRoot.dataset && invRoot.dataset.userRole === 'superadmin');
+                if (btnBulkDelete) btnBulkDelete.style.display = isSuperadmin ? '' : 'none';
+
+                function actualizarBarraMasiva() {
+                    const seleccionados = document.querySelectorAll('.select-item:checked');
+                    const total = seleccionados.length;
+
+                    if (total > 0) {
+                        bulkActionBar.classList.remove('d-none');
+                        bulkSelectedText.textContent = total;
+                        document.getElementById('bulkItemsCount').textContent = total;
+                    } else {
+                        bulkActionBar.classList.add('d-none');
+                        selectAllCheckbox.checked = false;
+                    }
+                }
+
+                selectAllCheckbox?.addEventListener('change', function () {
+                    const visibleCheckboxes = document.querySelectorAll('#inventario-table-body tr:not([style*="display: none"]) .select-item');
+                    visibleCheckboxes.forEach(cb => cb.checked = this.checked);
+                    visibleCheckboxes.forEach(cb => syncFilaSeleccionadaDesdeCheckbox(cb));
+                    actualizarBarraMasiva();
+                });
+
+                if (inventarioTableBody) {
+                    inventarioTableBody.addEventListener('change', function (e) {
+                        if (e.target.classList.contains('select-item')) {
+                            syncFilaSeleccionadaDesdeCheckbox(e.target);
+                            actualizarBarraMasiva();
+                        }
+                    });
+                }
+
+                document.getElementById('btnCancelBulk')?.addEventListener('click', function () {
+                    document.querySelectorAll('.select-item').forEach(cb => cb.checked = false);
+                    syncTodasFilasSeleccionadas();
+                    actualizarBarraMasiva();
+                });
+
+                syncTodasFilasSeleccionadas();
+
+                document.getElementById('btnOpenBulkModal')?.addEventListener('click', function () {
+                    bulkModal.show();
+                });
+
+                btnBulkDelete?.addEventListener('click', async function () {
+                    if (!isSuperadmin) {
+                        alert('Acceso denegado. Se requiere rol superadmin.');
+                        return;
+                    }
+                    const itemIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.value);
+                    if (itemIds.length === 0) {
+                        alert('No hay items seleccionados.');
+                        return;
+                    }
+                    if (!confirm(`¿Eliminar ${itemIds.length} items seleccionados? Esta acción también borrará su historial de préstamos.`)) {
+                        return;
+                    }
+
+                    try {
+                        LoadingUI.show('Eliminando items...');
+                        const resp = await fetch('/inventario/bulk_delete', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ item_ids: itemIds })
+                        });
+                        const result = await resp.json();
+                        LoadingUI.hide();
+                        LoadingUI.toast(result.message || (result.success ? 'Eliminación masiva completada.' : 'No se pudo eliminar.'), result.success ? 'success' : 'danger');
+                        if (resp.ok && result && result.success) {
+                            location.reload();
+                        }
+                    } catch (e) {
+                        LoadingUI.hide();
+                        LoadingUI.toast('Error al eliminar masivamente', 'danger');
+                    }
+                });
+
+                document.getElementById('bulkSede')?.addEventListener('change', function () {
+                    loadBodegas(this.value, document.getElementById('bulkBodega'));
+                });
+
+                document.getElementById('btnProcesarMasivo')?.addEventListener('click', async function () {
+                    const itemIds = Array.from(document.querySelectorAll('.select-item:checked')).map(cb => cb.value);
+                    const sedeId = document.getElementById('bulkSede').value;
+                    const bodegaId = document.getElementById('bulkBodega').value;
+
+                    if (!sedeId || !bodegaId) {
+                        alert('Debe seleccionar Sede y Bodega de destino.');
+                        return;
+                    }
+
+                    if (!confirm(`¿Está seguro de mover ${itemIds.length} items a la nueva ubicación?`)) return;
+
+                    const btn = this;
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Procesando...';
+
+                    try {
+                        LoadingUI.show('Actualizando ubicación...');
+                        const response = await fetch('/inventario/bulk_update', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                item_ids: itemIds,
+                                sede_id: sedeId,
+                                bodega_id: bodegaId
+                            })
+                        });
+
+                        const result = await response.json();
+                        LoadingUI.hide();
+                        if (result.success) {
+                            LoadingUI.toast(result.message, 'success');
+                            location.reload();
+                        } else {
+                            LoadingUI.toast('Error: ' + result.message, 'danger');
+                            btn.disabled = false;
+                            btn.textContent = 'Procesar Actualización';
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        LoadingUI.hide();
+                        LoadingUI.toast('Error al procesar la actualización masiva.', 'danger');
+                        btn.disabled = false;
+                        btn.textContent = 'Procesar Actualización';
+                    }
+                });
+                // --- SCROLL SUPERIOR SINCRONIZADO ---
+                const tableScroll = document.getElementById('table-scroll-container');
+                const topScrollContainer = document.getElementById('top-scrollbar-container');
+                const topScrollInner = document.getElementById('top-scrollbar-inner');
+                const table = document.getElementById('inventarioTable');
+
+                function updateTopScrollWidth() {
+                    if (!table || !topScrollInner) return;
+                    topScrollInner.style.width = table.scrollWidth + 'px';
+                }
+
+                if (tableScroll && topScrollContainer) {
+                    let syncingTop = false, syncingBottom = false;
+
+                    topScrollContainer.addEventListener('scroll', function () {
+                        if (syncingBottom) return;
+                        syncingTop = true;
+                        tableScroll.scrollLeft = this.scrollLeft;
+                        syncingTop = false;
+                    });
+
+                    tableScroll.addEventListener('scroll', function () {
+                        if (syncingTop) return;
+                        syncingBottom = true;
+                        topScrollContainer.scrollLeft = this.scrollLeft;
+                        syncingBottom = false;
+                    });
+
+                    // Actualizar ancho al cargar y al redimensionar
+                    setTimeout(updateTopScrollWidth, 300);
+                    window.addEventListener('resize', updateTopScrollWidth);
+                }
+
+                window.updateTopScrollWidth = updateTopScrollWidth;
+
+                // Lógica de Ocultar/Mostrar Columnas
+                function applyColumnPreferences() {
+                    const prefs = JSON.parse(localStorage.getItem('inventario_col_prefs') || '{}');
+                    document.querySelectorAll('.col-toggle').forEach(checkbox => {
+                        const colIdx = checkbox.value;
+                        if (prefs[colIdx] === false) {
+                            checkbox.checked = false;
+                            toggleColumn(colIdx, false);
+                        } else {
+                            checkbox.checked = true;
+                            toggleColumn(colIdx, true);
+                        }
+                    });
+                }
+
+                function toggleColumn(index, show) {
+                    const headers = document.querySelectorAll(`.col-${index}`);
+                    headers.forEach(h => h.classList.toggle('col-hidden', !show));
+
+                    const tbody = document.getElementById('inventario-table-body');
+                    const rows = tbody.querySelectorAll('tr');
+                    rows.forEach(row => {
+                        if (row.cells[index]) {
+                            row.cells[index].classList.toggle('col-hidden', !show);
+                        }
+                    });
+                    
+                    setTimeout(() => {
+                        if (typeof updateTopScrollWidth === 'function') updateTopScrollWidth();
+                    }, 50);
+                }
+
+                const colToggles = document.querySelectorAll('.col-toggle');
+                if (colToggles.length > 0) {
+                    colToggles.forEach(checkbox => {
+                        checkbox.addEventListener('change', function () {
+                            const colIdx = parseInt(this.value);
+                            const show = this.checked;
+                            toggleColumn(colIdx, show);
+
+                            // Guardar en localStorage
+                            const prefs = JSON.parse(localStorage.getItem('inventario_col_prefs') || '{}');
+                            prefs[colIdx] = show;
+                            localStorage.setItem('inventario_col_prefs', JSON.stringify(prefs));
+                            
+                            // Ajustar tabla después de un pequeño delay
+                            setTimeout(() => {
+                                if (typeof updateTopScrollWidth === 'function') {
+                                    updateTopScrollWidth();
+                                }
+                            }, 100);
+                        });
+                    });
+                }
+
+                // Inicializar preferencias al cargar
+                applyColumnPreferences();
+
+                // === FILTROS AVANZADOS ===
+                const filtroSedeSelect = document.getElementById('filtroSedeSelect');
+                const filtroBodegaSelect = document.getElementById('filtroBodegaSelect');
+                const filtroCategoriaSelect = document.getElementById('filtroCategoriaSelect');
+                const filtroEstadoSelect = document.getElementById('filtroEstadoSelect');
+                const filtroItemInput = document.getElementById('filtroItemInput');
+                const filtroMarcaInput = document.getElementById('filtroMarcaInput');
+                const filtroSerialInput = document.getElementById('filtroSerialInput');
+                const btnAplicarFiltros = document.getElementById('btnAplicarFiltros');
+                const btnLimpiarFiltros = document.getElementById('btnLimpiarFiltros');
+
+                console.log('🔍 Filtros avanzados inicializados');
+
+                // Cargar bodegas cuando se selecciona una sede en filtros
+                if (filtroSedeSelect) {
+                    filtroSedeSelect.addEventListener('change', function() {
+                        const sedeId = this.value;
+                        filtroBodegaSelect.innerHTML = '<option value="">Todas las bodegas</option>';
+                        
+                        if (sedeId) {
+                            filtroBodegaSelect.disabled = true;
+                            fetch(`/api/bodegas?sede_id=${sedeId}`)
+                                .then(r => r.json())
+                                .then(bodegas => {
+                                    bodegas.forEach(b => {
+                                        const opt = document.createElement('option');
+                                        opt.value = b.id;
+                                        opt.textContent = b.nombre;
+                                        filtroBodegaSelect.appendChild(opt);
+                                    });
+                                    filtroBodegaSelect.disabled = false;
+                                })
+                                .catch(err => {
+                                    console.error('Error cargando bodegas:', err);
+                                    filtroBodegaSelect.disabled = false;
+                                });
+                        } else {
+                            filtroBodegaSelect.disabled = true;
+                        }
+                    });
+                }
+
+                // Función para aplicar filtros
+                function aplicarFiltrosAvanzados() {
+                    console.log('🔍 Aplicando filtros...');
+                    const tbody = document.getElementById('inventario-table-body');
+                    if (!tbody) {
+                        console.error('❌ No se encontró el tbody');
+                        return;
+                    }
+
+                    // Obtener TODAS las filas, incluso las ocultas por DataTables
+                    const filas = tbody.querySelectorAll('tr.item-row');
+                    console.log(`📊 Total de filas en DOM: ${filas.length}`);
+                    
+                    const filtros = {
+                        categoria: filtroCategoriaSelect?.value.trim() || '',
+                        estado: filtroEstadoSelect?.value.trim() || '',
+                        sede: filtroSedeSelect?.value || '',
+                        bodega: filtroBodegaSelect?.value || '',
+                        item: filtroItemInput?.value.trim() || '',
+                        marca: filtroMarcaInput?.value.trim() || '',
+                        serial: filtroSerialInput?.value.trim() || ''
+                    };
+
+                    console.log('Filtros activos:', filtros);
+
+                    let visibles = 0;
+                    let primeraFila = true;
+                    
+                    filas.forEach((fila, idx) => {
+                        const celdas = fila.querySelectorAll('td');
+                        
+                        // Verificar que tengamos suficientes celdas
+                        if (celdas.length < 10) {
+                            console.warn(`Fila ${idx} tiene solo ${celdas.length} celdas`);
+                            return;
+                        }
+
+                        // Índices: 0=checkbox, 1=N°Inv, 2=Categoría, 3=Item, 4=Marca, 5=Serial, 6=Sede/Bodega, 7=Préstamos, 8=Estado, 9=Acciones
+                        const numInventario = (celdas[1]?.textContent || '').trim();
+                        const categoria = (celdas[2]?.textContent || '').trim();
+                        const item = (celdas[3]?.textContent || '').trim();
+                        const marca = (celdas[4]?.textContent || '').trim();
+                        const serial = (celdas[5]?.textContent || '').trim();
+                        const sedeTexto = (celdas[6]?.textContent || '').trim();
+                        const estadoTexto = (celdas[8]?.textContent || '').trim();
+
+                        // Mostrar valores de la primera fila para debug
+                        if (primeraFila) {
+                            console.log('📋 Ejemplo de valores en primera fila:');
+                            console.log('  - N° Inventario:', numInventario);
+                            console.log('  - Categoría:', categoria);
+                            console.log('  - Item:', item);
+                            console.log('  - Marca:', marca);
+                            console.log('  - Serial:', serial);
+                            console.log('  - Sede/Bodega:', sedeTexto);
+                            console.log('  - Estado:', estadoTexto);
+                            primeraFila = false;
+                        }
+
+                        let mostrar = true;
+                        let razon = '';
+
+                        // Aplicar cada filtro (comparación exacta, case-sensitive)
+                        if (filtros.categoria) {
+                            if (categoria !== filtros.categoria) {
+                                mostrar = false;
+                                razon = `categoría "${categoria}" no es igual a "${filtros.categoria}"`;
+                            }
+                        }
+                        
+                        if (filtros.estado) {
+                            if (estadoTexto !== filtros.estado) {
+                                mostrar = false;
+                                razon = `estado "${estadoTexto}" no es igual a "${filtros.estado}"`;
+                            }
+                        }
+                        
+                        if (filtros.item) {
+                            if (!item.toLowerCase().includes(filtros.item.toLowerCase())) {
+                                mostrar = false;
+                                razon = `item "${item}" no contiene "${filtros.item}"`;
+                            }
+                        }
+                        
+                        if (filtros.marca) {
+                            if (!marca.toLowerCase().includes(filtros.marca.toLowerCase())) {
+                                mostrar = false;
+                                razon = `marca "${marca}" no contiene "${filtros.marca}"`;
+                            }
+                        }
+                        
+                        if (filtros.serial) {
+                            if (!serial.toLowerCase().includes(filtros.serial.toLowerCase())) {
+                                mostrar = false;
+                                razon = `serial "${serial}" no contiene "${filtros.serial}"`;
+                            }
+                        }
+
+                        if (filtros.sede && filtroSedeSelect.selectedIndex > 0) {
+                            const sedeNombre = filtroSedeSelect.options[filtroSedeSelect.selectedIndex].text;
+                            if (!sedeTexto.includes(sedeNombre)) {
+                                mostrar = false;
+                                razon = `sede "${sedeTexto}" no contiene "${sedeNombre}"`;
+                            }
+                        }
+
+                        if (filtros.bodega && filtroBodegaSelect.selectedIndex > 0) {
+                            const bodegaNombre = filtroBodegaSelect.options[filtroBodegaSelect.selectedIndex].text;
+                            if (!sedeTexto.includes(bodegaNombre)) {
+                                mostrar = false;
+                                razon = `bodega "${sedeTexto}" no contiene "${bodegaNombre}"`;
+                            }
+                        }
+
+                        // Log de las primeras 3 filas que no pasan el filtro
+                        if (!mostrar && visibles === 0 && idx < 3) {
+                            console.log(`❌ Fila ${idx} oculta: ${razon}`);
+                        }
+
+                        fila.style.display = mostrar ? '' : 'none';
+                        if (mostrar) visibles++;
+                    });
+
+                    console.log(`✅ Filtros aplicados: ${visibles} de ${filas.length} items visibles`);
+                    
+                    // Mostrar mensaje si no hay resultados
+                    if (visibles === 0) {
+                        alert('No se encontraron items con los filtros seleccionados.\n\nNota: Solo se muestran 25 items por página. Usa la búsqueda general o cambia de página.');
+                    }
+                }
+
+                // Limpiar filtros
+                function limpiarFiltrosAvanzados() {
+                    console.log('🧹 Limpiando filtros...');
+                    
+                    if (filtroCategoriaSelect) filtroCategoriaSelect.value = '';
+                    if (filtroEstadoSelect) filtroEstadoSelect.value = '';
+                    if (filtroSedeSelect) filtroSedeSelect.value = '';
+                    if (filtroBodegaSelect) {
+                        filtroBodegaSelect.value = '';
+                        filtroBodegaSelect.innerHTML = '<option value="">Todas las bodegas</option>';
+                        filtroBodegaSelect.disabled = true;
+                    }
+                    if (filtroItemInput) filtroItemInput.value = '';
+                    if (filtroMarcaInput) filtroMarcaInput.value = '';
+                    if (filtroSerialInput) filtroSerialInput.value = '';
+
+                    const tbody = document.getElementById('inventario-table-body');
+                    if (tbody) {
+                        const filas = tbody.querySelectorAll('tr.item-row');
+                        filas.forEach(fila => fila.style.display = '');
+                        console.log(`✅ ${filas.length} items mostrados`);
+                    }
+                }
+
+                // Event listeners
+                if (btnAplicarFiltros) {
+                    btnAplicarFiltros.addEventListener('click', aplicarFiltrosAvanzados);
+                    console.log('✅ Botón Aplicar Filtros conectado');
+                }
+
+                if (btnLimpiarFiltros) {
+                    btnLimpiarFiltros.addEventListener('click', limpiarFiltrosAvanzados);
+                    console.log('✅ Botón Limpiar Filtros conectado');
+                }
+
+                // Aplicar filtros con Enter
+                [filtroItemInput, filtroMarcaInput, filtroSerialInput].forEach(input => {
+                    if (input) {
+                        input.addEventListener('keypress', function(e) {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                aplicarFiltrosAvanzados();
+                            }
+                        });
+                    }
+                });
+
+            });
+
+            </script>
+
+<script>
+    (function () {
+        function setRowSize(size) {
+            const table = document.getElementById('inventarioTable');
+            if (!table) return;
+            table.classList.remove('table-size-compact', 'table-size-normal', 'table-size-comfort');
+            if (size === 'compact') table.classList.add('table-size-compact');
+            else if (size === 'comfort') table.classList.add('table-size-comfort');
+            else table.classList.add('table-size-normal');
+            try { localStorage.setItem('inventario_row_size', size); } catch (_) { }
+        }
+
+        function initRowSizeControl() {
+            const select = document.getElementById('rowSizeSelect');
+            if (!select) return;
+            let saved = 'normal';
+            try { saved = localStorage.getItem('inventario_row_size') || 'normal'; } catch (_) { }
+            select.value = saved;
+            setRowSize(saved);
+            select.addEventListener('change', (e) => setRowSize(e.target.value));
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initRowSizeControl();
+        });
+    })();
+</script>
+
+<script>
+    // ==========================================
+    // TRAZABILIDAD 360°
+    // ==========================================
+    async function verTrazabilidadItem(itemId) {
+        const modalEl = document.getElementById('modalTrazabilidad');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        const container = document.getElementById('trazabilidadContenido');
+        
+        container.innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 text-muted">Cargando ciclo de vida e historial completo...</p>
+            </div>`;
+        modal.show();
+
+        try {
+            const resp = await fetch(`/inventario/${itemId}/trazabilidad`);
+            const data = await resp.json();
+
+            if (!data.success) {
+                container.innerHTML = `<div class="alert alert-danger">${data.message || 'Error al obtener trazabilidad'}</div>`;
+                return;
+            }
+
+            const it = data.item;
+            const prestamos = data.prestamos || [];
+            const mantenimientos = data.mantenimientos || [];
+            const auditorias = data.auditorias || [];
+
+            let prestamosRows = prestamos.length > 0 ? prestamos.map(p => `
+                <tr>
+                    <td><small>${p.fecha_prestamo || '--'}</small></td>
+                    <td><strong>${p.solicitante || 'Docente/Auxiliar'}</strong></td>
+                    <td>${p.fecha_devolucion ? `<small class="text-success">${p.fecha_devolucion}</small>` : '<span class="badge bg-warning text-dark">Activo</span>'}</td>
+                    <td><span class="badge bg-${p.estado === 'Devuelto' ? 'success' : (p.estado === 'Prestado' ? 'warning text-dark' : 'secondary')}">${p.estado || '--'}</span></td>
+                    <td><small class="text-muted">${p.observaciones || '--'}</small></td>
+                </tr>
+            `).join('') : '<tr><td colspan="5" class="text-center text-muted py-3">No hay registros de préstamos</td></tr>';
+
+            let mantRows = mantenimientos.length > 0 ? mantenimientos.map(m => `
+                <tr>
+                    <td><small>${m.fecha_envio || '--'}</small></td>
+                    <td><span class="badge bg-${m.tipo === 'Correctivo' ? 'danger' : 'info'}">${m.tipo}</span></td>
+                    <td>${m.proveedor_tecnico || '--'}</td>
+                    <td><small>${m.motivo || '--'}</small></td>
+                    <td><small class="text-success">${m.diagnostico_solucion || (m.estado === 'En Proceso' ? '<span class="badge bg-warning text-dark">En Taller</span>' : '--')}</small></td>
+                    <td><small>${m.fecha_retorno_real || m.fecha_estimada_retorno || '--'}</small></td>
+                </tr>
+            `).join('') : '<tr><td colspan="6" class="text-center text-muted py-3">No registra mantenimientos</td></tr>';
+
+            let auditRows = auditorias.length > 0 ? auditorias.map(a => `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted d-block">${a.fecha}</small>
+                        <strong class="text-dark">${a.accion}</strong>: ${a.descripcion}
+                    </div>
+                    <span class="badge bg-light text-dark border">${a.usuario}</span>
+                </li>
+            `).join('') : '<li class="list-group-item text-center text-muted">Sin registros de auditoría</li>';
+
+            container.innerHTML = `
+                <!-- Ficha del Activo -->
+                <div class="card border-0 shadow-sm mb-4 bg-light">
+                    <div class="card-body p-3">
+                        <div class="row align-items-center g-3">
+                            <div class="col-md-8">
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <span class="badge bg-primary fs-6 px-3 py-1">${it.numero_inventario || 'ID-' + it.id}</span>
+                                    <span class="badge bg-secondary">${it.categoria}</span>
+                                    <span class="badge bg-${it.estado === 'Disponible' ? 'success' : (it.estado === 'En Préstamo' ? 'warning text-dark' : (it.estado === 'De Baja' ? 'danger' : 'info'))}">
+                                        ${it.estado}
+                                    </span>
+                                </div>
+                                <h4 class="fw-bold mb-1">${it.item}</h4>
+                                <div class="small text-muted">
+                                    <strong>Marca/Modelo:</strong> ${it.marca_modelo} | 
+                                    <strong>Serial:</strong> ${it.serial} | 
+                                    <strong>Activo Fijo:</strong> ${it.activo_fijo}
+                                </div>
+                                <div class="small text-muted mt-1">
+                                    <strong>Ubicación:</strong> ${it.sede} - ${it.bodega} (${it.ubicacion})
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-md-end">
+                                <div class="p-2 border rounded bg-white text-center">
+                                    <small class="text-muted d-block">Total Préstamos</small>
+                                    <span class="fs-4 fw-bold text-primary">${it.veces_prestado}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs de Trazabilidad -->
+                <ul class="nav nav-pills mb-3" id="pills-tab-trazabilidad" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="tab-prestamos-btn" data-bs-toggle="pill" data-bs-target="#tab-prestamos" type="button" role="tab">
+                            <i class="bi bi-arrow-left-right me-1"></i>Historial de Préstamos (${prestamos.length})
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-mant-btn" data-bs-toggle="pill" data-bs-target="#tab-mant" type="button" role="tab">
+                            <i class="bi bi-tools me-1"></i>Mantenimientos (${mantenimientos.length})
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-audit-btn" data-bs-toggle="pill" data-bs-target="#tab-audit" type="button" role="tab">
+                            <i class="bi bi-shield-check me-1"></i>Auditoría de Cambios (${auditorias.length})
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="pills-tabContent-trazabilidad">
+                    <!-- Tab Préstamos -->
+                    <div class="tab-pane fade show active" id="tab-prestamos" role="tabpanel">
+                        <div class="table-responsive border rounded">
+                            <table class="table table-hover table-striped align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Fecha Préstamo</th>
+                                        <th>Solicitante / Docente</th>
+                                        <th>Fecha Devolución</th>
+                                        <th>Estado</th>
+                                        <th>Observaciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${prestamosRows}</tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tab Mantenimientos -->
+                    <div class="tab-pane fade" id="tab-mant" role="tabpanel">
+                        <div class="table-responsive border rounded">
+                            <table class="table table-hover table-striped align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Fecha Envío</th>
+                                        <th>Tipo</th>
+                                        <th>Proveedor / Técnico</th>
+                                        <th>Motivo / Diagnóstico</th>
+                                        <th>Solución Aplicada</th>
+                                        <th>Retorno</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${mantRows}</tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tab Auditoría -->
+                    <div class="tab-pane fade" id="tab-audit" role="tabpanel">
+                        <ul class="list-group list-group-flush border rounded">
+                            ${auditRows}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        } catch (err) {
+            container.innerHTML = `<div class="alert alert-danger">Error de conexión al cargar trazabilidad: ${err.message}</div>`;
+        }
+    }
+
+    // ==========================================
+    // GENERADOR DE ETIQUETAS Y CÓDIGO DE BARRAS
+    // ==========================================
+    function generarEtiquetaItem(id, numero_inventario, item, marca_modelo, serial, activo_fijo, categoria) {
+        document.getElementById('lblEtiquetaNumero').textContent = numero_inventario || ('ID-' + id);
+        document.getElementById('lblEtiquetaNombre').textContent = item || 'Equipo';
+        document.getElementById('lblEtiquetaMarcaSerial').textContent = (marca_modelo || '--') + ' | S/N: ' + (serial || 'N/A');
+        document.getElementById('lblEtiquetaActivoFijo').textContent = activo_fijo || '--';
+        document.getElementById('lblEtiquetaCategoria').textContent = categoria || 'Activo';
+
+        const barcodeVal = numero_inventario || ('ID-' + id);
+        try {
+            JsBarcode("#barcodeCanvas", barcodeVal, {
+                format: "CODE128",
+                width: 1.8,
+                height: 45,
+                displayValue: true,
+                fontSize: 13,
+                margin: 4
+            });
+        } catch (e) {
+            console.error("Error generando código de barras:", e);
+        }
+
+        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalEtiqueta'));
+        modal.show();
+    }
+
+    function imprimirEtiquetaIndividual() {
+        const printContent = document.getElementById('etiquetaPrintPreview').outerHTML;
+        const printSec = document.getElementById('seccionImpresionEtiquetas');
+        printSec.innerHTML = `<div class="d-flex justify-content-center p-4">${printContent}</div>`;
+        window.print();
+    }
+
+    async function abrirModalEtiquetasSeleccionados() {
+        const checkedBoxes = Array.from(document.querySelectorAll('.select-item:checked'));
+        let itemIds = checkedBoxes.map(cb => cb.value);
+
+        if (itemIds.length === 0) {
+            // Si no hay seleccionados, tomar los primeros 25 visibles
+            const allBoxes = Array.from(document.querySelectorAll('.select-item'));
+            itemIds = allBoxes.slice(0, 25).map(cb => cb.value);
+        }
+
+        if (itemIds.length === 0) {
+            alert('No hay items disponibles para generar etiquetas.');
+            return;
+        }
+
+        const modalEl = document.getElementById('modalEtiquetasMasivas');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        const container = document.getElementById('contenedorEtiquetasMasivas');
+        container.innerHTML = `
+            <div class="text-center py-5 w-100">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 text-muted">Generando códigos de barras masivos...</p>
+            </div>`;
+        modal.show();
+
+        try {
+            const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
+            const resp = await fetch('/inventario/api/etiquetas', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ item_ids: itemIds })
+            });
+            const data = await resp.json();
+
+            if (!data.success) {
+                container.innerHTML = `<div class="alert alert-danger">${data.message || 'Error al generar etiquetas'}</div>`;
+                return;
+            }
+
+            document.getElementById('lblTotalEtiquetasMasivas').textContent = data.etiquetas.length;
+            container.innerHTML = '';
+
+            data.etiquetas.forEach((it, index) => {
+                const canvasId = `barcode_bulk_${it.id}_${index}`;
+                const card = document.createElement('div');
+                card.className = 'etiqueta-item-card border rounded p-3 bg-white shadow-sm text-start';
+                card.style.cssText = 'width: 280px; font-family: "Inter", system-ui, sans-serif; border: 2px dashed #0284c7 !important;';
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-1 mb-1">
+                        <span class="fw-bold text-primary" style="font-size: 0.8rem;">UNIMINUTO</span>
+                        <span class="badge bg-secondary" style="font-size: 0.65rem;">${it.categoria}</span>
+                    </div>
+                    <div class="fw-bold text-dark text-truncate" style="font-size: 0.85rem;" title="${it.item}">${it.item}</div>
+                    <div class="small text-muted text-truncate" style="font-size: 0.72rem;">${it.marca_modelo || '--'} | S/N: ${it.serial || 'N/A'}</div>
+                    <div class="text-center my-1 bg-light p-1 rounded">
+                        <svg id="${canvasId}"></svg>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center border-top pt-1 mt-1" style="font-size: 0.7rem;">
+                        <div>
+                            <span class="text-muted d-block">N° INV</span>
+                            <strong class="text-dark">${it.numero_inventario}</strong>
+                        </div>
+                        <div class="text-end">
+                            <span class="text-muted d-block">ACT. FIJO</span>
+                            <strong class="text-dark">${it.activo_fijo || '--'}</strong>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+
+                try {
+                    JsBarcode(`#${canvasId}`, it.numero_inventario, {
+                        format: "CODE128",
+                        width: 1.4,
+                        height: 38,
+                        displayValue: true,
+                        fontSize: 11,
+                        margin: 2
+                    });
+                } catch (e) {
+                    console.error("Error barcode bulk:", e);
+                }
+            });
+        } catch (err) {
+            container.innerHTML = `<div class="alert alert-danger">Error al generar etiquetas masivas: ${err.message}</div>`;
+        }
+    }
+
+    function imprimirEtiquetasMasivas() {
+        const printContent = document.getElementById('contenedorEtiquetasMasivas').innerHTML;
+        const printSec = document.getElementById('seccionImpresionEtiquetas');
+        printSec.innerHTML = `<div class="d-flex flex-wrap gap-3 justify-content-center p-3">${printContent}</div>`;
+        window.print();
+    }
+
+    // ==========================================
+    // ACCIONES DE MANTENIMIENTO Y BAJA
+    // ==========================================
+    function abrirModalEnviarMantenimiento(id, itemNombre) {
+        document.getElementById('mantItemNombre').textContent = itemNombre;
+        const form = document.getElementById('formEnviarMantenimiento');
+        form.action = `/inventario/${id}/mantenimiento`;
+        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalEnviarMantenimiento'));
+        modal.show();
+    }
+
+    function abrirModalRetornoMantenimiento(id, itemNombre) {
+        document.getElementById('retornoItemNombre').textContent = itemNombre;
+        const form = document.getElementById('formRetornoMantenimiento');
+        form.action = `/inventario/${id}/retornar_mantenimiento`;
+        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalRetornoMantenimiento'));
+        modal.show();
+    }
+
+    function abrirModalBaja(id, itemNombre) {
+        document.getElementById('bajaItemNombre').textContent = itemNombre;
+        const form = document.getElementById('formDarDeBaja');
+        form.action = `/inventario/${id}/baja`;
+        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalDarDeBaja'));
+        modal.show();
+    }
+</script>
+
+{% include 'components/footer.html' %}

@@ -1,0 +1,79 @@
+<div class="row g-2 mb-2" id="resumen-tipos-prestamo">
+    <div class="col-6 col-lg-3">
+        <div class="border rounded p-2 h-100" style="background:#f8f9fa;">
+            <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">Portátil</small>
+                <span class="badge bg-primary" id="count-portatil">0</span>
+            </div>
+            <div class="mt-2" id="lista-portatil" style="font-size: 0.85rem;"></div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="border rounded p-2 h-100" style="background:#f8f9fa;">
+            <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">Cargador</small>
+                <span class="badge bg-info text-dark" id="count-cargador">0</span>
+            </div>
+            <div class="mt-2" id="lista-cargador" style="font-size: 0.85rem;"></div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="border rounded p-2 h-100" style="background:#f8f9fa;">
+            <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">HDMI</small>
+                <span class="badge bg-warning text-dark" id="count-hdmi">0</span>
+            </div>
+            <div class="mt-2" id="lista-hdmi" style="font-size: 0.85rem;"></div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="border rounded p-2 h-100" style="background:#f8f9fa;">
+            <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">Control TV</small>
+                <span class="badge bg-secondary" id="count-control">0</span>
+            </div>
+            <div class="mt-2" id="lista-control" style="font-size: 0.85rem;"></div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="border rounded p-2 h-100" style="background:#f8f9fa;">
+            <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">Teclado</small>
+                <span class="badge bg-success" id="count-teclado">0</span>
+            </div>
+            <div class="mt-2" id="lista-teclado" style="font-size: 0.85rem;"></div>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive border rounded" style="max-height: 200px; min-height: 150px;">
+    <table class="table table-sm table-hover mb-0" id="tablaItemsSeleccionados">
+        <thead class="table-light sticky-top">
+            <tr>
+                <th>ID</th>
+                <th>Item / Marca</th>
+                <th class="text-center">Devolver</th>
+                <th class="text-end">Quitar</th>
+            </tr>
+        </thead>
+        <tbody id="lista-items-carrito">
+            <tr id="carrito-vacio">
+                <td colspan="4" class="text-center text-muted py-4">No hay equipos seleccionados</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Botones de Acción -->
+<div class="row mt-3">
+    <div class="col-md-6">
+        <button type="button" class="btn btn-warning w-100" id="btnLimpiarSeleccion">
+            <i class="bi bi-trash"></i> Limpiar Selección
+        </button>
+    </div>
+    <div class="col-md-6">
+        <button type="button" class="btn btn-success w-100" id="btnConfirmarPrestamo">
+            <i class="bi bi-check-circle"></i> Confirmar Préstamo
+        </button>
+    </div>
+</div>

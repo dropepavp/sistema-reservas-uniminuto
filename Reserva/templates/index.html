@@ -1,0 +1,418 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+<style>
+    .hero-bienvenida {
+        background: linear-gradient(135deg, #1e3a5f 0%, #2d6a9f 100%);
+        border-radius: 16px;
+        color: white;
+        padding: 2rem 2.5rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-bienvenida::after {
+        content: '';
+        position: absolute;
+        right: -40px;
+        top: -40px;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, .05);
+    }
+
+    .hero-bienvenida h1 {
+        font-size: 1.7rem;
+        font-weight: 700;
+        margin-bottom: .35rem;
+    }
+
+    .hero-bienvenida p {
+        opacity: .85;
+        margin-bottom: 0;
+        font-size: 1rem;
+    }
+
+    .badge-rol {
+        background: rgba(255, 255, 255, .2);
+        border-radius: 999px;
+        padding: .25rem .75rem;
+        font-size: .8rem;
+    }
+
+    /* Alerta de vencidos */
+    .alert-vencidos {
+        background: linear-gradient(90deg, #7f1d1d, #991b1b);
+        border: none;
+        border-radius: 12px;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        animation: pulse-red 2s infinite;
+    }
+
+    @keyframes pulse-red {
+
+        0%,
+        100% {
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, .4);
+        }
+
+        50% {
+            box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+        }
+    }
+
+    .vencidos-count {
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1;
+        background: rgba(255, 255, 255, .2);
+        border-radius: 10px;
+        padding: .2rem .75rem;
+        min-width: 56px;
+        text-align: center;
+    }
+
+    /* Estilos Premium para Accesos Rápidos */
+    .transition-hover {
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .transition-hover:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .icon-circle {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .bg-primary-soft {
+        background-color: #eef2ff;
+    }
+
+    .bg-success-soft {
+        background-color: #ecfdf5;
+    }
+
+    .bg-warning-soft {
+        background-color: #fffbeb;
+    }
+
+    .bg-info-soft {
+        background-color: #e0f2fe;
+    }
+
+    .bg-danger-soft {
+        background-color: #fef2f2;
+    }
+
+    .bg-dark-soft {
+        background-color: #f3f4f6;
+    }
+</style>
+
+<div class="container mt-4">
+    <!-- Bienvenida -->
+    <div class="hero-bienvenida mb-3">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h1>👋 ¡Hola, {{ session.nombre_completo.split(' ')[0] }}!</h1>
+                <p>Panel principal del Sistema Integrado — {{ "hoy" }}</p>
+            </div>
+            <span class="badge-rol"><i class="bi bi-shield-check me-1"></i>{{ session.rol|capitalize }}</span>
+        </div>
+    </div>
+
+    <!-- ALERTA DE PRÉSTAMOS VENCIDOS (visible solo si hay vencidos) -->
+    {% if stats and stats.prestamos_vencidos and stats.prestamos_vencidos > 0 %}
+    <div class="alert-vencidos">
+        <div class="vencidos-count">{{ stats.prestamos_vencidos }}</div>
+        <div class="flex-grow-1">
+            <div class="fw-bold fs-5">⚠️ Préstamo{{ 's' if stats.prestamos_vencidos > 1 else '' }} vencido{{ 's' if
+                stats.prestamos_vencidos > 1 else '' }}</div>
+            <div class="opacity-75 small">
+                Ha{{ 'y' if stats.prestamos_vencidos == 1 else 'n' }} equipo{{ 's' if stats.prestamos_vencidos > 1 else
+                '' }} que
+                debí{{ 'an' if stats.prestamos_vencidos > 1 else 'a' }} haberse devuelto. Revisa y gestiona la
+                devolución.
+            </div>
+        </div>
+        <a href="{{ url_for('prestamos.prestamos_equipos') }}" class="btn btn-light btn-sm fw-bold flex-shrink-0">
+            <i class="bi bi-arrow-right-circle-fill me-1"></i>Ver préstamos
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Sección de Estadísticas -->
+    {% if stats %}
+    <div class="row">
+        <div class="col-12 d-flex justify-content-between align-items-center mb-4">
+            <h2 class="pb-2 border-bottom mb-0">Resumen del Sistema</h2>
+            <div class="btn-group" role="group" aria-label="Seleccionar periodo">
+                <a href="{{ url_for('index', periodo='dia') }}"
+                    class="btn btn-outline-primary {% if stats.periodo_actual == 'dia' %}active{% endif %}">Hoy</a>
+                <a href="{{ url_for('index', periodo='semana') }}"
+                    class="btn btn-outline-primary {% if stats.periodo_actual == 'semana' %}active{% endif %}">Esta
+                    Semana</a>
+                <a href="{{ url_for('index', periodo='mes') }}"
+                    class="btn btn-outline-primary {% if stats.periodo_actual == 'mes' %}active{% endif %}">Este Mes</a>
+            </div>
+        </div>
+
+        <!-- Préstamos Vencidos (Nueva Tarjeta) -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow-sm h-100 py-2">
+                <div class="card-body">
+                    <div class="row g-0 align-items-center">
+                        <div class="col me-2">
+                            <div class="text-xs fw-bold text-danger text-uppercase mb-1">
+                                Préstamos Vencidos</div>
+                            <div class="h5 mb-0 fw-bold text-gray-800">{{ stats.prestamos_vencidos }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-clock-history fs-2 text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Préstamos -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow-sm h-100 py-2">
+                <div class="card-body">
+                    <div class="row g-0 align-items-center">
+                        <div class="col me-2">
+                            <div class="text-xs fw-bold text-primary text-uppercase mb-1">
+                                Préstamos {{ stats.titulo_periodo }}</div>
+                            <div class="h5 mb-0 fw-bold text-gray-800">{{ stats.prestamos_total }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-laptop fs-2 text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reservas Salones -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow-sm h-100 py-2">
+                <div class="card-body">
+                    <div class="row g-0 align-items-center">
+                        <div class="col me-2">
+                            <div class="text-xs fw-bold text-success text-uppercase mb-1">
+                                Reservas de Salones {{ stats.titulo_periodo }}</div>
+                            <div class="h5 mb-0 fw-bold text-gray-800">{{ stats.reservas_salon }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-door-open fs-2 text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reservas Niñeras -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow-sm h-100 py-2">
+                <div class="card-body">
+                    <div class="row g-0 align-items-center">
+                        <div class="col me-2">
+                            <div class="text-xs fw-bold text-info text-uppercase mb-1">
+                                Reservas de Niñeras {{ stats.titulo_periodo }}</div>
+                            <div class="h5 mb-0 fw-bold text-gray-800">{{ stats.reservas_ninera }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-pc-display-horizontal fs-2 text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Sección de Acceso Rápido a Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-graph-up"></i> Resumen de Actividad</h5>
+                    <a href="{{ url_for('estadisticas.dashboard') }}" class="btn btn-sm btn-primary">
+                        Ver Estadísticas Completas <i class="bi bi-arrow-right-circle"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <!-- Top Equipo -->
+                        <div class="col-md-6 border-end">
+                            <h6 class="text-muted">Equipo Más Solicitado</h6>
+                            {% if top_equipo and top_equipo.cantidad > 0 %}
+                            <p class="fs-4 fw-bold mb-0">{{ top_equipo.nombre }}</p>
+                            <span class="badge bg-primary">{{ top_equipo.cantidad }} préstamos</span>
+                            {% else %}
+                            <p class="fs-5 text-muted">Sin datos</p>
+                            {% endif %}
+                        </div>
+                        <!-- Top Profesor -->
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Profesor con Más Solicitudes</h6>
+                            {% if top_profesor and top_profesor.cantidad > 0 %}
+                            <p class="fs-4 fw-bold mb-0">{{ top_profesor.nombre }}</p>
+                            <span class="badge bg-info text-dark">{{ top_profesor.cantidad }} préstamos</span>
+                            {% else %}
+                            <p class="fs-5 text-muted">Sin datos</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de Accesos Rápidos -->
+    <div class="row">
+        <div class="col-12">
+            <h2 class="pb-2 border-bottom my-4">Accesos Rápidos</h2>
+        </div>
+        {% if session.rol == 'admin' or mod_access.prestamos %}
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card text-center h-100 shadow-sm border-0 transition-hover">
+                <div class="card-body d-flex flex-column justify-content-center p-4">
+                    <div class="icon-circle bg-primary-soft mb-3 mx-auto">
+                        <i class="bi bi-laptop fs-2 text-primary"></i>
+                    </div>
+                    <h5 class="card-title">Préstamos de Equipos</h5>
+                    <p class="card-text small text-muted">Registra y gestiona la entrega y devolución de portátiles.</p>
+                    <a href="{{ url_for('prestamos.prestamos_equipos') }}" class="btn btn-primary mt-auto w-100">Ir a
+                        Préstamos</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if session.rol == 'admin' or mod_access.reservas %}
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card text-center h-100 shadow-sm border-0 transition-hover">
+                <div class="card-body d-flex flex-column justify-content-center p-4">
+                    <div class="icon-circle bg-success-soft mb-3 mx-auto">
+                        <i class="bi bi-calendar-week fs-2 text-success"></i>
+                    </div>
+                    <h5 class="card-title">Reservas de Recursos</h5>
+                    <p class="card-text small text-muted">Consulta disponibilidad y reserva salones o niñeras.</p>
+                    <a href="{{ url_for('reservas.reservas_main') }}" class="btn btn-success mt-auto w-100">Ir a
+                        Reservas</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if session.rol == 'admin' or mod_access.salas_computo %}
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card text-center h-100 shadow-sm border-0 transition-hover">
+                <div class="card-body d-flex flex-column justify-content-center p-4">
+                    <div class="icon-circle bg-dark-soft mb-3 mx-auto">
+                        <i class="bi bi-pc-display fs-2 text-dark"></i>
+                    </div>
+                    <h5 class="card-title">Salas de Cómputo</h5>
+                    <p class="card-text small text-muted">Control de asistencia y programación de salas de sistemas.</p>
+                    <a href="{{ url_for('salas_computo.dashboard_salas') }}" class="btn btn-dark mt-auto w-100">Ver
+                        Salas</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if session.rol == 'admin' or mod_access.profesores %}
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card text-center h-100 shadow-sm border-0 transition-hover">
+                <div class="card-body d-flex flex-column justify-content-center p-4">
+                    <div class="icon-circle bg-warning-soft mb-3 mx-auto">
+                        <i class="bi bi-person-badge fs-2 text-warning"></i>
+                    </div>
+                    <h5 class="card-title">Gestión de Profesores</h5>
+                    <p class="card-text small text-muted">Administra información de contacto y programas académicos.</p>
+                    <a href="{{ url_for('profesores.profesores_main') }}" class="btn btn-warning mt-auto w-100">Ir a
+                        Profesores</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if session.rol == 'admin' or mod_access.inventario %}
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card text-center h-100 shadow-sm border-0 transition-hover">
+                <div class="card-body d-flex flex-column justify-content-center p-4">
+                    <div class="icon-circle bg-info-soft mb-3 mx-auto">
+                        <i class="bi bi-box-seam fs-2 text-info"></i>
+                    </div>
+                    <h5 class="card-title">Gestión de Inventario</h5>
+                    <p class="card-text small text-muted">Administra los equipos y recursos físicos institucionales.</p>
+                    <a href="{{ url_for('inventario.inventario_main') }}" class="btn btn-info mt-auto w-100">Ir a
+                        Inventario</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if session.rol == 'admin' or mod_access.estadisticas %}
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card text-center h-100 shadow-sm border-0 transition-hover">
+                <div class="card-body d-flex flex-column justify-content-center p-4">
+                    <div class="icon-circle bg-danger-soft mb-3 mx-auto">
+                        <i class="bi bi-graph-up-arrow fs-2 text-danger"></i>
+                    </div>
+                    <h5 class="card-title">Estadísticas y Reportes</h5>
+                    <p class="card-text small text-muted">Visualiza gráficos y análisis detallados del sistema.</p>
+                    <a href="{{ url_for('estadisticas.dashboard') }}" class="btn btn-danger mt-auto w-100">Ver
+                        Reportes</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Estilos personalizados para las tarjetas de estadísticas -->
+<style>
+    .card.border-left-primary {
+        border-left: .25rem solid #4e73df !important;
+    }
+
+    .card.border-left-success {
+        border-left: .25rem solid #1cc88a !important;
+    }
+
+    .card.border-left-info {
+        border-left: .25rem solid #36b9cc !important;
+    }
+
+    .card.border-left-warning {
+        border-left: .25rem solid #f6c23e !important;
+    }
+
+    .card.border-left-danger {
+        border-left: .25rem solid #e74a3b !important;
+    }
+
+    .card.border-left-secondary {
+        border-left: .25rem solid #858796 !important;
+    }
+
+    .text-gray-800 {
+        color: #5a5c69 !important;
+    }
+
+    .text-xs {
+        font-size: .8rem;
+    }
+</style>
+
+{% include 'components/footer.html' %}

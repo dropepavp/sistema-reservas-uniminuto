@@ -1,0 +1,2201 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12 d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0"><i class="bi bi-laptop"></i> Gestión de Préstamos de Equipos - {{ current_user.sede.nombre if current_user and current_user.sede else 'Todas las Sedes' }}</h2>
+            <div>
+                <a href="#collapsePrestamoForm" class="btn btn-success" data-bs-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapsePrestamoForm">
+                    <i class="bi bi-plus-circle"></i> Nuevo Préstamo
+                </a>
+                <a href="#seccionPrestamos" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-return-left"></i> Registrar Devolución
+                </a>
+                <a href="{{ url_for('prestamos.exportar_prestamos_activos', formato='excel') }}" class="btn btn-outline-dark">
+                    <i class="bi bi-download"></i> Descargar Reporte
+                </a>
+                <a href="{{ url_for('prestamos.prestamos_historial') }}" class="btn btn-outline-info">
+                    <i class="bi bi-clock-history"></i> Ver Historial
+                </a>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-house-door"></i> Volver al Inicio
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Selección de Sede (solo para administradores) -->
+    {% if current_user and current_user.is_admin() %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Selección de Sede</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold" for="sede_prestamo">Sede de Préstamo:</label>
+                            <select class="form-select" id="sede_prestamo" name="sede_prestamo" required>
+                                <option value="">Seleccionar Sede...</option>
+                                {% for sede in sedes %}
+                                <option value="{{ sede.id }}" {% if current_user.sede and current_user.sede.id == sede.id %}selected{% endif %}>
+                                    {{ sede.nombre }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="alert alert-info mb-0">
+                                <i class="bi bi-info-circle"></i> <strong>Información:</strong> 
+                                <span id="info_sede">Seleccione una sede para ver los equipos disponibles</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Resumen de Inventario por Sede -->
+    <div class="row mb-4">
+        <div class="col-md-2 col-6 mb-3">
+            <div class="card text-white bg-success">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-0">Portátiles</h5>
+                        <p class="card-text fs-1 fw-bold">{{ disponibles.portatiles or 0 }}</p>
+                    </div>
+                    <i class="bi bi-laptop opacity-50" style="font-size: 3rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-6 mb-3">
+            <div class="card text-white bg-info">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-0">Cargadores</h5>
+                        <p class="card-text fs-1 fw-bold">{{ disponibles.cargadores or 0 }}</p>
+                    </div>
+                    <i class="bi bi-lightning-charge opacity-50" style="font-size: 3rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-6 mb-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-0">HDMI</h5>
+                        <p class="card-text fs-1 fw-bold">{{ disponibles.hdmi or 0 }}</p>
+                    </div>
+                    <i class="bi bi-usb-c opacity-50" style="font-size: 3rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-6 mb-3">
+            <div class="card text-white bg-secondary">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-0">Controles</h5>
+                        <p class="card-text fs-1 fw-bold">{{ disponibles.controles or 0 }}</p>
+                    </div>
+                    <i class="bi bi-remote opacity-50" style="font-size: 3rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-6 mb-3">
+            <div class="card text-white" style="background:#6f42c1;">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-0">Teclados</h5>
+                        <p class="card-text fs-1 fw-bold">{{ disponibles.teclados or 0 }}</p>
+                    </div>
+                    <i class="bi bi-keyboard opacity-50" style="font-size: 3rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3 mb-md-0">
+            <div class="card text-white" style="background:#198754;">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-1">Activos</h6>
+                        <div class="fs-2 fw-bold">{{ total_activos or 0 }}</div>
+                    </div>
+                    <i class="bi bi-check2-circle opacity-50" style="font-size: 2.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3 mb-md-0">
+            <div class="card text-white" style="background:#2d6a9f;">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-1">Devueltos</h6>
+                        <div class="fs-2 fw-bold">{{ total_devueltos or 0 }}</div>
+                    </div>
+                    <i class="bi bi-arrow-return-left opacity-50" style="font-size: 2.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3 mb-md-0">
+            <div class="card text-white" style="background:#dc3545;">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-1">Vencidos</h6>
+                        <div class="fs-2 fw-bold">{{ total_vencidos or 0 }}</div>
+                    </div>
+                    <i class="bi bi-exclamation-triangle opacity-50" style="font-size: 2.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white" style="background:#6c757d;">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-1">Realizados</h6>
+                        <div class="fs-2 fw-bold">{{ total_realizados or 0 }}</div>
+                    </div>
+                    <i class="bi bi-graph-up opacity-50" style="font-size: 2.5rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificaciones de Préstamos Vencidos -->
+    {% if prestamos_vencidos %}
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> ¡Atención! Préstamos Vencidos</h4>
+        <p>Los siguientes préstamos han superado su hora de devolución prevista y no han sido devueltos:</p>
+        <hr>
+        <ul class="mb-0">
+            {% for prestamo in prestamos_vencidos %}
+            <li>
+                <strong>Profesor:</strong> {{ prestamo.nombre_profesor }} -
+                <strong>Equipo:</strong> {{ prestamo.equipo_prestado }} -
+                <strong>Devolución prevista:</strong> {{ prestamo.hora_fin }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Formulario de Préstamo -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <a class="card-header bg-primary text-white text-decoration-none d-flex justify-content-between align-items-center"
+                    data-bs-toggle="collapse" href="#collapsePrestamoForm" role="button" aria-expanded="true"
+                    aria-controls="collapsePrestamoForm">
+                    <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Nuevo Préstamo</h5>
+                    <i class="bi bi-chevron-down"></i>
+                </a>
+                <div class="collapse show" id="collapsePrestamoForm">
+                    <div class="card-body">
+                        <form id="formPrestamo">
+                            <div class="row g-3">
+                                <!-- Selección de Profesor -->
+                                <div class="col-md-6 position-relative">
+                                    <label class="form-label" for="busqueda_profesor">Profesor (Busca por Cédula o Nombre):</label>
+                                    <input type="text" class="form-control" id="busqueda_profesor"
+                                        placeholder="Escribe cédula o nombre..." autocomplete="off" required>
+                                    <input type="hidden" id="cedula_profesor" name="cedula">
+                                    <div id="sugerenciasProfesores" class="list-group position-absolute w-100 shadow-sm"
+                                        style="display:none; max-height: 180px; overflow-y: auto; z-index: 1050; top: 100%;">
+                                    </div>
+                                </div>
+
+                                <!-- Información del Profesor Seleccionado -->
+                                <div id="infoProfesor" class="col-12 mt-2" style="display: none;">
+                                    <div class="card border-primary">
+                                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <i class="bi bi-person-badge"></i>
+                                                <strong>Profesor Seleccionado</strong>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-light" onclick="limpiarProfesorSeleccionado()">Cambiar</button>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row g-2">
+                                                <div class="col-md-6"><span class="text-muted">Nombre:</span> <strong id="profesorNombre"></strong></div>
+                                                <div class="col-md-3"><span class="text-muted">Cédula:</span> <strong id="profesorCedulaText"></strong></div>
+                                                <div class="col-md-3"><span class="text-muted">Programa:</span> <strong id="profesorPrograma"></strong></div>
+                                                <div class="col-md-6"><span class="text-muted">Correo:</span> <strong id="profesorCorreo"></strong></div>
+                                                <div class="col-md-6"><span class="text-muted">Salón:</span> <strong id="profesorSalon">No asignado</strong></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold" for="hora_inicio">Hora Inicio:</label>
+                                    <input type="text" class="form-control" id="hora_inicio" name="hora_inicio" required
+                                        inputmode="numeric" placeholder="HH:MM (00:00-23:59)" pattern="^([01]\d|2[0-3]):[0-5]\d$">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold" for="hora_fin">Hora Fin:</label>
+                                    <input type="text" class="form-control" id="hora_fin" name="hora_fin" required
+                                        inputmode="numeric" placeholder="HH:MM (00:00-23:59)" pattern="^([01]\d|2[0-3]):[0-5]\d$">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold" for="ubicacion">Ubicación (opcional):</label>
+                                    <input type="text" class="form-control" id="ubicacion" name="ubicacion" maxlength="100" placeholder="Ej: A501" list="lista-salones-sede-principal">
+                                    <datalist id="lista-salones-sede-principal">
+                                        <option value="A205"></option>
+                                        <option value="A301"></option>
+                                        <option value="A304"></option>
+                                        <option value="A403"></option>
+                                        <option value="A501"></option>
+                                        <option value="A502"></option>
+                                        <option value="A503"></option>
+                                        <option value="A504"></option>
+                                        <option value="A505"></option>
+                                        <option value="A506"></option>
+                                        <option value="A507"></option>
+                                        <option value="A508"></option>
+                                        <option value="A509"></option>
+                                        <option value="A510"></option>
+                                        <option value="B201"></option>
+                                        <option value="B202"></option>
+                                        <option value="B203"></option>
+                                        <option value="B204"></option>
+                                        <option value="B301"></option>
+                                        <option value="B303"></option>
+                                        <option value="B304"></option>
+                                        <option value="B305"></option>
+                                        <option value="B306"></option>
+                                        <option value="B307"></option>
+                                        <option value="B308"></option>
+                                        <option value="B309"></option>
+                                        <option value="B310"></option>
+                                        <option value="B401"></option>
+                                        <option value="B402"></option>
+                                        <option value="B403"></option>
+                                        <option value="B404"></option>
+                                        <option value="B405"></option>
+                                        <option value="B406"></option>
+                                        <option value="B407"></option>
+                                        <option value="B408"></option>
+                                        <option value="B409"></option>
+                                        <option value="B410"></option>
+                                        <option value="B501"></option>
+                                        <option value="B502"></option>
+                                        <option value="B503"></option>
+                                        <option value="B504"></option>
+                                        <option value="B505"></option>
+                                        <option value="B506"></option>
+                                        <option value="B602"></option>
+                                        <option value="B603"></option>
+                                        <option value="B604"></option>
+                                        <option value="B605"></option>
+                                        <option value="B606"></option>
+                                        <option value="B607"></option>
+                                        <option value="C301"></option>
+                                        <option value="C302"></option>
+                                        <option value="C303"></option>
+                                        <option value="C304"></option>
+                                        <option value="C305"></option>
+                                        <option value="C306"></option>
+                                        <option value="C307"></option>
+                                        <option value="C308"></option>
+                                        <option value="C309"></option>
+                                        <option value="C310"></option>
+                                        <option value="C311"></option>
+                                        <option value="C312"></option>
+                                        <option value="C401"></option>
+                                        <option value="C402"></option>
+                                        <option value="C403"></option>
+                                        <option value="C404"></option>
+                                        <option value="C405"></option>
+                                        <option value="C406"></option>
+                                        <option value="C407"></option>
+                                        <option value="C408"></option>
+                                        <option value="C409"></option>
+                                        <option value="C410"></option>
+                                        <option value="C411"></option>
+                                        <option value="C412"></option>
+                                        <option value="C501"></option>
+                                        <option value="C502"></option>
+                                        <option value="C503"></option>
+                                        <option value="C504"></option>
+                                        <option value="C505"></option>
+                                        <option value="C506"></option>
+                                        <option value="C507"></option>
+                                        <option value="C508"></option>
+                                        <option value="C509"></option>
+                                        <option value="C510"></option>
+                                        <option value="C601"></option>
+                                        <option value="C602"></option>
+                                        <option value="C603"></option>
+                                        <option value="C604"></option>
+                                        <option value="C605"></option>
+                                        <option value="C606"></option>
+                                        <option value="C607"></option>
+                                        <option value="C608"></option>
+                                        <option value="C609"></option>
+                                        <option value="BIBLIOTECA"></option>
+                                        <option value="CRAII"></option>
+                                        <option value="ALLEROOM"></option>
+                                        <option value="A207LS12"></option>
+                                        <option value="A208LS13"></option>
+                                        <option value="A209LS6"></option>
+                                        <option value="A210LS14"></option>
+                                        <option value="A211LS10"></option>
+                                        <option value="A212LS11"></option>
+                                        <option value="A213LS15"></option>
+                                        <option value="A305LS5"></option>
+                                        <option value="A306LS1"></option>
+                                        <option value="A307LS2"></option>
+                                        <option value="A308LS3"></option>
+                                        <option value="A309LS4"></option>
+                                        <option value="A310LS7"></option>
+                                        <option value="A311LS9"></option>
+                                        <option value="A312LS20"></option>
+                                        <option value="A313LS8"></option>
+                                        <option value="A401LS24"></option>
+                                        <option value="A402LS25"></option>
+                                        <option value="A404LS26"></option>
+                                        <option value="A405LS23"></option>
+                                        <option value="A406LS27"></option>
+                                        <option value="A408LS16"></option>
+                                        <option value="A409LS17"></option>
+                                        <option value="A410LS18"></option>
+                                        <option value="A411LS19"></option>
+                                        <option value="B305LS22"></option>
+                                        <option value="LS1"></option>
+                                        <option value="LS2"></option>
+                                        <option value="LS3"></option>
+                                    </datalist>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label fw-bold" for="observaciones">Observaciones (opcional):</label>
+                                    <textarea class="form-control" id="observaciones" name="observaciones" rows="2" maxlength="500" placeholder="Notas adicionales..."></textarea>
+                                </div>
+
+                                <!-- Búsqueda de Equipos desde Inventario -->
+                                <div class="col-12" id="seccion_equipos">
+                                    <div class="card border-success">
+                                        <div class="card-header bg-success text-white">
+                                            <h6 class="mb-0"><i class="bi bi-search"></i> Buscar Equipos desde Inventario</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row g-3 mb-3">
+                                                <div class="col-12">
+                                                    <div class="card border-0" style="background:#f8f9fa;">
+                                                        <div class="card-body">
+                                                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                                                <div>
+                                                                    <div class="fw-bold">Equipos Estándar</div>
+                                                                    <div class="text-muted" style="font-size: 0.9rem;">Portátil, Cargador, HDMI y Control (Samsung/Panasonic según salón)</div>
+                                                                </div>
+                                                                <div class="d-flex flex-wrap gap-2">
+                                                                    <button type="button" class="btn btn-sm btn-outline-primary" id="btnStdPortatil"><i class="bi bi-laptop"></i> Portátil</button>
+                                                                    <button type="button" class="btn btn-sm btn-outline-info" id="btnStdCargador"><i class="bi bi-lightning-charge"></i> Cargador</button>
+                                                                    <button type="button" class="btn btn-sm btn-outline-warning" id="btnStdHdmi"><i class="bi bi-usb-c"></i> HDMI</button>
+                                                                    <button type="button" class="btn btn-sm" id="btnStdControl" style="border:1px solid #6c757d;"><i class="bi bi-remote"></i> Control</button>
+                                                                    <button type="button" class="btn btn-sm btn-outline-success" id="btnStdTeclado"><i class="bi bi-keyboard"></i> Teclado</button>
+                                                                </div>
+                                                            </div>
+                                                            <div class="mt-2 text-muted" style="font-size: 0.9rem;">
+                                                                <span>Control sugerido: </span>
+                                                                <span class="badge" id="badgeControlSugerido" style="background:#6c757d;">No definido</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row g-3">
+                                                <!-- Búsqueda por Número de Inventario -->
+                                                <div class="col-12">
+                                                    <label class="form-label fw-bold">Buscar por Número de Inventario:</label>
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="numero_inventario_busqueda"
+                                                            placeholder="Escanear código o escribir número de inventario..." 
+                                                            list="lista-inventario-disponible">
+                                                        <button class="btn btn-primary" type="button" id="btnBuscarInventario">
+                                                            <i class="bi bi-search"></i> Buscar
+                                                        </button>
+                                                        <button class="btn btn-success" type="button" id="btnAgregarDirecto">
+                                                            <i class="bi bi-plus-lg"></i> Agregar Directo
+                                                        </button>
+                                                    </div>
+                                                    <datalist id="lista-inventario-disponible"></datalist>
+                                                </div>
+
+                                                <div class="col-12" id="resultados-inventario" style="display:none;">
+                                                    <div class="border rounded p-2" style="background: #fbfbfb;">
+                                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                                            <strong>Resultados del inventario</strong>
+                                                            <small class="text-muted" id="resultados-inventario-count"></small>
+                                                        </div>
+                                                        <div class="table-responsive" style="max-height: 220px; overflow: auto;">
+                                                            <table class="table table-sm table-hover mb-0">
+                                                                <thead class="table-light sticky-top">
+                                                                    <tr>
+                                                                        <th>Placa Activo</th>
+                                                                        <th>N° Inventario</th>
+                                                                        <th>Item</th>
+                                                                        <th>Marca</th>
+                                                                        <th>Serial</th>
+                                                                        <th>Bodega</th>
+                                                                        <th>Sede</th>
+                                                                        <th class="text-end">Acción</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody id="resultados-inventario-body"></tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tabla de Equipos Seleccionados -->
+                                <div class="col-md-7" id="seccion_tabla_equipos">
+                                    <label class="form-label fw-bold"><i class="bi bi-list-check"></i> Equipos a Prestar:</label>
+
+                                    <div class="row g-2 mb-2" id="resumen-tipos-prestamo">
+                                        <div class="col-6 col-lg-3">
+                                            <div class="border rounded p-2 h-100" style="background:#f8f9fa;">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">Portátil</small>
+                                                    <span class="badge bg-primary" id="count-portatil">0</span>
+                                                </div>
+                                                <div class="mt-2" id="lista-portatil" style="font-size: 0.85rem;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 col-lg-3">
+                                            <div class="border rounded p-2 h-100" style="background:#f8f9fa;">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">Cargador</small>
+                                                    <span class="badge bg-info text-dark" id="count-cargador">0</span>
+                                                </div>
+                                                <div class="mt-2" id="lista-cargador" style="font-size: 0.85rem;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 col-lg-3">
+                                            <div class="border rounded p-2 h-100" style="background:#f8f9fa;">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">HDMI</small>
+                                                    <span class="badge bg-warning text-dark" id="count-hdmi">0</span>
+                                                </div>
+                                                <div class="mt-2" id="lista-hdmi" style="font-size: 0.85rem;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 col-lg-3">
+                                            <div class="border rounded p-2 h-100" style="background:#f8f9fa;">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">Control TV</small>
+                                                    <span class="badge bg-secondary" id="count-control">0</span>
+                                                </div>
+                                                <div class="mt-2" id="lista-control" style="font-size: 0.85rem;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 col-lg-3">
+                                            <div class="border rounded p-2 h-100" style="background:#f8f9fa;">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">Teclado</small>
+                                                    <span class="badge bg-success" id="count-teclado">0</span>
+                                                </div>
+                                                <div class="mt-2" id="lista-teclado" style="font-size: 0.85rem;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="table-responsive border rounded" style="max-height: 200px; min-height: 150px;">
+                                        <table class="table table-sm table-hover mb-0" id="tablaItemsSeleccionados">
+                                            <thead class="table-light sticky-top">
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Item / Marca</th>
+                                                    <th class="text-center">Devolver</th>
+                                                    <th class="text-end">Quitar</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="lista-items-carrito">
+                                                <tr id="carrito-vacio">
+                                                    <td colspan="4" class="text-center text-muted py-4">No hay equipos seleccionados</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <!-- Botones de Acción -->
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <button type="button" class="btn btn-warning w-100" id="btnLimpiarSeleccion">
+                                                <i class="bi bi-trash"></i> Limpiar Selección
+                                            </button>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <button type="submit" class="btn btn-success w-100" id="btnConfirmarPrestamo">
+                                                <i class="bi bi-check-circle"></i> Confirmar Préstamo
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="seccionPrestamos">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <h5 class="mb-0"><i class="bi bi-activity"></i> Préstamos</h5>
+                        <div class="btn-group" role="group" aria-label="Filtros prestamos">
+                            <button type="button" class="btn btn-sm btn-light" id="btnFiltroActivos">
+                                <span class="badge bg-success">🟢</span> Activos ({{ total_activos or 0 }})
+                            </button>
+                            <button type="button" class="btn btn-sm btn-light" id="btnFiltroDevueltos">
+                                <span class="badge bg-primary">🔵</span> Devueltos ({{ total_devueltos or 0 }})
+                            </button>
+                            <button type="button" class="btn btn-sm btn-light" id="btnFiltroVencidos">
+                                <span class="badge bg-danger">🔴</span> Vencidos ({{ total_vencidos or 0 }})
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" id="tablaPrestamosActivosWrap">
+                        <table class="table table-hover table-sm" id="prestamosActivosTable">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Profesor</th>
+                                    <th>Teléfono</th>
+                                    <th>Ubicación</th>
+                                    <th>Hora Inicio</th>
+                                    <th>Hora Fin</th>
+                                    <th>Portátil(es)</th>
+                                    <th>Cargador(es)</th>
+                                    <th>HDMI</th>
+                                    <th>Control(es)</th>
+                                    <th>Teclado(s)</th>
+                                    <th>Total</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prestamo in prestamos_activos %}
+                                {% set total_equipos = prestamo.equipos.portatiles|length + prestamo.equipos.cargadores|length + prestamo.equipos.hdmi|length + prestamo.equipos.controles|length + prestamo.equipos.teclados|length %}
+                                <tr>
+                                    <td>{{ prestamo.id_grupo }}</td>
+                                    <td>{{ prestamo.nombre_profesor or '--' }}</td>
+                                    <td>{{ prestamo.telefono or '--' }}</td>
+                                    <td>{{ prestamo.ubicacion or '--' }}</td>
+                                    <td>{{ prestamo.hora_inicio.strftime('%H:%M') if prestamo.hora_inicio else '--' }}</td>
+                                    <td>{{ prestamo.hora_fin.strftime('%H:%M') if prestamo.hora_fin else '--' }}</td>
+                                    <td>
+                                        {% if prestamo.equipos.portatiles %}
+                                            {% for eq in prestamo.equipos.portatiles %}
+                                                <span class="badge bg-success">{{ eq.numero_inventario }}</span>
+                                            {% endfor %}
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if prestamo.equipos.cargadores %}
+                                            {% for eq in prestamo.equipos.cargadores %}
+                                                <span class="badge bg-info">{{ eq.numero_inventario }}</span>
+                                            {% endfor %}
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if prestamo.equipos.hdmi %}
+                                            {% for eq in prestamo.equipos.hdmi %}
+                                                <span class="badge bg-warning text-dark">{{ eq.numero_inventario }}</span>
+                                            {% endfor %}
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if prestamo.equipos.controles %}
+                                            {% for eq in prestamo.equipos.controles %}
+                                                <span class="badge bg-secondary">{{ eq.numero_inventario }}</span>
+                                            {% endfor %}
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if prestamo.equipos.teclados %}
+                                            {% for eq in prestamo.equipos.teclados %}
+                                                <span class="badge" style="background:#6f42c1;">{{ eq.numero_inventario }}</span>
+                                            {% endfor %}
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-dark fs-6">{{ total_equipos }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'warning' if prestamo.estado == 'Prestado' else 'success' }}">{{ prestamo.estado }}</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info me-1" onclick="verDetallesPrestamo('{{ prestamo.id_grupo }}')" title="Ver Detalles">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-primary me-1" onclick="editarPrestamo('{{ prestamo.id_grupo }}')" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-success" onclick="devolverPrestamo('{{ prestamo.id_grupo }}')" title="Devolver">
+                                            <i class="bi bi-arrow-return-left"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-responsive" id="tablaPrestamosDevueltosWrap" style="display:none;">
+                        <table class="table table-hover table-sm" id="prestamosDevueltosTable">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Profesor</th>
+                                    <th>Teléfono</th>
+                                    <th>Ubicación</th>
+                                    <th>Hora Inicio</th>
+                                    <th>Hora Fin</th>
+                                    <th>Portátil(es)</th>
+                                    <th>Cargador(es)</th>
+                                    <th>HDMI</th>
+                                    <th>Control(es)</th>
+                                    <th>Teclado(s)</th>
+                                    <th>Total</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prestamo in prestamos_devueltos %}
+                                {% set total_equipos = prestamo.equipos.portatiles|length + prestamo.equipos.cargadores|length + prestamo.equipos.hdmi|length + prestamo.equipos.controles|length + prestamo.equipos.teclados|length %}
+                                <tr>
+                                    <td>{{ prestamo.id_grupo }}</td>
+                                    <td>{{ prestamo.nombre_profesor or '--' }}</td>
+                                    <td>{{ prestamo.telefono or '--' }}</td>
+                                    <td>{{ prestamo.ubicacion or '--' }}</td>
+                                    <td>{{ prestamo.hora_inicio.strftime('%H:%M') if prestamo.hora_inicio else '--' }}</td>
+                                    <td>{{ prestamo.hora_fin.strftime('%H:%M') if prestamo.hora_fin else '--' }}</td>
+                                    <td>
+                                        {% if prestamo.equipos.portatiles %}
+                                            {% for eq in prestamo.equipos.portatiles %}
+                                                <span class="badge bg-success">{{ eq.numero_inventario }}</span>
+                                            {% endfor %}
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if prestamo.equipos.cargadores %}
+                                            {% for eq in prestamo.equipos.cargadores %}
+                                                <span class="badge bg-info">{{ eq.numero_inventario }}</span>
+                                            {% endfor %}
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if prestamo.equipos.hdmi %}
+                                            {% for eq in prestamo.equipos.hdmi %}
+                                                <span class="badge bg-warning text-dark">{{ eq.numero_inventario }}</span>
+                                            {% endfor %}
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if prestamo.equipos.controles %}
+                                            {% for eq in prestamo.equipos.controles %}
+                                                <span class="badge bg-secondary">{{ eq.numero_inventario }}</span>
+                                            {% endfor %}
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if prestamo.equipos.teclados %}
+                                            {% for eq in prestamo.equipos.teclados %}
+                                                <span class="badge" style="background:#6f42c1;">{{ eq.numero_inventario }}</span>
+                                            {% endfor %}
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-dark fs-6">{{ total_equipos }}</span>
+                                    </td>
+                                    <td><span class="badge bg-primary">{{ prestamo.estado }}</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="tablaPrestamosVencidosWrap" style="display:none;">
+                        <div class="alert alert-danger" role="alert" style="margin-bottom: 0;">
+                            <div class="fw-bold mb-2">Préstamos vencidos</div>
+                            {% if prestamos_vencidos %}
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Profesor</th>
+                                                <th>Equipo</th>
+                                                <th>Hora fin</th>
+                                                <th>Fecha</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for p in prestamos_vencidos %}
+                                            <tr>
+                                                <td>{{ p.id_prestamo }}</td>
+                                                <td>{{ p.nombre_profesor }}</td>
+                                                <td>{{ p.equipo_prestado }}</td>
+                                                <td>{{ p.hora_fin }}</td>
+                                                <td>{{ p.fecha_prestamo }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="text-muted">No hay préstamos vencidos.</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edición de Préstamo -->
+    <div class="modal fade" id="modalEditarPrestamo" tabindex="-1" aria-labelledby="modalEditarPrestamoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalEditarPrestamoLabel">
+                        <i class="bi bi-pencil-square"></i> Editar Préstamo
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditarPrestamo">
+                        <input type="hidden" id="edit_id_grupo" name="id_grupo">
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="edit_ubicacion" class="form-label">Ubicación</label>
+                                <input type="text" class="form-control" id="edit_ubicacion" name="ubicacion" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="edit_fecha_prestamo" class="form-label">Fecha</label>
+                                <input type="date" class="form-control" id="edit_fecha_prestamo" name="fecha_prestamo" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="edit_hora_inicio" class="form-label">Hora Inicio</label>
+                                <input type="time" class="form-control" id="edit_hora_inicio" name="hora_inicio" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="edit_hora_fin" class="form-label">Hora Fin</label>
+                                <input type="time" class="form-control" id="edit_hora_fin" name="hora_fin" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="edit_observaciones" class="form-label">Observaciones</label>
+                            <textarea class="form-control" id="edit_observaciones" name="observaciones" rows="3"></textarea>
+                        </div>
+                        
+                        <!-- Sección para mostrar equipos del préstamo -->
+                        <div class="mb-3">
+                            <label class="form-label">Equipos del Préstamo</label>
+                            <div id="edit_equipos_prestamo" class="border rounded p-3 bg-light">
+                                <div class="text-muted">Cargando equipos...</div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Los cambios se aplicarán a todos los equipos del préstamo.
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="guardarEdicionPrestamo()">
+                        <i class="bi bi-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script>
+console.log('🔄 Script de préstamos cargado - Versión:', new Date().toISOString());
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('✅ DOM Ready - Inicializando eventos');
+    // Función para mostrar sección de equipos cuando se selecciona profesor
+    function mostrarSeccionEquipos() {
+        const infoProfesor = document.getElementById('infoProfesor');
+        const seccionEquipos = document.getElementById('seccion_equipos');
+        const seccionTablaEquipos = document.getElementById('seccion_tabla_equipos');
+        
+        if (seccionEquipos) seccionEquipos.style.display = 'block';
+        if (seccionTablaEquipos) seccionTablaEquipos.style.display = 'block';
+    }
+
+    // Observar cambios en el profesor seleccionado
+    const observer = new MutationObserver(mostrarSeccionEquipos);
+    const infoProfesor = document.getElementById('infoProfesor');
+    if (infoProfesor) {
+        observer.observe(infoProfesor, { attributes: true, attributeFilter: ['style'] });
+    }
+
+    // Asegurar que el inventario/carrito estén visibles desde el inicio
+    mostrarSeccionEquipos();
+
+    // Funciones de búsqueda rápida
+    window.buscarEquipoRapido = function(tipo) {
+        console.log('Buscando equipo tipo:', tipo);
+        buscarEquiposDesdeInventario({ tipo_equipo: tipo });
+    };
+
+    window.buscarControlPorSalon = function(marca, salon) {
+        console.log('Buscando control:', marca, 'para salón:', salon);
+        buscarEquiposDesdeInventario({ tipo_equipo: 'CONTROL', marca: marca, salon: salon });
+    };
+
+    function getSalonDesdeUbicacion() {
+        const ub = document.getElementById('ubicacion');
+        if (!ub) return '';
+        const t = String(ub.value || '').trim().toUpperCase();
+        const m = t.match(/([A-Z]\d{3})/);
+        return m ? m[1] : '';
+    }
+
+    const SALON_MARCA_CONTROL = {
+        'A205': 'SAMSUNG',
+        'A301': 'PANASONIC',
+        'A304': 'SAMSUNG',
+        'A403': 'SAMSUNG',
+        'A501': 'PANASONIC',
+        'A502': 'PANASONIC',
+        'A503': 'PANASONIC',
+        'A504': 'PANASONIC',
+        'A505': 'SAMSUNG',
+        'A506': 'PANASONIC',
+        'A507': 'PANASONIC',
+        'A508': 'PANASONIC',
+        'A509': 'PANASONIC',
+        'A510': 'PANASONIC',
+        'B201': 'PANASONIC',
+        'B202': 'LG',
+        'B203': 'PANASONIC',
+        'B204': 'PANASONIC',
+        'B301': 'PANASONIC',
+        'B303': 'SAMSUNG',
+        'B304': 'PANASONIC',
+        'B305': 'PANASONIC',
+        'B306': 'SAMSUNG',
+        'B307': 'PANASONIC',
+        'B308': 'PANASONIC',
+        'B309': 'PANASONIC',
+        'B310': 'PANASONIC',
+        'B401': 'PANASONIC',
+        'B402': 'PANASONIC',
+        'B403': 'PANASONIC',
+        'B404': 'PANASONIC',
+        'B405': 'PANASONIC',
+        'B406': 'SAMSUNG',
+        'B407': 'PANASONIC',
+        'B408': 'PANASONIC',
+        'B409': 'PANASONIC',
+        'B410': 'SAMSUNG',
+        'B501': 'SAMSUNG',
+        'B502': 'PANASONIC',
+        'B503': 'PANASONIC',
+        'B504': 'PANASONIC',
+        'B505': 'PANASONIC',
+        'B506': 'PANASONIC',
+        'B602': 'PANASONIC',
+        'B603': 'SAMSUNG',
+        'B604': 'PANASONIC',
+        'B605': 'PANASONIC',
+        'B606': 'PANASONIC',
+        'B607': 'PANASONIC',
+        'C301': 'SAMSUNG',
+        'C302': 'SAMSUNG',
+        'C303': 'SAMSUNG',
+        'C304': 'SAMSUNG',
+        'C305': 'SAMSUNG',
+        'C306': 'PANASONIC',
+        'C307': 'PANASONIC',
+        'C308': 'SAMSUNG',
+        'C309': 'PANASONIC',
+        'C310': 'PANASONIC',
+        'C311': 'PANASONIC',
+        'C312': 'PANASONIC',
+        'C401': 'SAMSUNG',
+        'C402': 'SAMSUNG',
+        'C403': 'SAMSUNG',
+        'C404': 'PANASONIC',
+        'C405': 'SAMSUNG',
+        'C406': 'PANASONIC',
+        'C407': 'SAMSUNG',
+        'C408': 'SAMSUNG',
+        'C409': 'SAMSUNG',
+        'C410': 'PANASONIC',
+        'C411': 'SAMSUNG',
+        'C412': 'PANASONIC',
+        'C501': 'SAMSUNG',
+        'C502': 'SAMSUNG',
+        'C503': 'PANASONIC',
+        'C504': 'SAMSUNG',
+        'C505': 'PANASONIC',
+        'C506': 'SAMSUNG',
+        'C507': 'PANASONIC',
+        'C508': 'PANASONIC',
+        'C509': 'SAMSUNG',
+        'C510': 'PANASONIC',
+        'C601': 'SAMSUNG',
+        'C602': 'SAMSUNG',
+        'C603': 'SAMSUNG',
+        'C604': 'SAMSUNG',
+        'C605': 'PANASONIC',
+        'C606': 'PANASONIC',
+        'C607': 'PANASONIC',
+        'C608': 'SAMSUNG',
+        'C609': 'SAMSUNG'
+    };
+
+    function sugerirMarcaControl() {
+        const salon = getSalonDesdeUbicacion();
+        const badge = document.getElementById('badgeControlSugerido');
+        if (!badge) return '';
+
+        const marca = SALON_MARCA_CONTROL[salon] || '';
+        if (marca === 'SAMSUNG') {
+            badge.textContent = 'Samsung';
+            badge.style.background = '#6c757d';
+            return 'SAMSUNG';
+        }
+        if (marca === 'PANASONIC') {
+            badge.textContent = 'Panasonic';
+            badge.style.background = '#212529';
+            return 'PANASONIC';
+        }
+        if (marca === 'LG') {
+            badge.textContent = 'LG';
+            badge.style.background = '#2d6a9f';
+            return 'LG';
+        }
+        badge.textContent = 'No definido';
+        badge.style.background = '#6c757d';
+        return '';
+    }
+
+    const ubicacionEl = document.getElementById('ubicacion');
+    if (ubicacionEl) {
+        ubicacionEl.addEventListener('input', () => {
+            const marca = sugerirMarcaControl();
+            const btnStdControl = document.getElementById('btnStdControl');
+            if (btnStdControl) {
+                if (marca === 'SAMSUNG') {
+                    btnStdControl.className = 'btn btn-sm btn-outline-secondary';
+                } else if (marca === 'PANASONIC') {
+                    btnStdControl.className = 'btn btn-sm btn-outline-dark';
+                } else if (marca === 'LG') {
+                    btnStdControl.className = 'btn btn-sm btn-outline-primary';
+                } else {
+                    btnStdControl.className = 'btn btn-sm';
+                    btnStdControl.style.border = '1px solid #6c757d';
+                }
+            }
+        });
+        sugerirMarcaControl();
+    }
+
+    function agregarPrimerResultado(filtros, etiqueta) {
+        const params = new URLSearchParams(filtros);
+        fetch(`/prestamos/buscar-equipos?${params}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data && data.success && Array.isArray(data.equipos) && data.equipos.length > 0) {
+                    const eq = data.equipos[0];
+                    
+                    // Validar que activo_fijo no sea 'nan', 'undefined', 'null', etc.
+                    const activoFijoValido = eq.activo_fijo && 
+                                             String(eq.activo_fijo).trim() !== '' && 
+                                             String(eq.activo_fijo).toLowerCase() !== 'nan' &&
+                                             String(eq.activo_fijo).toLowerCase() !== 'undefined' &&
+                                             String(eq.activo_fijo).toLowerCase() !== 'null';
+                    
+                    const identificador = activoFijoValido ? eq.activo_fijo : eq.numero_inventario;
+                    
+                    console.log('📍 Llamada desde: btnAgregarPorSalon');
+                    agregarEquipo(identificador, eq.item, eq.marca);
+                    mostrarNotificacion(`${etiqueta}: agregado ${eq.item} - ${identificador}`, 'success');
+                } else {
+                    mostrarNotificacion(`${etiqueta}: no hay equipos disponibles`, 'warning');
+                }
+            })
+            .catch(() => {
+                mostrarNotificacion(`${etiqueta}: error al consultar inventario`, 'danger');
+            });
+    }
+
+    // Event listeners de botones movidos a prestamos_fix.js para evitar problemas de caché
+    // Los botones se configuran en el archivo externo con logs de debug
+
+    function setFiltroPrestamos(which) {
+        const wA = document.getElementById('tablaPrestamosActivosWrap');
+        const wD = document.getElementById('tablaPrestamosDevueltosWrap');
+        const wV = document.getElementById('tablaPrestamosVencidosWrap');
+        if (wA) wA.style.display = (which === 'activos') ? 'block' : 'none';
+        if (wD) wD.style.display = (which === 'devueltos') ? 'block' : 'none';
+        if (wV) wV.style.display = (which === 'vencidos') ? 'block' : 'none';
+    }
+
+    const btnFiltroActivos = document.getElementById('btnFiltroActivos');
+    if (btnFiltroActivos) btnFiltroActivos.addEventListener('click', () => setFiltroPrestamos('activos'));
+    const btnFiltroDevueltos = document.getElementById('btnFiltroDevueltos');
+    if (btnFiltroDevueltos) btnFiltroDevueltos.addEventListener('click', () => setFiltroPrestamos('devueltos'));
+    const btnFiltroVencidos = document.getElementById('btnFiltroVencidos');
+    if (btnFiltroVencidos) btnFiltroVencidos.addEventListener('click', () => setFiltroPrestamos('vencidos'));
+
+    setFiltroPrestamos('activos');
+
+    // Función para mostrar notificaciones
+    function mostrarNotificacion(mensaje, tipo) {
+        const alerta = document.createElement('div');
+        alerta.className = `alert alert-${tipo} alert-dismissible fade show position-fixed`;
+        alerta.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        alerta.innerHTML = `
+            ${mensaje}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alerta);
+        setTimeout(() => {
+            if (alerta.parentNode) {
+                alerta.parentNode.removeChild(alerta);
+            }
+        }, 3000);
+    }
+
+    // Función para extraer número corto del inventario
+    function extraerNumeroCorto(numeroInventario) {
+        if (!numeroInventario) return '';
+        
+        // Extraer solo los dígitos del número de inventario
+        const numeros = String(numeroInventario).match(/\d+/g);
+        if (numeros && numeros.length > 0) {
+            // Tomar el último número y asegurar que tenga 2 dígitos
+            const ultimoNumero = numeros[numeros.length - 1];
+            return ultimoNumero.padStart(2, '0');
+        }
+        return String(numeroInventario);
+    }
+
+    // Función principal para buscar equipos desde inventario
+    function buscarEquiposDesdeInventario(filtros) {
+        const timestamp = new Date().toISOString();
+        console.log(`🔍 [${timestamp}] Buscando equipos con filtros:`, filtros);
+        
+        // Agregar timestamp para evitar caché del navegador
+        const params = new URLSearchParams(filtros);
+        params.append('_t', Date.now());
+        params.append('_cache_bust', Math.random().toString(36).substring(7));
+        
+        console.log(`📡 URL completa: /prestamos/buscar-equipos?${params}`);
+        
+        // Limpiar caché de fetch si existe
+        const url = `/prestamos/buscar-equipos?${params}`;
+        const options = {
+            method: 'GET',
+            headers: {
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            },
+            cache: 'no-store'
+        };
+        
+        fetch(url, options)
+            .then(response => response.json())
+            .then(data => {
+                console.log('📦 Respuesta recibida:', data);
+                if (data && data.success && Array.isArray(data.equipos) && data.equipos.length > 0) {
+                    console.log(`✅ ${data.equipos.length} equipos encontrados:`, data.equipos.map(e => `${e.item} (${e.numero_inventario})`));
+                    
+                    // Validación adicional: verificar que los equipos coinciden con el tipo solicitado
+                    const tipoSolictado = filtros.tipo_equipo;
+                    if (tipoSolictado) {
+                        const equiposFiltrados = data.equipos.filter(eq => {
+                            const itemLower = eq.item.toLowerCase();
+                            if (tipoSolictado === 'PORTATIL') {
+                                return itemLower.includes('portátil') || itemLower.includes('portatil') || itemLower.includes('laptop');
+                            } else if (tipoSolictado === 'CARGADOR') {
+                                return itemLower.includes('cargador') || itemLower.includes('adaptador') || itemLower.includes('fuente');
+                            } else if (tipoSolictado === 'HDMI') {
+                                return itemLower.includes('hdmi');
+                            } else if (tipoSolictado === 'CONTROL') {
+                                return itemLower.includes('control');
+                            } else if (tipoSolictado === 'TECLADO') {
+                                return itemLower.includes('teclado');
+                            }
+                            return true;
+                        });
+                        
+                        if (equiposFiltrados.length !== data.equipos.length) {
+                            console.warn(`⚠️ Se filtraron ${data.equipos.length - equiposFiltrados.length} equipos que no coinciden con el tipo ${tipoSolictado}`);
+                            console.log('📋 Equipos válidos:', equiposFiltrados.map(e => `${e.item} (${e.numero_inventario})`));
+                            renderResultadosInventario(equiposFiltrados);
+                        } else {
+                            renderResultadosInventario(data.equipos);
+                        }
+                    } else {
+                        renderResultadosInventario(data.equipos);
+                    }
+
+                    // Poblar datalist para facilitar escaneo/escritura
+                    const dl = document.getElementById('lista-inventario-disponible');
+                    if (dl) {
+                        dl.innerHTML = '';
+                        data.equipos.forEach(eq => {
+                            const opt = document.createElement('option');
+                            opt.value = (eq.activo_fijo && String(eq.activo_fijo).trim()) ? eq.activo_fijo : eq.numero_inventario;
+                            dl.appendChild(opt);
+                        });
+                    }
+                } else {
+                    renderResultadosInventario([]);
+                    mostrarNotificacion('No se encontraron equipos disponibles', 'warning');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                mostrarNotificacion('Error al buscar equipos', 'danger');
+            });
+    }
+    
+    // Exponer funciones al scope global para que prestamos_fix.js pueda acceder
+    window.buscarEquiposDesdeInventario = buscarEquiposDesdeInventario;
+    window.sugerirMarcaControl = sugerirMarcaControl;
+    window.getSalonDesdeUbicacion = getSalonDesdeUbicacion;
+
+    function renderResultadosInventario(equipos) {
+        console.log('🎨 renderResultadosInventario llamado con', equipos.length, 'equipos');
+        const cont = document.getElementById('resultados-inventario');
+        const body = document.getElementById('resultados-inventario-body');
+        const count = document.getElementById('resultados-inventario-count');
+        if (!cont || !body) return;
+
+        body.innerHTML = '';
+        if (!equipos || equipos.length === 0) {
+            cont.style.display = 'none';
+            if (count) count.textContent = '';
+            return;
+        }
+
+        cont.style.display = 'block';
+        if (count) count.textContent = `${equipos.length} resultado(s)`;
+
+        equipos.forEach(eq => {
+            // Validar que activo_fijo no sea 'nan', 'undefined', 'null', etc.
+            const activoFijoValido = eq.activo_fijo && 
+                                     String(eq.activo_fijo).trim() !== '' && 
+                                     String(eq.activo_fijo).toLowerCase() !== 'nan' &&
+                                     String(eq.activo_fijo).toLowerCase() !== 'undefined' &&
+                                     String(eq.activo_fijo).toLowerCase() !== 'null';
+            
+            const identificador = activoFijoValido ? eq.activo_fijo : eq.numero_inventario;
+            
+            console.log('🔍 Procesando equipo:', { 
+                item: eq.item, 
+                activo_fijo: eq.activo_fijo, 
+                numero_inventario: eq.numero_inventario,
+                identificador_final: identificador 
+            });
+            
+            const tr = document.createElement('tr');
+            
+            // Determinar si está disponible
+            console.log('🔍 Procesando equipo:', eq);
+            console.log('   eq.disponible:', eq.disponible, 'tipo:', typeof eq.disponible);
+            console.log('   eq.mensaje_prestamo:', eq.mensaje_prestamo);
+            
+            // Lógica simplificada para determinar disponibilidad
+            const estaDisponible = eq.disponible === true || eq.disponible === undefined;
+            const mensajePrestamo = eq.mensaje_prestamo;
+            
+            // Construir HTML según estado
+            let botonHtml = '';
+            let claseFila = '';
+            
+            if (!estaDisponible && mensajePrestamo) {
+                // Equipo prestado
+                claseFila = 'table-warning';
+                botonHtml = `<button type="button" class="btn btn-sm btn-warning" disabled title="${mensajePrestamo}">
+                    <i class="bi bi-lock"></i> No disponible
+                </button>`;
+            } else {
+                // Equipo disponible
+                botonHtml = `<button type="button" class="btn btn-sm btn-success">Agregar</button>`;
+            }
+            
+            tr.className = claseFila;
+            tr.innerHTML = `
+                <td><code>${activoFijoValido ? eq.activo_fijo : ''}</code></td>
+                <td><code>${eq.numero_inventario || ''}</code></td>
+                <td>${eq.item || ''}</td>
+                <td>${eq.marca || ''}</td>
+                <td>${eq.serial || ''}</td>
+                <td>${eq.bodega || ''}</td>
+                <td>${eq.sede || ''}</td>
+                <td class="text-end">
+                    ${botonHtml}
+                </td>
+            `;
+            
+            // Si está prestado, agregar una fila adicional con el mensaje
+            if (!estaDisponible && mensajePrestamo) {
+                const trMensaje = document.createElement('tr');
+                trMensaje.className = 'table-warning';
+                trMensaje.innerHTML = `
+                    <td colspan="7" class="text-center">
+                        <small class="text-muted">
+                            <i class="bi bi-info-circle"></i> ${mensajePrestamo}
+                        </small>
+                    </td>
+                    <td></td>
+                `;
+                body.appendChild(trMensaje);
+            }
+
+            const btn = tr.querySelector('button');
+            if (btn) {
+                btn.addEventListener('click', function() {
+                    // Prevenir múltiples clics
+                    if (this.disabled || this.dataset.agregado === 'true') {
+                        console.warn('⚠️ Botón ya fue clickeado');
+                        return;
+                    }
+                    
+                    this.disabled = true;
+                    this.dataset.agregado = 'true';
+                    this.innerHTML = '<i class="bi bi-check"></i> Agregado';
+                    
+                    console.log('%c🔘 Botón Agregar clickeado en renderResultadosInventario', 'background: #00ff00; color: #000; font-size: 14px; padding: 5px;');
+                    console.log('   Equipo del backend:', eq);
+                    console.log('   activo_fijo:', eq.activo_fijo);
+                    console.log('   numero_inventario:', eq.numero_inventario);
+                    console.log('   activoFijoValido:', activoFijoValido);
+                    console.log('   Identificador FINAL:', identificador);
+                    console.log('   Item:', eq.item);
+                    console.log('   Marca:', eq.marca);
+                    
+                    if (typeof agregarEquipo === 'function') {
+                        agregarEquipo(identificador, eq.item, eq.marca);
+                        mostrarNotificacion(`Equipo agregado: ${eq.item} - ${identificador}`, 'success');
+                    } else {
+                        console.error('❌ agregarEquipo no es una función');
+                        alert('Error: La función agregarEquipo no está disponible');
+                    }
+                });
+            }
+
+            body.appendChild(tr);
+        });
+    }
+
+    // Función para agregar equipos
+    // Variable para rastrear equipos en proceso de agregación
+    const equiposEnProceso = new Set();
+    
+    window.agregarEquipo = function(id, nombre, marca) {
+        // LOG CRÍTICO: Ver qué parámetros llegan
+        console.log('%c📥 agregarEquipo LLAMADO', 'background: #ff00ff; color: #fff; font-size: 16px; padding: 5px;');
+        console.log('   ID recibido:', id);
+        console.log('   Nombre recibido:', nombre);
+        console.log('   Marca recibida:', marca);
+        console.log('   Stack trace:', new Error().stack);
+        
+        // Extraer número corto para mostrar
+        const numeroCorto = extraerNumeroCorto(id);
+        console.log('   Número corto extraído:', numeroCorto);
+        
+        // Validar que el ID no sea inválido
+        if (!id || id === 'nan' || id === 'undefined' || id === 'null' || String(id).trim() === '') {
+            console.error('❌ ID de equipo inválido:', id);
+            mostrarNotificacion('Error: Número de inventario inválido', 'danger');
+            return;
+        }
+        
+        // Bloquear si ya está en proceso
+        if (equiposEnProceso.has(id)) {
+            console.warn('⚠️ Equipo ya en proceso de agregación:', id);
+            return;
+        }
+        
+        equiposEnProceso.add(id);
+        
+        try {
+            console.log('🔍 agregarEquipo llamado:', { id, nombre, marca });
+            const tbody = document.getElementById('lista-items-carrito');
+            
+            if (!tbody) {
+                console.error('❌ No se encontró el tbody lista-items-carrito');
+                return;
+            }
+            
+            // Verificar si el equipo ya existe en el carrito
+            const filasExistentes = Array.from(tbody.querySelectorAll('tr'));
+            const yaExiste = filasExistentes.some(fila => {
+                const primeraColumna = fila.children[0];
+                return primeraColumna && primeraColumna.textContent.trim() === id;
+            });
+            
+            if (yaExiste) {
+                console.warn('⚠️ El equipo ya está en el carrito:', id);
+                mostrarNotificacion(`El equipo ${id} ya está en el carrito`, 'warning');
+                return;
+            }
+            
+            const carritoVacio = document.getElementById('carrito-vacio');
+            if (carritoVacio) {
+                carritoVacio.remove();
+            }
+            
+            const tr = document.createElement('tr');
+            // Almacenar el ID completo en un atributo data para poder enviarlo
+            tr.setAttribute('data-id-completo', id);
+            tr.innerHTML = `
+                <td>${numeroCorto}</td>
+                <td>${nombre} ${marca ? '(' + marca + ')' : ''}</td>
+                <td class="text-center">
+                    <input type="checkbox" class="form-check-input" checked>
+                </td>
+                <td class="text-end">
+                    <button type="button" class="btn btn-sm btn-danger btn-quitar-item">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            `;
+            const btnQuitar = tr.querySelector('.btn-quitar-item');
+            if (btnQuitar) {
+                btnQuitar.addEventListener('click', function() {
+                    const fila = this.closest('tr');
+                    if (fila) {
+                        const idEquipo = fila.children[0].textContent.trim();
+                        fila.remove();
+                        equiposEnProceso.delete(idEquipo);
+                        actualizarResumenTipos();
+                    }
+                });
+            }
+            tbody.appendChild(tr);
+            console.log('✅ Fila agregada al tbody');
+            actualizarResumenTipos();
+        } finally {
+            // Liberar después de un pequeño delay para evitar race conditions
+            setTimeout(() => {
+                equiposEnProceso.delete(id);
+            }, 100);
+        }
+    };
+
+    function normalizarTexto(s) {
+        return (s || '')
+            .toString()
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function clasificarTipoItem(texto) {
+        const t = normalizarTexto(texto);
+        if (t.includes('portatil') || t.includes('laptop')) return 'portatil';
+        if (t.includes('cargador') || t.includes('adaptador')) return 'cargador';
+        if (t.includes('hdmi')) return 'hdmi';
+        if (t.includes('control')) return 'control';
+        if (t.includes('teclado')) return 'teclado';
+        return 'otro';
+    }
+
+    function setCount(id, value) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = String(value);
+    }
+
+    function actualizarResumenTipos() {
+        const filas = Array.from(document.querySelectorAll('#lista-items-carrito tr'))
+            .filter(tr => tr.id !== 'carrito-vacio');
+
+        const counts = {
+            portatil: 0,
+            cargador: 0,
+            hdmi: 0,
+            control: 0,
+            teclado: 0
+        };
+
+        const itemsPorTipo = {
+            portatil: [],
+            cargador: [],
+            hdmi: [],
+            control: [],
+            teclado: []
+        };
+
+        filas.forEach(tr => {
+            const numInv = (tr.children && tr.children[0]) ? tr.children[0].textContent.trim() : '';
+            const desc = (tr.children && tr.children[1]) ? tr.children[1].textContent : '';
+            const tipo = clasificarTipoItem(desc);
+            if (tipo in counts) {
+                counts[tipo] += 1;
+                const etiqueta = numInv ? `${numInv} - ${desc.trim()}` : desc.trim();
+                itemsPorTipo[tipo].push(etiqueta);
+            }
+        });
+
+        setCount('count-portatil', counts.portatil);
+        setCount('count-cargador', counts.cargador);
+        setCount('count-hdmi', counts.hdmi);
+        setCount('count-control', counts.control);
+        setCount('count-teclado', counts.teclado);
+
+        renderListaTipo('lista-portatil', itemsPorTipo.portatil);
+        renderListaTipo('lista-cargador', itemsPorTipo.cargador);
+        renderListaTipo('lista-hdmi', itemsPorTipo.hdmi);
+        renderListaTipo('lista-control', itemsPorTipo.control);
+        renderListaTipo('lista-teclado', itemsPorTipo.teclado);
+    }
+
+    function renderListaTipo(containerId, items) {
+        const el = document.getElementById(containerId);
+        if (!el) return;
+        if (!items || items.length === 0) {
+            el.innerHTML = '<span class="text-muted">--</span>';
+            return;
+        }
+        el.innerHTML = `<ul class="mb-0 ps-3">${items.map(x => `<li>${escapeHtml(x)}</li>`).join('')}</ul>`;
+    }
+
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    // === AUTOCOMPLETADO DE PROFESORES ===
+    const inputProfesor = document.getElementById('busqueda_profesor');
+    const sugerencias = document.getElementById('sugerenciasProfesores');
+    const cedulaHidden = document.getElementById('cedula_profesor');
+
+    function ocultarSugerencias() {
+        if (sugerencias) sugerencias.style.display = 'none';
+    }
+
+    function mostrarSugerencias(items) {
+        if (!sugerencias) return;
+        sugerencias.innerHTML = '';
+        if (!items || items.length === 0) {
+            ocultarSugerencias();
+            return;
+        }
+        items.forEach(p => {
+            const a = document.createElement('button');
+            a.type = 'button';
+            a.className = 'list-group-item list-group-item-action';
+            a.textContent = `${p.nombre_completo} (${p.cedula})`;
+            a.addEventListener('click', () => {
+                if (inputProfesor) inputProfesor.value = `${p.nombre_completo} (${p.cedula})`;
+                if (cedulaHidden) cedulaHidden.value = p.cedula;
+                const info = document.getElementById('infoProfesor');
+                if (info) info.style.display = 'block';
+                const tNombre = document.getElementById('profesorNombre');
+                const tCed = document.getElementById('profesorCedulaText');
+                const tCorreo = document.getElementById('profesorCorreo');
+                const tPrograma = document.getElementById('profesorPrograma');
+                if (tNombre) tNombre.textContent = p.nombre_completo || '';
+                if (tCed) tCed.textContent = p.cedula || '';
+                if (tCorreo) tCorreo.textContent = p.correo || '';
+                if (tPrograma) tPrograma.textContent = p.programa || '';
+                ocultarSugerencias();
+            });
+            sugerencias.appendChild(a);
+        });
+        sugerencias.style.display = 'block';
+    }
+
+    async function buscarProfesores(query) {
+        if (!query || query.trim().length < 1) {
+            ocultarSugerencias();
+            return;
+        }
+        try {
+            const res = await fetch(`/profesores/buscar?q=${encodeURIComponent(query.trim())}`);
+            const data = await res.json();
+            const profesores = Array.isArray(data?.profesores) ? data.profesores : Array.isArray(data?.results) ? data.results : [];
+            if (data && data.success && profesores.length > 0) {
+                mostrarSugerencias(profesores);
+            } else {
+                ocultarSugerencias();
+            }
+        } catch (e) {
+            ocultarSugerencias();
+        }
+    }
+
+    let timeoutProfes;
+    if (inputProfesor) {
+        inputProfesor.addEventListener('input', function(e) {
+            clearTimeout(timeoutProfes);
+            timeoutProfes = setTimeout(() => buscarProfesores(e.target.value), 250);
+        });
+        inputProfesor.addEventListener('blur', function() {
+            setTimeout(ocultarSugerencias, 200);
+        });
+    }
+
+    window.limpiarProfesorSeleccionado = function() {
+        if (inputProfesor) inputProfesor.value = '';
+        if (cedulaHidden) cedulaHidden.value = '';
+        const info = document.getElementById('infoProfesor');
+        if (info) info.style.display = 'none';
+        ocultarSugerencias();
+    };
+
+    function getHoraActualHHMM() {
+        const d = new Date();
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mm = String(d.getMinutes()).padStart(2, '0');
+        return `${hh}:${mm}`;
+    }
+
+    function precargarHoraInicio() {
+        const horaInicioEl = document.getElementById('hora_inicio');
+        if (!horaInicioEl) return;
+        const v = String(horaInicioEl.value || '').trim();
+        if (!v) horaInicioEl.value = getHoraActualHHMM();
+    }
+
+    precargarHoraInicio();
+
+    // Manejo del formulario
+    document.getElementById('formPrestamo').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const cedula = (cedulaHidden && cedulaHidden.value) ? cedulaHidden.value.trim() : '';
+        if (!cedula) {
+            mostrarNotificacion('Seleccione un profesor válido', 'warning');
+            return;
+        }
+
+        const tbody = document.getElementById('lista-items-carrito');
+        const items = Array.from(tbody.querySelectorAll('tr'))
+            .map(tr => {
+                if (!tr.children || !tr.children[0]) return '';
+                // Usar el ID completo almacenado en el atributo data
+                const idCompleto = tr.getAttribute('data-id-completo');
+                const numeroCorto = tr.children[0].textContent.trim();
+                const descripcion = tr.children[1] ? tr.children[1].textContent.trim() : '';
+                
+                console.log('📦 Item en carrito:', { idCompleto, numeroCorto, descripcion });
+                
+                // Filtrar valores inválidos como 'nan', 'undefined', etc.
+                if (!idCompleto || idCompleto === 'nan' || idCompleto === 'undefined' || idCompleto === 'null') {
+                    console.warn('⚠️ Item inválido filtrado:', idCompleto);
+                    return '';
+                }
+                return idCompleto; // Enviar el ID completo
+            })
+            .filter(Boolean);
+        
+        console.log('📋 Items finales a enviar:', items);
+
+        if (items.length === 0) {
+            mostrarNotificacion('Agregue al menos un equipo para el préstamo', 'warning');
+            return;
+        }
+
+        const sedeSelect = document.getElementById('sede_prestamo');
+        const sedeId = sedeSelect ? sedeSelect.value : '';
+
+        const horaInicioEl = document.getElementById('hora_inicio');
+        const horaFinEl = document.getElementById('hora_fin');
+        const ubicacionEl = document.getElementById('ubicacion');
+        const obsEl = document.getElementById('observaciones');
+
+        const timeRegex = /^([01]\d|2[0-3]):[0-5]\d$/;
+        let horaInicio = horaInicioEl ? horaInicioEl.value.trim() : '';
+        const horaFin = horaFinEl ? horaFinEl.value.trim() : '';
+
+        if (!horaInicio) {
+            horaInicio = getHoraActualHHMM();
+            if (horaInicioEl) horaInicioEl.value = horaInicio;
+        }
+
+        if (!timeRegex.test(horaInicio)) {
+            mostrarNotificacion('Hora inicio inválida. Use formato militar HH:MM (00:00-23:59)', 'warning');
+            return;
+        }
+        if (!timeRegex.test(horaFin)) {
+            mostrarNotificacion('Hora fin inválida. Use formato militar HH:MM (00:00-23:59)', 'warning');
+            return;
+        }
+
+        const payload = {
+            cedula: cedula,
+            items: items,
+            hora_inicio: horaInicio,
+            hora_fin: horaFin,
+            ubicacion: ubicacionEl ? ubicacionEl.value : '',
+            observaciones: obsEl ? obsEl.value : ''
+        };
+
+        if (sedeId) payload.sede_id = sedeId;
+
+        console.log('📤 Enviando préstamo:', payload);
+
+        fetch('/prestamos/nuevo', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(r => r.text().then(text => {
+            let json = null;
+            try { json = text ? JSON.parse(text) : null; } catch (e) { json = null; }
+            return { ok: r.ok, status: r.status, text: text, json: json };
+        }))
+        .then(({ ok, status, json }) => {
+            if (ok && json && json.success) {
+                mostrarNotificacion(json.message || 'Préstamo registrado', 'success');
+                setTimeout(() => location.reload(), 600);
+            } else {
+                const errorMsg = (json && json.message) ? json.message : `Error ${status}: No se pudo registrar el préstamo`;
+                console.error('Error al crear préstamo:', errorMsg, json);
+                mostrarNotificacion(errorMsg, 'danger');
+            }
+        })
+        .catch((err) => {
+            console.error('Error de conexión:', err);
+            mostrarNotificacion('Error de conexión al registrar el préstamo', 'danger');
+        });
+    });
+
+    // === VER DETALLES DE PRÉSTAMO ===
+    window.verDetallesPrestamo = function(idGrupo) {
+        if (!idGrupo) return;
+        
+        console.log('🔍 Cargando detalles del préstamo:', idGrupo);
+        
+        fetch(`/prestamos/detalles/${idGrupo}`, {
+            method: 'GET',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
+        })
+        .then(r => {
+            const contentType = r.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('La respuesta no es JSON. Puede que la sesión haya expirado.');
+            }
+            return r.json();
+        })
+        .then(data => {
+            if (data && data.success && data.prestamo) {
+                const p = data.prestamo;
+                
+                // Construir HTML con los detalles
+                let detallesHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="bi bi-person-badge"></i> Información del Profesor</h6>
+                            <table class="table table-sm">
+                                <tr><td><strong>Nombre:</strong></td><td>${p.nombre_profesor || '--'}</td></tr>
+                                <tr><td><strong>Cédula:</strong></td><td>${p.cedula_profesor || '--'}</td></tr>
+                                <tr><td><strong>Teléfono:</strong></td><td>${p.telefono || '--'}</td></tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="bi bi-geo-alt"></i> Información del Préstamo</h6>
+                            <table class="table table-sm">
+                                <tr><td><strong>ID Grupo:</strong></td><td><span class="badge bg-primary">${p.id_grupo}</span></td></tr>
+                                <tr><td><strong>Fecha:</strong></td><td>${p.fecha_prestamo || '--'}</td></tr>
+                                <tr><td><strong>Horario:</strong></td><td>${p.hora_inicio || '--'} - ${p.hora_fin || '--'}</td></tr>
+                                <tr><td><strong>Ubicación:</strong></td><td>${p.ubicacion || '--'}</td></tr>
+                                <tr><td><strong>Estado:</strong></td><td><span class="badge bg-${p.estado === 'Prestado' ? 'warning' : 'success'}">${p.estado}</span></td></tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6><i class="bi bi-box-seam"></i> Equipos Prestados (${p.total_equipos || 0} equipos)</h6>
+                            <div class="row">
+                `;
+                
+                // Agregar cada tipo de equipo
+                if (p.equipos && p.equipos.portatiles && p.equipos.portatiles.length > 0) {
+                    detallesHTML += `
+                        <div class="col-md-6 mb-2">
+                            <div class="card border-success">
+                                <div class="card-header bg-success text-white">
+                                    <i class="bi bi-laptop"></i> Portátiles (${p.equipos.portatiles.length})
+                                </div>
+                                <div class="card-body">
+                                    ${p.equipos.portatiles.map(eq => `<span class="badge bg-success me-1">${eq.numero_inventario}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if (p.equipos && p.equipos.cargadores && p.equipos.cargadores.length > 0) {
+                    detallesHTML += `
+                        <div class="col-md-6 mb-2">
+                            <div class="card border-info">
+                                <div class="card-header bg-info text-white">
+                                    <i class="bi bi-lightning-charge"></i> Cargadores (${p.equipos.cargadores.length})
+                                </div>
+                                <div class="card-body">
+                                    ${p.equipos.cargadores.map(eq => `<span class="badge bg-info me-1">${eq.numero_inventario}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if (p.equipos && p.equipos.hdmi && p.equipos.hdmi.length > 0) {
+                    detallesHTML += `
+                        <div class="col-md-6 mb-2">
+                            <div class="card border-warning">
+                                <div class="card-header bg-warning text-dark">
+                                    <i class="bi bi-usb-c"></i> HDMI (${p.equipos.hdmi.length})
+                                </div>
+                                <div class="card-body">
+                                    ${p.equipos.hdmi.map(eq => `<span class="badge bg-warning text-dark me-1">${eq.numero_inventario}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if (p.equipos && p.equipos.controles && p.equipos.controles.length > 0) {
+                    detallesHTML += `
+                        <div class="col-md-6 mb-2">
+                            <div class="card border-secondary">
+                                <div class="card-header bg-secondary text-white">
+                                    <i class="bi bi-remote"></i> Controles (${p.equipos.controles.length})
+                                </div>
+                                <div class="card-body">
+                                    ${p.equipos.controles.map(eq => `<span class="badge bg-secondary me-1">${eq.numero_inventario}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if (p.equipos && p.equipos.teclados && p.equipos.teclados.length > 0) {
+                    detallesHTML += `
+                        <div class="col-md-6 mb-2">
+                            <div class="card" style="border-color: #6f42c1;">
+                                <div class="card-header text-white" style="background:#6f42c1;">
+                                    <i class="bi bi-keyboard"></i> Teclados (${p.equipos.teclados.length})
+                                </div>
+                                <div class="card-body">
+                                    ${p.equipos.teclados.map(eq => `<span class="badge me-1" style="background:#6f42c1;">${eq.numero_inventario}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                detallesHTML += `
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                if (p.observaciones) {
+                    detallesHTML += `
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h6><i class="bi bi-chat-dots"></i> Observaciones</h6>
+                                <div class="alert alert-info">${p.observaciones}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Mostrar en el modal
+                document.getElementById('detallesPrestamoContent').innerHTML = detallesHTML;
+                
+                // Mostrar el modal
+                const modal = new bootstrap.Modal(document.getElementById('modalDetallesPrestamo'));
+                modal.show();
+            } else {
+                mostrarNotificacion(data.message || 'No se pudieron cargar los detalles del préstamo', 'danger');
+            }
+        })
+        .catch(err => {
+            console.error('Error al cargar detalles del préstamo:', err);
+            if (err.message.includes('sesión')) {
+                mostrarNotificacion('Tu sesión ha expirado. Por favor, recarga la página.', 'warning');
+            } else {
+                mostrarNotificacion('Error al cargar los detalles del préstamo', 'danger');
+            }
+        });
+    };
+
+    // === DEVOLUCIÓN ===
+    window.devolverPrestamo = function(idPrestamo) {
+        if (!idPrestamo) return;
+        if (!confirm(`¿Marcar el préstamo ${idPrestamo} como devuelto?`)) return;
+
+        fetch(`/prestamos/devolver/${idPrestamo}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+        })
+        .then(r => r.json().then(j => ({ ok: r.ok, json: j })))
+        .then(({ ok, json }) => {
+            if (ok && json && json.success) {
+                mostrarNotificacion(json.message || 'Devuelto', 'success');
+                setTimeout(() => location.reload(), 600);
+            } else {
+                mostrarNotificacion((json && json.message) ? json.message : 'No se pudo devolver', 'danger');
+            }
+        })
+        .catch(() => {
+            mostrarNotificacion('Error de conexión al devolver', 'danger');
+        });
+    };
+
+    // === EDICIÓN ===
+    window.editarPrestamo = function(idGrupo) {
+        console.log('🔧 editarPrestamo llamado con idGrupo:', idGrupo);
+        
+        // Abrir modal de Bootstrap primero
+        const modal = new bootstrap.Modal(document.getElementById('modalEditarPrestamo'));
+        modal.show();
+        
+        // Cargar datos y actualizar equipos
+        fetch(`/prestamos/editar/${idGrupo}`, {
+            method: 'GET',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
+        })
+        .then(r => r.json())
+        .then(data => {
+            console.log('📦 Datos recibidos:', data);
+            
+            if (data && data.success && data.prestamo) {
+                const p = data.prestamo;
+                console.log('✅ Préstamo cargado:', p);
+                
+                // Llenar formulario básico
+                document.getElementById('edit_id_grupo').value = idGrupo;
+                document.getElementById('edit_ubicacion').value = p.ubicacion || '';
+                document.getElementById('edit_fecha_prestamo').value = p.fecha_prestamo || '';
+                document.getElementById('edit_hora_inicio').value = p.hora_inicio || '';
+                document.getElementById('edit_hora_fin').value = p.hora_fin || '';
+                document.getElementById('edit_observaciones').value = p.observaciones || '';
+                
+                // Actualizar equipos con números cortos
+                const equiposEditDiv = document.getElementById('edit_items_container');
+                console.log('🔍 Div equipos:', !!equiposEditDiv);
+                console.log('🔍 p.equipos:', p.equipos);
+                
+                if (equiposEditDiv && p.equipos) {
+                    let equiposHTML = '';
+                    
+                    // Portátiles
+                    if (p.equipos.portatiles && p.equipos.portatiles.length > 0) {
+                        console.log('📋 Portátiles:', p.equipos.portatiles);
+                        equiposHTML += '<div style="background: #d4edda; padding: 10px; margin: 5px; border-radius: 5px;"><strong>💻 Portátiles:</strong> ';
+                        p.equipos.portatiles.forEach(eq => {
+                            const numero = eq.numero_inventario.replace(/\D/g, '');
+                            equiposHTML += '<span style="background: #155724; color: white; padding: 3px 8px; border-radius: 12px; margin: 2px; font-weight: bold;">' + numero + '</span>';
+                        });
+                        equiposHTML += '</div>';
+                    }
+                    
+                    // Cargadores
+                    if (p.equipos.cargadores && p.equipos.cargadores.length > 0) {
+                        console.log('📋 Cargadores:', p.equipos.cargadores);
+                        equiposHTML += '<div style="background: #d1ecf1; padding: 10px; margin: 5px; border-radius: 5px;"><strong>⚡ Cargadores:</strong> ';
+                        p.equipos.cargadores.forEach(eq => {
+                            const numero = eq.numero_inventario.replace(/\D/g, '');
+                            equiposHTML += '<span style="background: #0c5460; color: white; padding: 3px 8px; border-radius: 12px; margin: 2px; font-weight: bold;">' + numero + '</span>';
+                        });
+                        equiposHTML += '</div>';
+                    }
+                    
+                    // Controles con abreviaturas
+                    if (p.equipos.controles && p.equipos.controles.length > 0) {
+                        console.log('📋 Controles:', p.equipos.controles);
+                        equiposHTML += '<div style="background: #f8d7da; padding: 10px; margin: 5px; border-radius: 5px;"><strong>🎮 Controles:</strong> ';
+                        p.equipos.controles.forEach(eq => {
+                            let abreviatura = '';
+                            if (eq.numero_inventario.includes('PANASONIC')) abreviatura = 'PANASONIC';
+                            else if (eq.numero_inventario.includes('SAMSUG')) abreviatura = 'SAMSUG';
+                            else abreviatura = eq.numero_inventario.replace(/\D/g, '') || 'CONTROL';
+                            
+                            equiposHTML += '<span style="background: #721c24; color: white; padding: 3px 8px; border-radius: 12px; margin: 2px; font-weight: bold;">' + abreviatura + '</span>';
+                        });
+                        equiposHTML += '</div>';
+                    }
+                    
+                    // Teclados
+                    if (p.equipos.teclados && p.equipos.teclados.length > 0) {
+                        console.log('📋 Teclados:', p.equipos.teclados);
+                        equiposHTML += '<div style="background: #e2e3e5; padding: 10px; margin: 5px; border-radius: 5px;"><strong>⌨️ Teclados:</strong> ';
+                        p.equipos.teclados.forEach(eq => {
+                            const numero = eq.numero_inventario.replace(/\D/g, '');
+                            equiposHTML += '<span style="background: #383d41; color: white; padding: 3px 8px; border-radius: 12px; margin: 2px; font-weight: bold;">' + numero + '</span>';
+                        });
+                        equiposHTML += '</div>';
+                    }
+                    
+                    console.log('📝 equiposHTML final:', equiposHTML);
+                    
+                    if (equiposHTML) {
+                        equiposEditDiv.innerHTML = equiposHTML;
+                    } else {
+                        equiposEditDiv.innerHTML = '<div class="text-muted">No hay equipos asignados</div>';
+                    }
+                }
+            } else {
+                console.log('❌ Error en datos:', data);
+            }
+        })
+        .catch(err => {
+            console.error('❌ Error:', err);
+        });
+    };
+    
+    // Agregar event listeners a los botones de editar
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🎯 Agregando event listeners a botones de editar');
+        
+        // Buscar todos los botones de editar
+        const editButtons = document.querySelectorAll('button[onclick*="editarPrestamo"]');
+        console.log('🔍 Botones de editar encontrados:', editButtons.length);
+        
+        editButtons.forEach((button, index) => {
+            const onclickAttr = button.getAttribute('onclick');
+            console.log(`🔍 Botón ${index + 1}:`, onclickAttr);
+            
+            // Agregar event listener adicional
+            button.addEventListener('click', function(e) {
+                console.log('🔘 Botón de editar clickeado:', e.target);
+                console.log('🔘 onclick attribute:', onclickAttr);
+            });
+        });
+    });
+
+    // Guardar edición de préstamo
+    window.guardarEdicionPrestamo = function() {
+        const idGrupo = document.getElementById('edit_id_grupo').value;
+        const formData = {
+            ubicacion: document.getElementById('edit_ubicacion').value,
+            fecha_prestamo: document.getElementById('edit_fecha_prestamo').value,
+            hora_inicio: document.getElementById('edit_hora_inicio').value,
+            hora_fin: document.getElementById('edit_hora_fin').value,
+            observaciones: document.getElementById('edit_observaciones').value
+        };
+        
+        fetch(`/prestamos/editar/${idGrupo}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data && data.success) {
+                mostrarNotificacion(data.message || 'Préstamo actualizado correctamente', 'success');
+                
+                // Cerrar modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('modalEditarPrestamo'));
+                if (modal) modal.hide();
+                
+                // Recargar página
+                setTimeout(() => location.reload(), 600);
+            } else {
+                mostrarNotificacion(data.message || 'Error al actualizar el préstamo', 'danger');
+            }
+        })
+        .catch(err => {
+            console.error('Error al guardar:', err);
+            mostrarNotificacion('Error al guardar los cambios', 'danger');
+        });
+    };
+
+    // Botón limpiar selección
+    document.getElementById('btnLimpiarSeleccion').addEventListener('click', function() {
+        const tbody = document.getElementById('lista-items-carrito');
+        tbody.innerHTML = '<tr id="carrito-vacio"><td colspan="4" class="text-center text-muted py-4">No hay equipos seleccionados</td></tr>';
+        actualizarResumenTipos();
+    });
+
+    // Botón de búsqueda manual
+    const btnBuscar = document.getElementById('btnBuscarInventario');
+    if (btnBuscar) {
+        btnBuscar.addEventListener('click', function() {
+            const numero = document.getElementById('numero_inventario_busqueda').value;
+
+            const filtros = {};
+            if (numero) {
+                filtros.numero_inventario = numero;
+                buscarEquiposDesdeInventario(filtros);
+            } else {
+                mostrarNotificacion('Escriba un número de inventario/placa activo o use los botones de equipos estándar', 'info');
+            }
+        });
+    }
+
+    // Botón agregar directo (para escaneo)
+    const btnAgregar = document.getElementById('btnAgregarDirecto');
+    if (btnAgregar) {
+        btnAgregar.addEventListener('click', function() {
+            const numero = document.getElementById('numero_inventario_busqueda').value.trim();
+            if (numero) {
+                fetch(`/prestamos/buscar-equipos?numero_inventario=${encodeURIComponent(numero)}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data && data.success && Array.isArray(data.equipos) && data.equipos.length > 0) {
+                            const eq = data.equipos[0];
+                            
+                            // Validar que activo_fijo no sea 'nan', 'undefined', 'null', etc.
+                            const activoFijoValido = eq.activo_fijo && 
+                                                     String(eq.activo_fijo).trim() !== '' && 
+                                                     String(eq.activo_fijo).toLowerCase() !== 'nan' &&
+                                                     String(eq.activo_fijo).toLowerCase() !== 'undefined' &&
+                                                     String(eq.activo_fijo).toLowerCase() !== 'null';
+                            
+                            const identificador = activoFijoValido ? eq.activo_fijo : eq.numero_inventario;
+                            
+                            agregarEquipo(identificador, eq.item, eq.marca);
+                            mostrarNotificacion(`Equipo agregado: ${eq.item} - ${identificador}`, 'success');
+                        } else {
+                            mostrarNotificacion('No se encontró el equipo disponible con ese número', 'warning');
+                        }
+                    })
+                    .catch(() => {
+                        mostrarNotificacion('Error al buscar en inventario', 'danger');
+                    });
+            } else {
+                mostrarNotificacion('Ingrese un número de inventario', 'warning');
+            }
+        });
+    }
+    
+    // ============================================
+    // CORRECCIÓN FINAL: Reemplazar event listeners de botones
+    // ============================================
+    console.log('%c🔧 APLICANDO CORRECCIÓN DE BOTONES', 'background: #ff00ff; color: #fff; font-size: 18px; font-weight: bold; padding: 10px;');
+    
+    // Esperar un momento para que todo esté cargado
+    setTimeout(function() {
+        // Clonar botones para eliminar todos los event listeners anteriores
+        const botonesIds = ['btnStdPortatil', 'btnStdCargador', 'btnStdHdmi', 'btnStdControl', 'btnStdTeclado'];
+        
+        botonesIds.forEach(function(btnId) {
+            const btnViejo = document.getElementById(btnId);
+            if (btnViejo) {
+                const btnNuevo = btnViejo.cloneNode(true);
+                btnViejo.parentNode.replaceChild(btnNuevo, btnViejo);
+                console.log('🔄 Botón ' + btnId + ' clonado');
+            }
+        });
+        
+        // Ahora agregar los event listeners correctos
+        const btnPortatil = document.getElementById('btnStdPortatil');
+        if (btnPortatil) {
+            btnPortatil.addEventListener('click', function() {
+                console.log('🔵 PORTÁTIL CLICKEADO');
+                buscarEquiposDesdeInventario({ tipo_equipo: 'PORTATIL' });
+            });
+        }
+        
+        const btnCargador = document.getElementById('btnStdCargador');
+        if (btnCargador) {
+            console.log('✅ Botón Cargador configurado correctamente');
+            btnCargador.addEventListener('click', function() {
+                console.log('🔌 CARGADOR CLICKEADO - Buscando Cargadores/Adaptadores');
+                buscarEquiposDesdeInventario({ tipo_equipo: 'CARGADOR' });
+            });
+        }
+        
+        const btnHdmi = document.getElementById('btnStdHdmi');
+        if (btnHdmi) {
+            btnHdmi.addEventListener('click', function() {
+                console.log('🔵 HDMI CLICKEADO');
+                buscarEquiposDesdeInventario({ tipo_equipo: 'HDMI' });
+            });
+        }
+        
+        const btnControl = document.getElementById('btnStdControl');
+        if (btnControl) {
+            btnControl.addEventListener('click', function() {
+                console.log('🔵 CONTROL CLICKEADO');
+                const marca = sugerirMarcaControl();
+                const salon = getSalonDesdeUbicacion();
+                const filtros = { tipo_equipo: 'CONTROL' };
+                if (marca) filtros.marca = marca;
+                if (salon) filtros.salon = salon;
+                buscarEquiposDesdeInventario(filtros);
+            });
+        }
+        
+        const btnTeclado = document.getElementById('btnStdTeclado');
+        if (btnTeclado) {
+            btnTeclado.addEventListener('click', function() {
+                console.log('🔵 TECLADO CLICKEADO');
+                buscarEquiposDesdeInventario({ tipo_equipo: 'TECLADO' });
+            });
+        }
+        
+        console.log('%c✅ BOTONES RECONFIGURADOS CORRECTAMENTE', 'background: #00ff00; color: #000; font-size: 18px; font-weight: bold; padding: 10px;');
+    }, 500); // Esperar 500ms para asegurar que todo esté listo
+});
+</script>
+
+{% include 'components/footer.html' %}
+// ┌ltima actualizaci¾n: 2026-03-12 12:33:15.323381

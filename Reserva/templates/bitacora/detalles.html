@@ -1,0 +1,185 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1><i class="bi bi-zoom-in"></i> Detalles del Registro</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('bitacora.dashboard_bitacora') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    <!-- Información General -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="bi bi-info-circle"></i> Información General</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <strong class="text-muted">ID de Registro:</strong>
+                    <p class="fs-6">{{ log.id }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong class="text-muted">Fecha:</strong>
+                    <p class="fs-6">{{ log.fecha.strftime('%d/%m/%Y') }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong class="text-muted">Hora:</strong>
+                    <p class="fs-6">{{ log.hora.strftime('%H:%M:%S') }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong class="text-muted">Módulo:</strong>
+                    <p class="fs-6"><span class="badge bg-primary">{{ log.modulo|title }}</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del Usuario y Acción -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="bi bi-person-circle"></i> Usuario y Acción</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <strong class="text-muted">Usuario:</strong>
+                    <p class="fs-6">
+                        <a href="{{ url_for('bitacora.movimientos_usuario', usuario_documento=log.usuario_documento) }}">
+                            {{ log.usuario_nombre or log.usuario_documento }}
+                        </a>
+                    </p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <strong class="text-muted">Documento:</strong>
+                    <p class="fs-6">{{ log.usuario_documento }}</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <strong class="text-muted">Acción:</strong>
+                    <p class="fs-6">
+                        {% if log.accion == 'CREAR' %}
+                            <span class="badge bg-success"><i class="bi bi-plus-circle"></i> CREAR</span>
+                        {% elif log.accion == 'EDITAR' %}
+                            <span class="badge bg-info"><i class="bi bi-pencil-square"></i> EDITAR</span>
+                        {% elif log.accion == 'ELIMINAR' %}
+                            <span class="badge bg-danger"><i class="bi bi-trash"></i> ELIMINAR</span>
+                        {% elif log.accion == 'DEVOLVER' %}
+                            <span class="badge bg-warning"><i class="bi bi-arrow-return-left"></i> DEVOLVER</span>
+                        {% elif log.accion == 'CANCELAR' %}
+                            <span class="badge bg-secondary"><i class="bi bi-x-circle"></i> CANCELAR</span>
+                        {% else %}
+                            <span class="badge bg-dark">{{ log.accion }}</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información de la Entidad Afectada -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="bi bi-file-earmark"></i> Entidad Afectada</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <strong class="text-muted">Tipo de Entidad:</strong>
+                    <p class="fs-6">{{ log.entidad_tipo }}</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <strong class="text-muted">ID de Entidad:</strong>
+                    <p class="fs-6">{{ log.entidad_id }}</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <strong class="text-muted">Módulo Afectado:</strong>
+                    <p class="fs-6">
+                        <a href="{{ url_for('bitacora.movimientos_modulo', modulo=log.modulo) }}" class="text-decoration-none">
+                            <span class="badge bg-primary">{{ log.modulo|title }}</span>
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+            {% if log.descripcion %}
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <strong class="text-muted">Descripción:</strong>
+                    <p class="fs-6 mt-2">{{ log.descripcion }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Cambios Realizados -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-arrow-left"></i> Datos Antes</h5>
+                </div>
+                <div class="card-body" style="font-family: monospace; font-size: 0.9rem; max-height: 400px; overflow-y: auto;">
+                    {% if datos_antes %}
+                        {% if datos_antes is mapping %}
+                            <table class="table table-sm table-bordered mb-0">
+                                <tbody>
+                                    {% for clave, valor in datos_antes.items() %}
+                                    <tr>
+                                        <td class="text-muted" style="width: 40%"><strong>{{ clave }}</strong></td>
+                                        <td>{{ valor }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <pre class="text-muted mb-0">{{ datos_antes }}</pre>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted mb-0"><i class="bi bi-dash"></i> Sin datos anteriores (nuevo registro)</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-arrow-right"></i> Datos Después</h5>
+                </div>
+                <div class="card-body" style="font-family: monospace; font-size: 0.9rem; max-height: 400px; overflow-y: auto;">
+                    {% if datos_despues %}
+                        {% if datos_despues is mapping %}
+                            <table class="table table-sm table-bordered mb-0">
+                                <tbody>
+                                    {% for clave, valor in datos_despues.items() %}
+                                    <tr>
+                                        <td class="text-muted" style="width: 40%"><strong>{{ clave }}</strong></td>
+                                        <td>{{ valor }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <pre class="text-muted mb-0">{{ datos_despues }}</pre>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted mb-0"><i class="bi bi-dash"></i> Sin datos posteriores (eliminado)</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    pre { white-space: pre-wrap; }
+    .table-sm td { padding: 0.5rem; }
+</style>
+
+{% include 'components/footer.html' %}

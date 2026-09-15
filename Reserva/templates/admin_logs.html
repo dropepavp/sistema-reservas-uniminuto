@@ -1,0 +1,63 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12 d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0"><i class="bi bi-journal-text"></i> Logs del Sistema</h2>
+            <a href="{{ url_for('admin.configuracion_sistema') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver a Configuración
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Actividad Reciente</h5>
+                    <small>Mostrando los últimos registros de eventos</small>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 200px;">Fecha y Hora</th>
+                                    <th style="width: 100px;">Nivel</th>
+                                    <th>Mensaje</th>
+                                    <th style="width: 150px;">Usuario</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in logs %}
+                                <tr>
+                                    <td>{{ log.timestamp }}</td>
+                                    <td>
+                                        <span
+                                            class="badge bg-{{ 'info' if log.nivel == 'INFO' else 'warning' if log.nivel == 'WARNING' else 'danger' }}">
+                                            {{ log.nivel }}
+                                        </span>
+                                    </td>
+                                    <td>{{ log.mensaje }}</td>
+                                    <td><code class="text-dark">{{ log.usuario }}</code></td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-5 text-muted">No hay registros de actividad
+                                        disponibles</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer text-muted text-center">
+                    <small>Nota: Los logs mostrados actualmente son simulados para demostración técnica.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'components/footer.html' %}

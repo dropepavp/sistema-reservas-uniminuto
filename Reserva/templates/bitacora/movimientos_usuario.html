@@ -1,0 +1,209 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1><i class="bi bi-person-badge"></i> Movimientos de {{ usuario.nombre_completo }}</h1>
+            <p class="text-muted">Documento: {{ usuario.documento }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('bitacora.dashboard_bitacora') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    <!-- Estadísticas del Usuario -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <h3 class="text-primary">{{ total_acciones }}</h3>
+                            <p class="text-muted">Total de Acciones</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h4 class="text-info">{{ acciones_por_modulo|length }}</h4>
+                            <p class="text-muted">Módulos Utilizados</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h4 class="text-success">{{ acciones_por_tipo|length }}</h4>
+                            <p class="text-muted">Tipos de Acciones</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos de Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Acciones por Módulo</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-hover mb-0">
+                        {% for modulo, cantidad in acciones_por_modulo %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('bitacora.movimientos_modulo', modulo=modulo) }}" class="text-decoration-none">
+                                    {{ modulo|title }}
+                                </a>
+                            </td>
+                            <td class="text-end">
+                                <span class="badge bg-primary">{{ cantidad }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Acciones por Tipo</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-hover mb-0">
+                        {% for accion, cantidad in acciones_por_tipo %}
+                        <tr>
+                            <td>
+                                {% if accion == 'CREAR' %}
+                                    <span class="badge bg-success"><i class="bi bi-plus-circle"></i> CREAR</span>
+                                {% elif accion == 'EDITAR' %}
+                                    <span class="badge bg-info"><i class="bi bi-pencil-square"></i> EDITAR</span>
+                                {% elif accion == 'ELIMINAR' %}
+                                    <span class="badge bg-danger"><i class="bi bi-trash"></i> ELIMINAR</span>
+                                {% elif accion == 'DEVOLVER' %}
+                                    <span class="badge bg-warning"><i class="bi bi-arrow-return-left"></i> DEVOLVER</span>
+                                {% elif accion == 'CANCELAR' %}
+                                    <span class="badge bg-secondary"><i class="bi bi-x-circle"></i> CANCELAR</span>
+                                {% else %}
+                                    <span class="badge bg-dark">{{ accion }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <span class="badge bg-primary">{{ cantidad }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historial Detallado -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="bi bi-list-ul"></i> Historial Detallado</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 15%">Fecha/Hora</th>
+                        <th style="width: 12%">Módulo</th>
+                        <th style="width: 12%">Acción</th>
+                        <th style="width: 25%">Descripción</th>
+                        <th style="width: 18%">Entidad</th>
+                        <th style="width: 8%">Ver</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td>
+                            <small class="text-muted">
+                                {{ log.fecha.strftime('%Y-%m-%d') }}<br>
+                                {{ log.hora.strftime('%H:%M:%S') }}
+                            </small>
+                        </td>
+                        <td>
+                            <span class="badge bg-primary">{{ log.modulo|title }}</span>
+                        </td>
+                        <td>
+                            {% if log.accion == 'CREAR' %}
+                                <span class="badge bg-success">CREAR</span>
+                            {% elif log.accion == 'EDITAR' %}
+                                <span class="badge bg-info">EDITAR</span>
+                            {% elif log.accion == 'ELIMINAR' %}
+                                <span class="badge bg-danger">ELIMINAR</span>
+                            {% elif log.accion == 'DEVOLVER' %}
+                                <span class="badge bg-warning text-dark">DEVOLVER</span>
+                            {% else %}
+                                <span class="badge bg-dark">{{ log.accion }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <small>{{ log.descripcion[:40] }}{% if log.descripcion|length > 40 %}...{% endif %}</small>
+                        </td>
+                        <td>
+                            <small class="text-muted">{{ log.entidad_tipo }} ({{ log.entidad_id }})</small>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('bitacora.detalles_log', log_id=log.id) }}" 
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            No hay registros
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        {% if logs_paginados.pages > 1 %}
+        <nav class="card-footer bg-light">
+            <ul class="pagination justify-content-center mb-0">
+                {% if logs_paginados.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">Primera</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ logs_paginados.prev_num }}">Anterior</a>
+                </li>
+                {% endif %}
+
+                {% for page_num in logs_paginados.iter_pages() %}
+                    {% if page_num %}
+                        {% if page_num == page %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+
+                {% if logs_paginados.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ logs_paginados.next_num }}">Siguiente</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ logs_paginados.pages }}">Última</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+{% include 'components/footer.html' %}

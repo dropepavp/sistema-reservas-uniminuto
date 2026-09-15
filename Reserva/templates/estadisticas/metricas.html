@@ -1,0 +1,680 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<style>
+    :root {
+        --dash-primary: #1e3a5f;
+        --dash-primary-light: #2d6a9f;
+        --dash-success: #198754;
+        --dash-success-light: #28a745;
+        --dash-warning: #c2410c;
+        --dash-warning-light: #f59e0b;
+        --dash-info: #0369a1;
+        --dash-info-light: #0ea5e9;
+        --dash-secondary: #475569;
+    }
+    .metrics-card {
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(30, 58, 95, 0.1);
+        border: none;
+        transition: transform 0.2s ease-in-out;
+    }
+    .metrics-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(30, 58, 95, 0.15);
+    }
+    .metric-item {
+        background: linear-gradient(135deg, var(--dash-primary) 0%, var(--dash-primary-light) 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .metric-item.success {
+        background: linear-gradient(135deg, #146c43 0%, var(--dash-success) 100%);
+    }
+    .metric-item.warning {
+        background: linear-gradient(135deg, var(--dash-warning) 0%, var(--dash-warning-light) 100%);
+    }
+    .metric-item.info {
+        background: linear-gradient(135deg, var(--dash-info) 0%, var(--dash-info-light) 100%);
+    }
+    .metric-item.secondary {
+        background: linear-gradient(135deg, var(--dash-secondary) 0%, var(--dash-primary-light) 100%);
+    }
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+    .metric-label {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    .metric-change {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin: 20px 0;
+    }
+    .gauge-container {
+        position: relative;
+        height: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .gauge-value {
+        position: absolute;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    .performance-indicator {
+        padding: 15px;
+        border-left: 4px solid;
+        margin-bottom: 15px;
+    }
+    .indicator-excellent {
+        background-color: #d4edda;
+        border-color: #28a745;
+        color: #155724;
+    }
+    .indicator-good {
+        background-color: #d1ecf1;
+        border-color: #17a2b8;
+        color: #0c5460;
+    }
+    .indicator-warning {
+        background-color: #fff3cd;
+        border-color: #ffc107;
+        color: #856404;
+    }
+    .indicator-poor {
+        background-color: #f8d7da;
+        border-color: #dc3545;
+        color: #721c24;
+    }
+    .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 200px;
+    }
+    .refresh-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--dash-primary) 0%, var(--dash-primary-light) 100%);
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+    }
+    .refresh-btn:hover {
+        transform: scale(1.1);
+    }
+</style>
+
+<div class="container-fluid py-4">
+    
+    <!-- Header de la sección -->
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-primary text-white p-3 rounded-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-speedometer2" style="font-size: 1.8rem;"></i>
+                </div>
+                <div>
+                    <h1 class="h3 mb-1">Métricas Avanzadas</h1>
+                    <p class="text-muted mb-0">Indicadores clave de rendimiento del sistema</p>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('estadisticas.dashboard') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-chart-bar me-1"></i>Dashboard
+                </a>
+                <a href="{{ url_for('estadisticas.reportes') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-file-alt me-1"></i>Reportes
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Métricas Principales de Rendimiento -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="mb-4">
+                <i class="fas fa-chart-line me-2"></i>
+                Indicadores de Rendimiento del Sistema
+            </h3>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4" id="metricas-principales">
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-item">
+                <div id="loading-tiempo" class="loading-spinner">
+                    <div class="spinner-border text-light" role="status"></div>
+                </div>
+                <div id="metric-tiempo" style="display: none;">
+                    <i class="fas fa-clock fa-2x mb-3"></i>
+                    <div class="metric-value">0</div>
+                    <div class="metric-label">Días Promedio de Préstamo</div>
+                    <div class="metric-change">↗ Comparado con el mes anterior</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-item success">
+                <div id="metric-puntualidad" style="display: none;">
+                    <i class="fas fa-check-circle fa-2x mb-3"></i>
+                    <div class="metric-value">0%</div>
+                    <div class="metric-label">Tasa de Puntualidad</div>
+                    <div class="metric-change">Devoluciones a tiempo</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-item info">
+                <div id="metric-utilizacion" style="display: none;">
+                    <i class="fas fa-percentage fa-2x mb-3"></i>
+                    <div class="metric-value">0%</div>
+                    <div class="metric-label">Utilización de Equipos</div>
+                    <div class="metric-change">Equipos en uso activo</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-item secondary">
+                <div id="metric-equipos" style="display: none;">
+                    <i class="fas fa-laptop fa-2x mb-3"></i>
+                    <div class="metric-value">0</div>
+                    <div class="metric-label">Total de Equipos</div>
+                    <div class="metric-change">En el inventario</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos de Análisis Avanzado -->
+    <div class="row g-4 mb-4">
+        <!-- Distribución de Tiempo de Préstamos -->
+        <div class="col-lg-8">
+            <div class="card metrics-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Análisis de Tiempo de Préstamos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="tiempoChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medidores de Rendimiento -->
+        <div class="col-lg-4">
+            <div class="card metrics-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Medidores de Rendimiento
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Medidor de Puntualidad -->
+                    <div class="gauge-container mb-4">
+                        <canvas id="puntualidadGauge" width="200" height="100"></canvas>
+                        <div class="gauge-value">
+                            <div id="puntualidad-percentage">0%</div>
+                            <small>Puntualidad</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Medidor de Utilización -->
+                    <div class="gauge-container">
+                        <canvas id="utilizacionGauge" width="200" height="100"></canvas>
+                        <div class="gauge-value">
+                            <div id="utilizacion-percentage">0%</div>
+                            <small>Utilización</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Indicadores de Calidad del Servicio -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card metrics-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-award me-2"></i>
+                        Indicadores de Calidad del Servicio
+                    </h5>
+                </div>
+                <div class="card-body" id="indicadores-calidad">
+                    <div class="loading-spinner">
+                        <div class="spinner-border text-primary" role="status"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tendencias de Uso por Hora -->
+        <div class="col-lg-6">
+            <div class="card metrics-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock me-2"></i>
+                        Patrones de Uso por Hora del Día
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="horasChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Análisis Comparativo -->
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card metrics-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Análisis Comparativo de Rendimiento (Últimos 6 Meses)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="height: 400px;">
+                        <canvas id="comparativoChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Botón de Actualización -->
+<button class="refresh-btn" onclick="actualizarMetricas()" title="Actualizar métricas">
+    <i class="fas fa-sync-alt"></i>
+</button>
+
+<!-- JavaScript del módulo -->
+<script>
+    document.title = 'Métricas Avanzadas - Sistema Integrado';
+    let tiempoChart, horasChart, comparativoChart;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        inicializarMetricas();
+    });
+
+    async function inicializarMetricas() {
+        try {
+            // Usar Promise.allSettled para continuar aunque uno falle
+            const results = await Promise.allSettled([
+                cargarMetricasRendimiento(),
+                cargarTendenciasComparativas()
+            ]);
+            
+            // Verificar resultados
+            const errors = results.filter(r => r.status === 'rejected').length;
+            
+            if (errors === 0) {
+                console.log('Métricas cargadas exitosamente');
+            } else {
+                console.warn(`${errors} funciones de métricas fallaron`);
+            }
+            
+        } catch (error) {
+            console.error('Error crítico al inicializar métricas:', error);
+            
+            if (window.notificationSystem) {
+                window.notificationSystem.notify({
+                    title: '❌ Error Crítico',
+                    message: 'Error al inicializar el módulo de métricas: ' + error.message,
+                    type: 'danger',
+                    icon: 'bi-x-circle',
+                    sound: 'urgent'
+                });
+            }
+        }
+    }
+
+    // Cargar métricas de rendimiento principales
+    async function cargarMetricasRendimiento() {
+        try {
+            const response = await fetch('/estadisticas/api/metricas/rendimiento', {
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.success && data.data) {
+                mostrarMetricasRendimiento(data.data);
+                crearIndicadoresCalidad(data.data);
+                crearMedidores(data.data);
+            } else {
+                // Valores predeterminados si falla el API
+                mostrarMetricasRendimiento({
+                    tiempo_promedio_prestamo: 0,
+                    tasa_puntualidad: 0,
+                    tasa_utilizacion_equipos: 0,
+                    total_equipos: 0
+                });
+            }
+        } catch (error) {
+            console.error('Error cargando métricas:', error);
+            
+            // Ocultar loading spinner
+            const loadingElement = document.getElementById('loading-tiempo');
+            if (loadingElement) {
+                loadingElement.style.display = 'none';
+            }
+            
+            // Mostrar valores predeterminados
+            mostrarMetricasRendimiento({
+                tiempo_promedio_prestamo: 0,
+                tasa_puntualidad: 0,
+                tasa_utilizacion_equipos: 0,
+                total_equipos: 0
+            });
+            
+            // Notificación de error
+            if (window.notificationSystem) {
+                window.notificationSystem.notify({
+                    title: '⚠️ Error en Métricas',
+                    message: 'No se pudieron cargar las métricas de rendimiento. Usando valores predeterminados.',
+                    type: 'warning',
+                    icon: 'bi-exclamation-triangle',
+                    sound: 'subtle'
+                });
+            }
+        }
+    }
+
+    function mostrarMetricasRendimiento(data) {
+        document.getElementById('loading-tiempo').style.display = 'none';
+        
+        document.getElementById('metric-tiempo').style.display = 'block';
+        document.getElementById('metric-puntualidad').style.display = 'block';
+        document.getElementById('metric-utilizacion').style.display = 'block';
+        document.getElementById('metric-equipos').style.display = 'block';
+        
+        document.querySelector('#metric-tiempo .metric-value').textContent = data.tiempo_promedio_prestamo;
+        document.querySelector('#metric-puntualidad .metric-value').textContent = data.tasa_puntualidad + '%';
+        document.querySelector('#metric-utilizacion .metric-value').textContent = data.tasa_utilizacion_equipos + '%';
+        document.querySelector('#metric-equipos .metric-value').textContent = data.total_equipos;
+    }
+
+    function crearIndicadoresCalidad(data) {
+        const container = document.getElementById('indicadores-calidad');
+        
+        const indicadores = [
+            {
+                titulo: 'Puntualidad en Devoluciones',
+                valor: data.tasa_puntualidad,
+                tipo: data.tasa_puntualidad >= 90 ? 'excellent' : 
+                      data.tasa_puntualidad >= 75 ? 'good' : 
+                      data.tasa_puntualidad >= 50 ? 'warning' : 'poor',
+                descripcion: `${data.tasa_puntualidad}% de préstamos devueltos a tiempo`
+            },
+            {
+                titulo: 'Utilización de Inventario',
+                valor: data.tasa_utilizacion_equipos,
+                tipo: data.tasa_utilizacion_equipos >= 80 ? 'excellent' : 
+                      data.tasa_utilizacion_equipos >= 60 ? 'good' : 
+                      data.tasa_utilizacion_equipos >= 40 ? 'warning' : 'poor',
+                descripcion: `${data.tasa_utilizacion_equipos}% de equipos han sido utilizados`
+            },
+            {
+                titulo: 'Tiempo Promedio de Préstamo',
+                valor: data.tiempo_promedio_prestamo,
+                tipo: data.tiempo_promedio_prestamo <= 3 ? 'excellent' : 
+                      data.tiempo_promedio_prestamo <= 7 ? 'good' : 
+                      data.tiempo_promedio_prestamo <= 14 ? 'warning' : 'poor',
+                descripcion: `${data.tiempo_promedio_prestamo} días en promedio por préstamo`
+            }
+        ];
+
+        container.innerHTML = indicadores.map(indicador => `
+            <div class="performance-indicator indicator-${indicador.tipo}">
+                <h6 class="mb-1">${indicador.titulo}</h6>
+                <p class="mb-0">${indicador.descripcion}</p>
+            </div>
+        `).join('');
+    }
+
+    function crearMedidores(data) {
+        crearGaugeChart('puntualidadGauge', data.tasa_puntualidad, '#28a745');
+        document.getElementById('puntualidad-percentage').textContent = data.tasa_puntualidad + '%';
+        
+        crearGaugeChart('utilizacionGauge', data.tasa_utilizacion_equipos, '#17a2b8');
+        document.getElementById('utilizacion-percentage').textContent = data.tasa_utilizacion_equipos + '%';
+    }
+
+    function crearGaugeChart(canvasId, valor, color) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext('2d');
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height - 10;
+        const radius = 80;
+        
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, Math.PI, 2 * Math.PI);
+        ctx.strokeStyle = '#e9ecef';
+        ctx.lineWidth = 15;
+        ctx.stroke();
+        
+        const angle = Math.PI + (Math.PI * valor / 100);
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, Math.PI, angle);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 15;
+        ctx.stroke();
+    }
+
+    async function cargarTendenciasComparativas() {
+        try {
+            const response = await fetch('/estadisticas/api/tendencias', {
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.success && data.data) {
+                crearGraficoComparativo(data.data);
+                crearGraficoPatronesHora();
+            }
+        } catch (error) {
+            console.error('Error cargando tendencias:', error);
+            
+            // Notificación de error
+            if (window.notificationSystem) {
+                window.notificationSystem.notify({
+                    title: '⚠️ Error en Tendencias',
+                    message: 'No se pudieron cargar las tendencias comparativas.',
+                    type: 'warning',
+                    icon: 'bi-exclamation-triangle',
+                    sound: 'subtle'
+                });
+            }
+        }
+    }
+
+    function crearGraficoComparativo(data) {
+        const ctx = document.getElementById('comparativoChart').getContext('2d');
+        
+        if (comparativoChart) {
+            comparativoChart.destroy();
+        }
+        
+        comparativoChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.prestamos.map(p => p.mes),
+                datasets: [
+                    {
+                        label: 'Préstamos',
+                        data: data.prestamos.map(p => p.total_prestamos),
+                        borderColor: '#2d6a9f',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Reservas',
+                        data: data.reservas.map(r => r.total_reservas),
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(56, 239, 125, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Evolución de Préstamos y Reservas'
+                    },
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function crearGraficoPatronesHora() {
+        const horasData = {
+            labels: ['7:00', '8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'],
+            data: [2, 8, 15, 23, 18, 12, 8, 20, 25, 22, 15, 8]
+        };
+        
+        const ctx = document.getElementById('horasChart').getContext('2d');
+        
+        if (horasChart) {
+            horasChart.destroy();
+        }
+        
+        horasChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: horasData.labels,
+                datasets: [{
+                    label: 'Préstamos por Hora',
+                    data: horasData.data,
+                    backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                    borderColor: '#2d6a9f',
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    async function actualizarMetricas() {
+        const btn = document.querySelector('.refresh-btn');
+        const icon = btn.querySelector('i');
+        
+        icon.classList.add('fa-spin');
+        
+        try {
+            await inicializarMetricas();
+            
+            if (typeof LoadingUI !== 'undefined') {
+                LoadingUI.toast('Métricas actualizadas correctamente', 'success');
+            }
+            
+        } catch (error) {
+            if (typeof LoadingUI !== 'undefined') {
+                LoadingUI.toast('Error al actualizar métricas', 'danger');
+            }
+        } finally {
+            setTimeout(() => {
+                icon.classList.remove('fa-spin');
+            }, 1000);
+        }
+    }
+
+    setInterval(actualizarMetricas, 600000);
+</script>
+
+{% include 'components/footer.html' %}

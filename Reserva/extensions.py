@@ -1,0 +1,66 @@
+"""
+Extensiones centralizadas de Flask.
+
+Este módulo instancia las extensiones compartidas (SQLAlchemy, CSRFProtect, Limiter, SocketIO)
+sin importar la aplicación, evitando imports circulares entre database.py, app.py y los blueprints.
+
+Uso:
+    from extensions import db, csrf, limiter, socketio
+"""
+from flask_sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CSRFProtect
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from flask_socketio import SocketIO
+from flask_migrate import Migrate
+from flasgger import Swagger
+from sqlalchemy import create_engine
+from urllib.parse import urlparse, unquote
+
+
+def _make_engine(raw_url: str):
+    """Crea un engine de SQLAlchemy usando connect_args para evitar
+    problemas de encoding con caracteres especiales en la contraseña."""
+    parsed = urlparse(raw_url)
+    password = unquote(parsed.password or '')
+    connect_args = {
+        'host': parsed.hostname or 'localhost',
+        'port': parsed.port or 5432,
+        'user': parsed.username or 'postgres',
+        'password': password,
+        'database': parsed.path.lstrip('/') or 'sistema_reserva',
+        'client_encoding': 'utf8',
+    }
+    return create_engine(
+        'postgresql+psycopg2://',
+        connect_args=connect_args,
+        echo=False,
+        pool_pre_ping=True,
+    )
+
+
+class _SmartSQLAlchemy(SQLAlchemy):
+    """SQLAlchemy que usa connect_args cuando DATABASE_URL está disponible."""
+
+    def init_app(self, app, **kwargs):
+        super().init_app(app, **kwargs)
+        import os
+        raw_url = os.environ.get('DATABASE_URL')
+        if not app.config.get('TESTING') and raw_url and 'sqlite' not in raw_url:
+            try:
+                eng = _make_engine(raw_url)
+                with app.app_context():
+                    if hasattr(self, 'engines'):
+                        self.engines[None] = eng
+                    self.session.bind = eng
+                app.logger.info("Conexion PostgreSQL establecida via connect_args.")
+            except Exception as e:
+                app.logger.error("Error al conectar a PostgreSQL: %s", e)
+
+
+db = _SmartSQLAlchemy()
+csrf = CSRFProtect()
+limiter = Limiter(key_func=get_remote_address, default_limits=["200 per minute"])
+socketio = SocketIO()
+migrate = Migrate()
+swagger = Swagger()

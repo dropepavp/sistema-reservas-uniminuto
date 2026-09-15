@@ -1,0 +1,187 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12 d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0"><i class="bi bi-calendar-event"></i> Gestión de Días Festivos</h2>
+            <div>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFestivoModal">
+                    <i class="bi bi-calendar-plus"></i> Agregar Festivo
+                </button>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-house-door"></i> Volver
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Festivos Futuros -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Próximos Festivos</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Descripción</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for festivo in festivos_futuros %}
+                                <tr>
+                                    <td><strong>{{ festivo.fecha.strftime('%d/%m/%Y') }}</strong></td>
+                                    <td>{{ festivo.descripcion }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-danger btn-delete-festivo"
+                                            data-fecha="{{ festivo.fecha.strftime('%Y-%m-%d') }}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center py-4 text-muted">No hay festivos futuros
+                                        configurados</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Festivos Pasados -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="bi bi-calendar-x"></i> Historial de Festivos</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Descripción</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for festivo in festivos_pasados %}
+                                <tr>
+                                    <td>{{ festivo.fecha.strftime('%d/%m/%Y') }}</td>
+                                    <td>{{ festivo.descripcion }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-danger btn-delete-festivo"
+                                            data-fecha="{{ festivo.fecha.strftime('%Y-%m-%d') }}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center py-4 text-muted">No hay registro de festivos
+                                        pasados</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Agregar Festivo -->
+<div class="modal fade" id="addFestivoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Agregar Día Festivo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formAddFestivo">
+                    <div class="mb-3">
+                        <label class="form-label">Fecha</label>
+                        <input type="date" class="form-control" name="fecha" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <input type="text" class="form-control" name="descripcion"
+                            placeholder="Ej: Año Nuevo, Día de la Independencia" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnGuardarFestivo">Guardar Festivo</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Agregar Festivo
+        document.getElementById('btnGuardarFestivo').addEventListener('click', async function () {
+            const form = document.getElementById('formAddFestivo');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            if (!data.fecha || !data.descripcion) {
+                alert('Por favor complete todos los campos');
+                return;
+            }
+
+            try {
+                const response = await fetch('{{ url_for("admin.agregar_festivo") }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.success) {
+                    location.reload();
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                alert('Error al conectar con el servidor');
+            }
+        });
+
+        // Eliminar Festivo
+        document.querySelectorAll('.btn-delete-festivo').forEach(btn => {
+            btn.addEventListener('click', async function () {
+                const fecha = this.dataset.fecha;
+                if (!confirm(`¿Está seguro de eliminar el festivo del ${fecha}?`)) return;
+
+                try {
+                    const response = await fetch(`/admin/festivos/${fecha}`, {
+                        method: 'DELETE'
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        location.reload();
+                    } else {
+                        alert(result.message);
+                    }
+                } catch (error) {
+                    alert('Error al conectar con el servidor');
+                }
+            });
+        });
+    });
+</script>
+
+{% include 'components/footer.html' %}

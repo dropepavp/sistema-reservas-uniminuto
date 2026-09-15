@@ -1,0 +1,49 @@
+<div class="row g-3">
+    <!-- Profesor -->
+    <div class="col-md-6 position-relative">
+        <label class="form-label" for="busqueda_profesor">
+            <i class="bi bi-person-badge"></i> Profesor
+        </label>
+        <input type="text" class="form-control form-control-lg" id="busqueda_profesor"
+            placeholder="Escribe cédula o nombre..." autocomplete="off" required>
+        <input type="hidden" id="cedula_profesor" name="cedula">
+        <div id="sugerenciasProfesores" class="list-group position-absolute w-100 shadow-lg"
+            style="display:none; max-height: 200px; overflow-y: auto; z-index: 1050;">
+        </div>
+    </div>
+
+    <!-- Ubicación -->
+    <div class="col-md-6">
+        <label class="form-label" for="ubicacion">
+            <i class="bi bi-geo-alt"></i> Ubicación
+        </label>
+        <input type="text" class="form-control form-control-lg" id="ubicacion"
+            placeholder="Ej: A501" required>
+        <div id="marca_preview" class="mt-1" style="min-height:20px;"></div>
+    </div>
+
+    <!-- Horarios -->
+    <div class="col-md-6">
+        <label class="form-label" for="hora_inicio">
+            <i class="bi bi-clock"></i> Hora Inicio
+        </label>
+        <input type="text" class="form-control form-control-lg" id="hora_inicio" placeholder="HH:MM"
+            pattern="^([01]\d|2[0-3]):[0-5]\d$" required>
+    </div>
+    <div class="col-md-6">
+        <label class="form-label" for="hora_fin">
+            <i class="bi bi-hourglass-end"></i> Hora Fin
+        </label>
+        <input type="text" class="form-control form-control-lg" id="hora_fin" placeholder="HH:MM"
+            pattern="^([01]\d|2[0-3]):[0-5]\d$" required>
+    </div>
+
+    <!-- Observaciones -->
+    <div class="col-12">
+        <label class="form-label" for="observaciones">
+            <i class="bi bi-chat-dots"></i> Observaciones (Opcional)
+        </label>
+        <textarea class="form-control" id="observaciones" rows="2" maxlength="500"
+            placeholder="Notas adicionales..."></textarea>
+    </div>
+</div>

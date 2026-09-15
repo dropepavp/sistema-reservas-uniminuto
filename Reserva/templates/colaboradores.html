@@ -1,0 +1,1566 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    body { font-family: 'Inter', sans-serif; }
+
+    /* ── Header gradient ── */
+    .colab-header {
+        background: var(--uniminuto-gradient-primary);
+        border-radius: 16px;
+        padding: 1.5rem 2rem;
+        color: white;
+        box-shadow: 0 4px 15px rgba(30, 58, 95, 0.18);
+    }
+    .colab-header h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: .2rem; }
+    .colab-header .subtitle { opacity: .85; font-size: .9rem; }
+
+    /* ── Stat cards ── */
+    .stat-card { background: white; border-radius: 12px; padding: 1rem 1.25rem;
+        box-shadow: 0 1px 4px rgba(0,0,0,.07); border-left: 4px solid transparent; }
+    .stat-card.s1 { border-color: var(--uniminuto-600); }
+    .stat-card.s2 { border-color: var(--uniminuto-warning); }
+    .stat-card.s3 { border-color: var(--uniminuto-secondary); }
+    .stat-num { font-size: 1.6rem; font-weight: 700; color: #1e293b; line-height: 1; }
+    .stat-lbl { font-size: .75rem; color: #64748b; text-transform: uppercase; letter-spacing: .4px; }
+
+    /* ── Tabla colaboradores ── */
+    #colaboradoresTable { width: 100% !important; table-layout: auto !important;
+        margin-bottom: 0; border-collapse: separate; border-spacing: 0; }
+    #colaboradoresTable thead th {
+        position: sticky; top: 0; background-color: #f8fafc !important;
+        color: #1e293b !important; z-index: 5; box-shadow: inset 0 -1px 0 #cbd5e1;
+        white-space: nowrap; vertical-align: middle; font-size: .78rem; font-weight: 700;
+        letter-spacing: .5px; text-transform: uppercase; padding: .75rem .85rem !important; }
+    #colaboradoresTable td { padding: .65rem .85rem !important; vertical-align: middle;
+        font-size: .875rem; color: #334155; }
+    #colaboradoresTable tbody tr:hover { background-color: rgba(45, 106, 159, 0.06) !important;
+        transition: background-color .15s ease; }
+
+    /* ── Horario grid ── */
+    .horario-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: .5rem; }
+    .horario-cell { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+        padding: .5rem; text-align: center; }
+    .horario-cell .dia-label { font-size: .7rem; font-weight: 700; text-transform: uppercase;
+        color: #64748b; margin-bottom: .35rem; }
+    .horario-cell input { font-size: .78rem; text-align: center; }
+    .horario-cell .horas-badge { margin-top: .3rem; font-size: .72rem; font-weight: 600;
+        color: var(--uniminuto-600); }
+
+    /* ── Tareas ── */
+    .tarea-item { border-radius: 10px; border: 1px solid #e2e8f0; padding: .75rem 1rem;
+        margin-bottom: .5rem; background: white; transition: box-shadow .15s; }
+    .tarea-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+    .tarea-item .tarea-titulo { font-weight: 600; font-size: .9rem; color: #1e293b; }
+    .tarea-item .tarea-meta { font-size: .76rem; color: #64748b; }
+
+    /* ── Permisos ── */
+    .permiso-row { display: grid; grid-template-columns: 150px repeat(4, 1fr); gap: .5rem;
+        align-items: center; padding: .5rem 0; border-bottom: 1px solid #f1f5f9; }
+    .permiso-row:last-child { border-bottom: none; }
+    .permiso-modulo { font-size: .85rem; font-weight: 600; color: #334155;
+        text-transform: capitalize; }
+    .permiso-check { display: flex; flex-direction: column; align-items: center; gap: .2rem;
+        font-size: .7rem; color: #64748b; }
+    .permiso-check input[type=checkbox] { width: 1.1rem; height: 1.1rem; cursor: pointer; }
+
+    /* ── Modal tabs ── */
+    .modal-tab-btn { border: none; background: none; padding: .6rem 1rem; font-size: .85rem;
+        font-weight: 600; color: #64748b; border-bottom: 3px solid transparent; cursor: pointer; }
+    .modal-tab-btn.active { color: var(--uniminuto-600); border-bottom-color: var(--uniminuto-600); }
+    .modal-tab-pane { display: none; }
+    .modal-tab-pane.active { display: block; }
+
+    /* ── Card table header ── */
+    .table-header-grad {
+        background: var(--uniminuto-gradient-primary);
+        border-radius: 12px 12px 0 0;
+    }
+
+    /* ── Scroll ── */
+    #colab-scroll::-webkit-scrollbar { height: 8px; width: 8px; }
+    #colab-scroll::-webkit-scrollbar-thumb { background: var(--uniminuto-600); border-radius: 6px; }
+    #colab-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 6px; }
+
+    /* Estado badges */
+    .badge-pendiente { background: #fef3c7; color: #92400e; }
+    .badge-en_progreso { background: #dbeafe; color: #1e40af; }
+    .badge-completada { background: #d1fae5; color: #065f46; }
+    .badge-baja { background: #f1f5f9; color: #475569; }
+    .badge-normal { background: #ede9fe; color: #5b21b6; }
+    .badge-alta { background: #fee2e2; color: #991b1b; }
+    /* ── Main Tab Switcher ── */
+    .custom-main-tabs {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 4px;
+    }
+    .custom-main-tabs .nav-link {
+        color: #475569;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        font-size: 0.92rem;
+        padding: 0.6rem 1.4rem;
+        border: none;
+    }
+    .custom-main-tabs .nav-link:hover {
+        color: var(--uniminuto-600);
+        background: rgba(45, 106, 159, 0.08);
+    }
+    .custom-main-tabs .nav-link.active {
+        background: var(--uniminuto-gradient-primary) !important;
+        color: white !important;
+        box-shadow: 0 2px 8px rgba(30, 58, 95, 0.25);
+    }
+
+    /* ── Matriz de Horarios ── */
+    #matrizHorariosTable {
+        width: 100% !important;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    #matrizHorariosTable thead th {
+        background-color: #f8fafc;
+        color: #1e293b;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 0.75rem 0.5rem;
+        vertical-align: middle;
+    }
+    #matrizHorariosTable tbody tr:hover {
+        background-color: rgba(45, 106, 159, 0.04);
+    }
+    .horario-slot {
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .horario-slot:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        border-color: var(--uniminuto-600) !important;
+    }
+    .cobertura-card {
+        border: 1px solid #e2e8f0;
+        cursor: pointer;
+        transition: all .2s ease;
+    }
+    .cobertura-card:hover {
+        border-color: var(--uniminuto-600) !important;
+        box-shadow: 0 2px 8px rgba(45, 106, 159, 0.15);
+        transform: translateY(-1px);
+    }
+    .cobertura-card.active {
+        border: 2px solid var(--uniminuto-600) !important;
+        background: #f0f7ff !important;
+    }
+
+    /* ── Print Styles ── */
+    @media print {
+        body { background: white !important; padding: 0 !important; }
+        .app-topbar, #sidebar-menu, .custom-main-tabs, .btn, #buscarMatrizHorario, #filtroSedeMatriz, #filtroDiaMatriz, .colab-header, .stat-card, .btn-ver-detalle, .btn-editar-colab, .btn-eliminar-colab {
+            display: none !important;
+        }
+        #tab-pane-todos-horarios { display: block !important; opacity: 1 !important; }
+        #tab-pane-colaboradores { display: none !important; }
+        .card { border: none !important; box-shadow: none !important; }
+        .card-header { background: #0f766e !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        #matriz-scroll { max-height: none !important; overflow: visible !important; }
+        #matrizHorariosTable { font-size: 8pt !important; width: 100% !important; }
+        #matrizHorariosTable th, #matrizHorariosTable td { padding: 4px !important; }
+    }
+</style>
+
+<div class="container-fluid py-4">
+
+    <!-- ── HEADER ── -->
+    <div class="row mb-4">
+        <div class="col-lg-7">
+            <div class="colab-header">
+                <h1><i class="bi bi-person-vcard me-2"></i>Gestión de Colaboradores</h1>
+                <div class="subtitle">Horarios semanales, control de jornada 42h, tareas asignadas y permisos</div>
+            </div>
+        </div>
+        <div class="col-lg-5 mt-3 mt-lg-0">
+            <div class="row g-2">
+                <div class="col-3">
+                    <div class="stat-card s1">
+                        <div class="stat-num">{{ stats.total }}</div>
+                        <div class="stat-lbl">Activos</div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="stat-card s1">
+                        <div class="stat-num" style="font-size:1.3rem;">{{ stats.total_horas_programadas }}h</div>
+                        <div class="stat-lbl" title="Meta total: {{ stats.total_horas_meta }}h">Prog: {{ stats.cumplimiento_pct }}%</div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="stat-card s2">
+                        <div class="stat-num">{{ stats.tareas_pendientes }}</div>
+                        <div class="stat-lbl">Tareas</div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="stat-card s3">
+                        <div class="stat-num">{{ stats.inactivos }}</div>
+                        <div class="stat-lbl">Inactivos</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── PESTAÑAS PRINCIPALES ── -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <ul class="nav nav-pills custom-main-tabs rounded-3 shadow-sm d-inline-flex" id="colaboradoresMainTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active fw-semibold" id="tab-btn-colaboradores" data-bs-toggle="pill" data-bs-target="#tab-pane-colaboradores" type="button" role="tab" aria-selected="true">
+                    <i class="bi bi-people-fill me-2"></i>Lista de Colaboradores
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-semibold" id="tab-btn-todos-horarios" data-bs-toggle="pill" data-bs-target="#tab-pane-todos-horarios" type="button" role="tab" aria-selected="false">
+                    <i class="bi bi-calendar3-week me-2"></i>Matriz de Todos los Horarios
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-2 fw-bold">{{ stats.total }}</span>
+                </button>
+            </li>
+        </ul>
+    </div>
+
+    <!-- ── CONTENIDO DE PESTAÑAS ── -->
+    <div class="tab-content" id="colaboradoresMainTabContent">
+
+        <!-- ════ PESTAÑA 1: LISTA DE COLABORADORES ════ -->
+        <div class="tab-pane fade show active" id="tab-pane-colaboradores" role="tabpanel">
+            <div class="card border-0 shadow-sm" style="border-radius:12px;">
+                <!-- Header -->
+                <div class="card-header border-0 py-3 table-header-grad">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <h5 class="text-white mb-0">
+                            <i class="bi bi-person-vcard me-2"></i>Lista de Colaboradores
+                        </h5>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <div class="input-group" style="min-width:230px;">
+                                <span class="input-group-text border-0 text-white" style="background:rgba(255,255,255,.15);">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text" class="form-control border-0" id="buscarColab"
+                                       placeholder="Buscar colaborador…"
+                                       style="background:rgba(255,255,255,.15);color:white;" autocomplete="off">
+                                <button class="btn btn-outline-light btn-sm" id="limpiarBuscarColab">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                            {% if session.rol in ('admin', 'superadmin') %}
+                            <button class="btn btn-light btn-sm fw-semibold" id="btnNuevoColab">
+                                <i class="bi bi-plus-lg me-1"></i>Nuevo Colaborador
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <!-- Table -->
+                <div class="card-body p-0">
+                    <div id="colab-scroll" style="max-height:65vh; overflow-x:auto; overflow-y:auto; border-radius:0 0 12px 12px;">
+                        <table id="colaboradoresTable" class="table table-striped table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="min-width:200px;">Colaborador</th>
+                                    <th style="min-width:120px;">Cargo</th>
+                                    <th style="min-width:100px;">Sede</th>
+                                    <th style="min-width:80px;" class="text-center">Horas/Sem</th>
+                                    <th style="min-width:120px;">Inicio Horario</th>
+                                    <th style="min-width:80px;" class="text-center">Tareas</th>
+                                    <th style="min-width:80px;" class="text-center">Estado</th>
+                                    <th style="min-width:130px;" class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="colab-table-body">
+                                {% for c in colaboradores %}
+                                <tr class="colab-row" data-id="{{ c.id }}">
+                                    <td>
+                                        <div class="fw-semibold">{{ c.nombre_completo }}</div>
+                                        {% if c.correo %}
+                                        <small class="text-muted"><i class="bi bi-envelope me-1"></i>{{ c.correo }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ c.cargo or '—' }}</td>
+                                    <td>{{ c.sede.nombre if c.sede else '—' }}</td>
+                                    <td class="text-center">
+                                        {% set prog = c.horas_programadas_total | round(1) %}
+                                        {% set meta = c.total_horas_semana or 42 %}
+                                        {% set diff = (prog - meta) | round(1) %}
+                                        {% if (diff | abs) <= 0.2 %}
+                                        <span class="badge bg-success" title="Meta cumplida: {{ prog }}h asignadas de {{ meta }}h requeridas">
+                                            <i class="bi bi-check-circle me-1"></i>{{ prog }}h / {{ meta }}h
+                                        </span>
+                                        {% elif diff < 0 %}
+                                        <span class="badge bg-warning text-dark" title="Déficit: Faltan {{ (-diff) | round(1) }}h ({{ prog }}h de {{ meta }}h)">
+                                            <i class="bi bi-exclamation-triangle me-1"></i>{{ prog }}h / {{ meta }}h
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-primary" title="Excedente: +{{ diff }}h ({{ prog }}h de {{ meta }}h)">
+                                            <i class="bi bi-plus-circle me-1"></i>{{ prog }}h / {{ meta }}h
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ c.fecha_inicio_horario or '—' }}</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-warning text-dark">{{ c.tareas | selectattr('estado', 'eq', 'pendiente') | list | length }} pend.</span>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if c.activo %}
+                                        <span class="badge bg-success">Activo</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-outline-teal btn-ver-detalle me-1"
+                                                style="border-color:#0d9488;color:#0d9488;"
+                                                title="Ver / editar detalle" data-id="{{ c.id }}">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        {% if session.rol in ('admin', 'superadmin') %}
+                                        <button class="btn btn-sm btn-outline-primary btn-editar-colab me-1"
+                                                title="Editar info" data-id="{{ c.id }}">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger btn-eliminar-colab"
+                                                title="Desactivar" data-id="{{ c.id }}">
+                                            <i class="bi bi-person-x"></i>
+                                        </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted py-5">
+                                        <i class="bi bi-person-vcard fs-2 d-block mb-2 opacity-25"></i>
+                                        No hay colaboradores registrados
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ════ PESTAÑA 2: MATRIZ DE TODOS LOS HORARIOS ════ -->
+        <div class="tab-pane fade" id="tab-pane-todos-horarios" role="tabpanel">
+            <div class="card border-0 shadow-sm" style="border-radius:12px;">
+                <!-- Header Matriz -->
+                <div class="card-header border-0 py-3 table-header-grad">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div>
+                            <h5 class="text-white mb-0">
+                                <i class="bi bi-calendar3-week me-2"></i>Matriz General de Horarios de Colaboradores
+                            </h5>
+                            <small class="text-white-50">Vista consolidada de turnos, jornadas y cobertura semanal</small>
+                        </div>
+                        <div class="d-flex gap-2 flex-wrap align-items-center">
+                            <!-- Buscador en matriz -->
+                            <div class="input-group input-group-sm" style="min-width:210px;">
+                                <span class="input-group-text border-0 text-white" style="background:rgba(255,255,255,.15);">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text" class="form-control border-0 text-white" id="buscarMatrizHorario"
+                                       placeholder="Buscar en horarios…"
+                                       style="background:rgba(255,255,255,.15);" autocomplete="off">
+                                <button class="btn btn-outline-light btn-sm" id="limpiarBuscarMatriz" title="Limpiar búsqueda">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                            <!-- Filtro Sede -->
+                            <select class="form-select form-select-sm border-0 text-white" id="filtroSedeMatriz"
+                                    style="background:rgba(255,255,255,.2); width:auto;">
+                                <option value="" class="text-dark">Todas las sedes</option>
+                                {% for s in sedes %}
+                                <option value="{{ s.id }}" class="text-dark">{{ s.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                            <!-- Filtro Día -->
+                            <select class="form-select form-select-sm border-0 text-white" id="filtroDiaMatriz"
+                                    style="background:rgba(255,255,255,.2); width:auto;">
+                                <option value="" class="text-dark">Toda la semana</option>
+                                {% for dia in dias_semana %}
+                                <option value="{{ dia }}" class="text-dark">{{ dia }}</option>
+                                {% endfor %}
+                            </select>
+                            <!-- Botón Exportar CSV -->
+                            <button class="btn btn-outline-light btn-sm fw-semibold" id="btnExportarHorariosCSV" title="Exportar matriz a Excel / CSV">
+                                <i class="bi bi-file-earmark-spreadsheet me-1"></i>CSV
+                            </button>
+                            <!-- Botón Imprimir -->
+                            <button class="btn btn-light btn-sm fw-semibold" id="btnImprimirMatriz" title="Imprimir horario consolidado">
+                                <i class="bi bi-printer me-1"></i>Imprimir
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barra de Cobertura Diaria (7 días) -->
+                <div class="bg-light p-3 border-bottom">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="fw-bold text-muted small text-uppercase" style="letter-spacing: .5px;">
+                            <i class="bi bi-graph-up me-1 text-teal" style="color:#0d9488;"></i>Cobertura de personal por día
+                        </span>
+                        <span class="badge bg-secondary-subtle text-secondary small">Haz clic en un día para resaltarlo</span>
+                    </div>
+                    <div class="row g-2">
+                        {% for dia in dias_semana %}
+                        {% set count = stats.cobertura_dias.get(dia, 0) %}
+                        <div class="col-6 col-md-3 col-lg">
+                            <div class="card p-2 text-center cobertura-card" data-dia="{{ dia }}"
+                                 style="border-radius:10px; background:white;" title="Filtrar {{ dia }}">
+                                <div class="text-muted fw-semibold small text-uppercase">{{ dia[:3] }}</div>
+                                <div class="fs-5 fw-bold text-dark">{{ count }}</div>
+                                <div class="text-muted" style="font-size:0.7rem;">en turno</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Tabla Matriz Consolidada -->
+                <div class="card-body p-0">
+                    <div id="matriz-scroll" style="max-height:68vh; overflow-x:auto; overflow-y:auto; border-radius:0 0 12px 12px;">
+                        <table id="matrizHorariosTable" class="table table-bordered table-hover align-middle mb-0" style="font-size:0.83rem;">
+                            <thead class="table-light text-center" style="position:sticky; top:0; z-index:5; box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+                                <tr>
+                                    <th style="min-width:210px; text-align:left;" class="ps-3">Colaborador</th>
+                                    {% for dia in dias_semana %}
+                                    <th class="col-dia col-dia-{{ dia }}" style="min-width:135px;">
+                                        <div class="fw-bold text-dark">{{ dia }}</div>
+                                        <small class="text-muted fw-normal" style="font-size:0.7rem;">{{ stats.cobertura_dias.get(dia, 0) }} asignados</small>
+                                    </th>
+                                    {% endfor %}
+                                    <th style="min-width:95px;" class="text-center">Total Hrs</th>
+                                    <th style="min-width:80px;" class="text-center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="matriz-table-body">
+                                {% for c in colaboradores %}
+                                {% set hmap = c.mapa_horarios %}
+                                <tr class="matriz-row" data-id="{{ c.id }}" data-sede="{{ c.sede_id or '' }}"
+                                    data-nombre="{{ c.nombre_completo.lower() }}" data-cargo="{{ (c.cargo or '').lower() }}">
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="avatar-circle" style="width:34px; height:34px; min-width:34px; border-radius:50%; background:#e0f2fe; color:#0369a1; font-weight:700; font-size:0.8rem; display:flex; align-items:center; justify-content:center;">
+                                                {{ c.nombre_completo[:2].upper() }}
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark">{{ c.nombre_completo }}</div>
+                                                <div class="text-muted small" style="font-size:0.74rem;">
+                                                    {{ c.cargo or 'Colaborador' }} {% if c.sede %} • <span class="badge bg-light text-dark border">{{ c.sede.nombre }}</span>{% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    {% for dia in dias_semana %}
+                                    {% set h = hmap.get(dia) %}
+                                    <td class="text-center col-dia col-dia-{{ dia }} p-2" data-dia="{{ dia }}"
+                                        data-activo="{% if h and (h.hora_entrada or h.hora_salida) %}1{% else %}0{% endif %}">
+                                        {% if h and (h.hora_entrada or h.hora_salida) %}
+                                        <div class="horario-slot p-1 rounded border bg-white shadow-2xs">
+                                            <div class="fw-bold text-teal" style="color:#0f766e; font-size:0.82rem;">
+                                                <i class="bi bi-clock me-1"></i>{{ h.hora_entrada or '--' }} - {{ h.hora_salida or '--' }}
+                                            </div>
+                                            {% if h.horas_dia %}
+                                            <span class="badge bg-teal-subtle text-teal fw-semibold mt-1" style="background:#ccfbf1; color:#0f766e; font-size:0.7rem;">
+                                                {{ h.horas_dia }}h
+                                            </span>
+                                            {% endif %}
+                                            {% if h.piso_laboratorio %}
+                                            <div class="badge bg-light text-secondary border mt-1 d-block text-truncate" style="font-size:0.68rem;" title="{{ h.piso_laboratorio }}">
+                                                <i class="bi bi-geo-alt me-1"></i>{{ h.piso_laboratorio }}
+                                            </div>
+                                            {% elif h.jornada %}
+                                            <div class="badge bg-light text-muted border mt-1 d-block text-truncate" style="font-size:0.68rem;">
+                                                {{ h.jornada }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        {% else %}
+                                        <div class="text-muted py-2" style="font-size:0.74rem; opacity:0.55;">
+                                            <i class="bi bi-moon-stars me-1 opacity-50"></i>Descanso
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                    {% endfor %}
+                                    <td class="text-center fw-bold">
+                                        {% set prog = c.horas_programadas_total | round(1) %}
+                                        {% set meta = c.total_horas_semana or 42 %}
+                                        {% set diff = (prog - meta) | round(1) %}
+                                        {% if (diff | abs) <= 0.2 %}
+                                        <span class="badge bg-success p-2" style="font-size:0.8rem;" title="Meta cumplida: {{ prog }}h / {{ meta }}h">
+                                            <i class="bi bi-check-circle me-1"></i>{{ prog }}h / {{ meta }}h
+                                        </span>
+                                        {% elif diff < 0 %}
+                                        <span class="badge bg-warning text-dark p-2" style="font-size:0.8rem;" title="Déficit: Faltan {{ (-diff) | round(1) }}h ({{ prog }}h / {{ meta }}h)">
+                                            <i class="bi bi-exclamation-triangle me-1"></i>{{ prog }}h / {{ meta }}h
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-primary p-2" style="font-size:0.8rem;" title="Excedente: +{{ diff }}h ({{ prog }}h / {{ meta }}h)">
+                                            <i class="bi bi-plus-circle me-1"></i>{{ prog }}h / {{ meta }}h
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-outline-teal btn-ver-detalle" data-id="{{ c.id }}" title="Ver / Editar horario de {{ c.nombre_completo }}" style="border-color:#0d9488;color:#0d9488;">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="{{ dias_semana|length + 3 }}" class="text-center py-5 text-muted">
+                                        No hay colaboradores activos para mostrar.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /.tab-content -->
+
+</div><!-- /.container-fluid -->
+
+<!-- ═══════════════════ MODAL DETALLE (tabs: horario, tareas, permisos) ═════════════════════ -->
+<div class="modal fade" id="modalDetalle" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header py-3" style="background:var(--uniminuto-gradient-primary);">
+                <h5 class="modal-title text-white" id="detalleTitulo">
+                    <i class="bi bi-person-vcard me-2"></i><span id="detalleNombreModal"></span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <!-- Tabs -->
+                <div class="d-flex border-bottom px-3 pt-2 gap-1">
+                    <button class="modal-tab-btn active" data-tab="horario">
+                        <i class="bi bi-calendar-week me-1"></i>Horario
+                    </button>
+                    <button class="modal-tab-btn" data-tab="tareas">
+                        <i class="bi bi-list-task me-1"></i>Tareas
+                    </button>
+                    <button class="modal-tab-btn" data-tab="permisos">
+                        <i class="bi bi-shield-check me-1"></i>Permisos
+                    </button>
+                </div>
+
+                <!-- TAB HORARIO -->
+                <div class="modal-tab-pane active p-4" id="tab-horario">
+                    
+                    <!-- Plantillas Rápidas (Presets) -->
+                    <div class="card border-0 bg-light p-2 mb-3 rounded-3 shadow-xs">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            <div class="small fw-bold text-muted text-uppercase" style="font-size:0.75rem; letter-spacing:0.5px;">
+                                <i class="bi bi-lightning-charge-fill text-warning me-1"></i>Plantillas Rápidas:
+                            </div>
+                            <div class="d-flex gap-1 flex-wrap">
+                                <button type="button" class="btn btn-sm btn-outline-teal bg-white btn-preset-horario" data-preset="manana" style="border-color:#0d9488; color:#0f766e; font-size:0.78rem;">
+                                    🌅 Mañana (42h)
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-primary bg-white btn-preset-horario" data-preset="tarde" style="font-size:0.78rem;">
+                                    🌇 Tarde (42h)
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-info bg-white text-dark btn-preset-horario" data-preset="completo" style="font-size:0.78rem;">
+                                    ⚡ Continua (42h)
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary bg-white btn-preset-horario" data-preset="oficina" style="font-size:0.78rem;">
+                                    🏢 Oficina (40h)
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger bg-white btn-preset-horario" data-preset="limpiar" style="font-size:0.78rem;">
+                                    <i class="bi bi-eraser me-1"></i>Limpiar Todo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Balance y Semáforo de Horas Semanales -->
+                    <div class="d-flex align-items-center justify-content-between bg-white border p-3 rounded-3 mb-3 shadow-xs" id="modalSemaforoContainer">
+                        <div class="d-flex align-items-center gap-3 flex-wrap">
+                            <div>
+                                <span class="small text-muted d-block" style="font-size:0.75rem;">HORAS CALCULADAS</span>
+                                <span class="fs-5 fw-bold text-dark" id="modalHorasCalculadasBadge">0.0h</span>
+                            </div>
+                            <div class="border-start ps-3">
+                                <span class="small text-muted d-block" style="font-size:0.75rem;">META SEMANAL</span>
+                                <span class="fs-5 fw-bold text-teal" style="color:#0d9488;" id="modalMetaHorasTexto">42h</span>
+                            </div>
+                        </div>
+                        <div id="modalSemaforoEstado">
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2" style="font-size:0.82rem;">
+                                <i class="bi bi-check-circle me-1"></i>Meta Cumplida (42h)
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-3 mb-3 align-items-end">
+                        <div>
+                            <label class="form-label fw-semibold mb-1" style="font-size:.82rem;">Total horas meta / semana</label>
+                            <input type="number" id="modalTotalHoras" class="form-control form-control-sm" style="width:110px;" min="0" max="60" value="42">
+                        </div>
+                        <div>
+                            <label class="form-label fw-semibold mb-1" style="font-size:.82rem;">A partir del</label>
+                            <input type="text" id="modalFechaInicio" class="form-control form-control-sm" style="width:200px;" placeholder="Ej: 15 de julio 2026">
+                        </div>
+                        <button class="btn btn-sm btn-success ms-auto px-3" id="btnGuardarHorarioModal">
+                            <i class="bi bi-floppy me-1"></i>Guardar Horario
+                        </button>
+                    </div>
+
+                    <!-- Table horario -->
+                    <div class="table-responsive mb-3">
+                        <table class="table table-bordered table-sm align-middle text-center" id="modalHorarioTable" style="font-size: .85rem;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width:12%">Día</th>
+                                    <th style="width:18%">Jornada</th>
+                                    <th style="width:13%">Entrada (HH:MM)</th>
+                                    <th style="width:13%">Salida (HH:MM)</th>
+                                    <th style="width:17%">Piso / Lab</th>
+                                    <th style="width:17%">Recurso Móvil</th>
+                                    <th style="width:10%">Hrs</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dia in dias_semana %}
+                                <tr class="horario-row" data-dia="{{ dia }}">
+                                    <td class="fw-semibold text-muted">{{ dia }}</td>
+                                    <td><input type="text" class="form-control form-control-sm m-jornada" placeholder="Ej: Mañana"></td>
+                                    <td><input type="text" class="form-control form-control-sm m-hora-entrada text-center" placeholder="06:30" maxlength="5"></td>
+                                    <td><input type="text" class="form-control form-control-sm m-hora-salida text-center" placeholder="13:15" maxlength="5"></td>
+                                    <td><input type="text" class="form-control form-control-sm m-piso" placeholder="Ej. A201"></td>
+                                    <td><input type="text" class="form-control form-control-sm m-recurso" placeholder="Ej. TV 1"></td>
+                                    <td><input type="number" class="form-control form-control-sm m-horas-dia text-center fw-bold" step="0.25" min="0" max="24" placeholder="0.0"></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div>
+                        <label class="form-label fw-semibold" style="font-size:.82rem;">Descripción textual del horario</label>
+                        <textarea id="modalHorarioTexto" class="form-control" rows="2"
+                                  placeholder="Ej: Lunes a viernes 6:30 am a 1:15 pm, Sábado de 6:30 am a 2:00 pm."></textarea>
+                    </div>
+                </div>
+
+                <!-- TAB TAREAS -->
+                <div class="modal-tab-pane p-4" id="tab-tareas">
+                    {% if session.rol in ('admin', 'superadmin') %}
+                    <div class="card border-0 bg-light rounded-3 p-3 mb-3">
+                        <div class="row g-2">
+                            <div class="col-12 col-md-4">
+                                <input type="text" id="nuevaTareaTitulo" class="form-control form-control-sm" placeholder="Título de la tarea *">
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <input type="text" id="nuevaTareaDesc" class="form-control form-control-sm" placeholder="Descripción (opcional)">
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <select id="nuevaTareaEstado" class="form-select form-select-sm">
+                                    <option value="pendiente">Pendiente</option>
+                                    <option value="en_progreso">En progreso</option>
+                                    <option value="completada">Completada</option>
+                                </select>
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <select id="nuevaTareaPrioridad" class="form-select form-select-sm">
+                                    <option value="baja">Baja</option>
+                                    <option value="normal" selected>Normal</option>
+                                    <option value="alta">Alta</option>
+                                </select>
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <input type="date" id="nuevaTareaVence" class="form-control form-control-sm" title="Fecha de vencimiento">
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <button class="btn btn-sm btn-success w-100" id="btnAgregarTarea">
+                                    <i class="bi bi-plus-lg"></i> Agregar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div id="listaTareas">
+                        <p class="text-center text-muted py-4">Cargando tareas…</p>
+                    </div>
+                </div>
+
+                <!-- TAB PERMISOS -->
+                <div class="modal-tab-pane p-4" id="tab-permisos">
+                    {% if session.rol in ('admin', 'superadmin') %}
+                    <p class="text-muted mb-3" style="font-size:.85rem;">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Configure qué módulos puede ver, crear, editar o eliminar este colaborador.
+                    </p>
+                    <div class="permiso-row fw-bold text-muted mb-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;">
+                        <div>Módulo</div>
+                        <div class="text-center">Ver</div>
+                        <div class="text-center">Crear</div>
+                        <div class="text-center">Editar</div>
+                        <div class="text-center">Eliminar</div>
+                    </div>
+                    <div id="listaPermisos">
+                        {% for mod in modulos_sistema %}
+                        <div class="permiso-row" data-modulo="{{ mod }}">
+                            <div class="permiso-modulo">{{ mod.replace('_', ' ') }}</div>
+                            <div class="permiso-check">
+                                <input type="checkbox" class="perm-ver" title="Ver">
+                                <span>Ver</span>
+                            </div>
+                            <div class="permiso-check">
+                                <input type="checkbox" class="perm-crear" title="Crear">
+                                <span>Crear</span>
+                            </div>
+                            <div class="permiso-check">
+                                <input type="checkbox" class="perm-editar" title="Editar">
+                                <span>Editar</span>
+                            </div>
+                            <div class="permiso-check">
+                                <input type="checkbox" class="perm-eliminar" title="Eliminar">
+                                <span>Eliminar</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-3 d-flex justify-content-end">
+                        <button class="btn btn-primary" id="btnGuardarPermisos">
+                            <i class="bi bi-shield-check me-1"></i>Guardar Permisos
+                        </button>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-4">Solo los administradores pueden gestionar permisos.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════ MODAL CREAR / EDITAR COLABORADOR ═════════════════════ -->
+<div class="modal fade" id="modalColab" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header py-3" style="background:var(--uniminuto-gradient-primary);">
+                <h5 class="modal-title text-white" id="modalColabTitulo">
+                    <i class="bi bi-person-plus me-2"></i>Nuevo Colaborador
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" id="colabId">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label fw-semibold" for="colabNombre">Nombre Completo *</label>
+                        <input type="text" class="form-control" id="colabNombre" placeholder="Apellidos y nombres completos">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold" for="colabDoc">Documento</label>
+                        <input type="text" class="form-control" id="colabDoc" placeholder="CC / TI">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold" for="colabCargo">Cargo</label>
+                        <input type="text" class="form-control" id="colabCargo" placeholder="Ej: Auxiliar, Técnico">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold" for="colabCorreo">Correo</label>
+                        <input type="email" class="form-control" id="colabCorreo" placeholder="correo@ejemplo.com">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold" for="colabTel">Teléfono</label>
+                        <input type="text" class="form-control" id="colabTel" placeholder="3001234567">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold" for="colabSede">Sede</label>
+                        <select class="form-select" id="colabSede">
+                            <option value="">— Sin sede —</option>
+                            {% for sede in sedes %}
+                            <option value="{{ sede.id }}">{{ sede.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold" for="colabHoras">Total horas / semana</label>
+                        <input type="number" class="form-control" id="colabHoras" value="42" min="0" max="60">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold" for="colabFechaInicio">Inicio de horario</label>
+                        <input type="text" class="form-control" id="colabFechaInicio" placeholder="Ej: 15 de julio 2026">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold" for="colabObs">Observaciones</label>
+                        <textarea class="form-control" id="colabObs" rows="2" placeholder="Notas adicionales…"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success px-4" id="btnGuardarColab">
+                    <i class="bi bi-check-lg me-1"></i>Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ─── CSRF Token ─── */
+const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+/* ─── Estado global ─── */
+let colabActualId = null;
+let modalDetalle = null;
+let modalColab = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    modalDetalle = new bootstrap.Modal(document.getElementById('modalDetalle'));
+    modalColab   = new bootstrap.Modal(document.getElementById('modalColab'));
+});
+
+/* ═══════════════════════════════════════
+   BÚSQUEDA EN TIEMPO REAL
+   ═══════════════════════════════════════ */
+document.getElementById('buscarColab')?.addEventListener('input', function () {
+    const term = this.value.toLowerCase().trim();
+    document.querySelectorAll('#colab-table-body tr.colab-row').forEach(row => {
+        row.style.display = !term || row.textContent.toLowerCase().includes(term) ? '' : 'none';
+    });
+});
+document.getElementById('limpiarBuscarColab')?.addEventListener('click', function () {
+    document.getElementById('buscarColab').value = '';
+    document.querySelectorAll('#colab-table-body tr.colab-row').forEach(r => r.style.display = '');
+});
+
+/* ═══════════════════════════════════════
+   MATRIZ DE HORARIOS: FILTROS Y BÚSQUEDA
+   ═══════════════════════════════════════ */
+function filtrarMatrizHorarios() {
+    const term = (document.getElementById('buscarMatrizHorario')?.value || '').toLowerCase().trim();
+    const sede = document.getElementById('filtroSedeMatriz')?.value || '';
+    const diaSel = document.getElementById('filtroDiaMatriz')?.value || '';
+
+    // Filtrar filas de la matriz
+    document.querySelectorAll('#matriz-table-body tr.matriz-row').forEach(row => {
+        const nombre = row.dataset.nombre || '';
+        const cargo = row.dataset.cargo || '';
+        const rowSede = row.dataset.sede || '';
+        
+        const matchText = !term || nombre.includes(term) || cargo.includes(term);
+        const matchSede = !sede || rowSede === sede;
+        
+        let matchDia = true;
+        if (diaSel) {
+            const celdaDia = row.querySelector(`.col-dia-${diaSel}`);
+            matchDia = celdaDia && celdaDia.dataset.activo === '1';
+        }
+
+        row.style.display = (matchText && matchSede && matchDia) ? '' : 'none';
+    });
+
+    // Resaltar columna del día si está seleccionada
+    document.querySelectorAll('#matrizHorariosTable .col-dia').forEach(th => {
+        th.style.backgroundColor = '';
+        th.style.color = '';
+    });
+    if (diaSel) {
+        document.querySelectorAll(`#matrizHorariosTable .col-dia-${diaSel}`).forEach(cell => {
+            cell.style.backgroundColor = '#ecfdf5';
+        });
+    }
+
+    // Actualizar estado de las tarjetas de cobertura
+    document.querySelectorAll('.cobertura-card').forEach(card => {
+        if (diaSel && card.dataset.dia === diaSel) {
+            card.classList.add('active');
+        } else {
+            card.classList.remove('active');
+        }
+    });
+}
+
+document.getElementById('buscarMatrizHorario')?.addEventListener('input', filtrarMatrizHorarios);
+document.getElementById('filtroSedeMatriz')?.addEventListener('change', filtrarMatrizHorarios);
+document.getElementById('filtroDiaMatriz')?.addEventListener('change', filtrarMatrizHorarios);
+
+document.getElementById('limpiarBuscarMatriz')?.addEventListener('click', function() {
+    const input = document.getElementById('buscarMatrizHorario');
+    if (input) { input.value = ''; filtrarMatrizHorarios(); }
+});
+
+// Click en tarjetas de cobertura para filtrar rápidamente por ese día
+document.querySelectorAll('.cobertura-card').forEach(card => {
+    card.addEventListener('click', function() {
+        const dia = this.dataset.dia;
+        const select = document.getElementById('filtroDiaMatriz');
+        if (select) {
+            if (select.value === dia) {
+                select.value = ''; // Deseleccionar
+            } else {
+                select.value = dia; // Seleccionar
+            }
+            filtrarMatrizHorarios();
+        }
+    });
+});
+
+// Click en botones de detalle dentro de la matriz
+document.getElementById('matriz-table-body')?.addEventListener('click', function(e) {
+    const btn = e.target.closest('.btn-ver-detalle');
+    if (btn) {
+        const id = parseInt(btn.dataset.id);
+        if (id) abrirDetalle(id);
+    }
+});
+
+// Botón imprimir
+document.getElementById('btnImprimirMatriz')?.addEventListener('click', function() {
+    window.print();
+});
+
+// Botón Exportar CSV
+document.getElementById('btnExportarHorariosCSV')?.addEventListener('click', function() {
+    const rows = [];
+    const dias = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
+    
+    // Header
+    rows.push(['Colaborador', 'Cargo', 'Sede', ...dias, 'Total Horas Semana'].map(c => `"${c}"`).join(','));
+
+    // Filas
+    document.querySelectorAll('#matriz-table-body tr.matriz-row').forEach(tr => {
+        if (tr.style.display === 'none') return;
+        const nombre = tr.querySelector('.fw-bold.text-dark')?.textContent.trim() || '';
+        const info = tr.querySelector('.text-muted.small')?.textContent.trim() || '';
+        const partesInfo = info.split('•').map(p => p.trim());
+        const cargo = partesInfo[0] || '';
+        const sede = partesInfo[1] || '';
+
+        const rowData = [nombre, cargo, sede];
+
+        dias.forEach(dia => {
+            const cell = tr.querySelector(`.col-dia-${dia}`);
+            if (cell && cell.dataset.activo === '1') {
+                const horarioText = cell.querySelector('.text-teal')?.textContent.trim() || '';
+                const horasBadge = cell.querySelector('.badge.bg-teal-subtle')?.textContent.trim() || '';
+                const extraBadge = cell.querySelector('.badge.bg-light')?.textContent.trim() || '';
+                let cellContent = horarioText;
+                if (horasBadge) cellContent += ` (${horasBadge})`;
+                if (extraBadge) cellContent += ` [${extraBadge}]`;
+                rowData.push(cellContent);
+            } else {
+                rowData.push('Descanso');
+            }
+        });
+
+        const totalHrs = tr.querySelector('.badge.bg-teal')?.textContent.trim() || '';
+        rowData.push(totalHrs);
+
+        rows.push(rowData.map(v => `"${(v || '').replace(/"/g, '""')}"`).join(','));
+    });
+
+    const csvContent = '\uFEFF' + rows.join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Matriz_Horarios_Colaboradores_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('success', 'Archivo CSV exportado con éxito');
+});
+
+    /* ═══════════════════════════════════════
+       TABS DEL MODAL DETALLE
+       ═══════════════════════════════════════ */
+    document.querySelectorAll('.modal-tab-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+        document.querySelectorAll('.modal-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.modal-tab-pane').forEach(p => p.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+        if (this.dataset.tab === 'tareas' && colabActualId) cargarTareas(colabActualId);
+        if (this.dataset.tab === 'permisos' && colabActualId) cargarPermisos(colabActualId);
+    });
+});
+
+    /* ═══════════════════════════════════════
+       VER DETALLE (abre modal con horario)
+       ═══════════════════════════════════════ */
+    document.getElementById('colab-table-body')?.addEventListener('click', function (e) {
+    const btnDetalle = e.target.closest('.btn-ver-detalle');
+    const btnEditar  = e.target.closest('.btn-editar-colab');
+    const btnElim    = e.target.closest('.btn-eliminar-colab');
+
+    if (btnDetalle) {
+        const id = parseInt(btnDetalle.dataset.id);
+        abrirDetalle(id);
+    }
+    if (btnEditar) {
+        const id = parseInt(btnEditar.dataset.id);
+        abrirEditar(id);
+    }
+    if (btnElim) {
+        const id = parseInt(btnElim.dataset.id);
+        if (confirm('¿Desactivar este colaborador?')) {
+            fetch(`/colaboradores/api/colaboradores/${id}`, { method: 'DELETE', headers: { 'X-CSRFToken': csrfToken } })
+                .then(r => r.json()).then(d => {
+                    if (d.success) location.reload();
+                    else alert(d.message);
+                });
+        }
+    }
+});
+/* ─── Abrir detalle ─── */
+async function abrirDetalle(id) {
+    colabActualId = id;
+    const r = await fetch(`/colaboradores/api/colaboradores/${id}`);
+    const { colaborador: c } = await r.json();
+    document.getElementById('detalleNombreModal').textContent = c.nombre_completo;
+    document.getElementById('modalTotalHoras').value = c.total_horas_semana || 42;
+    document.getElementById('modalFechaInicio').value = c.fecha_inicio_horario || '';
+    document.getElementById('modalHorarioTexto').value = c.horario_texto || '';
+
+    // Cargar horarios en tabla
+    const horarios = c.horarios || [];
+    document.querySelectorAll('#modalHorarioTable .horario-row').forEach(row => {
+        const dia = row.dataset.dia;
+        const h = horarios.find(x => x.dia === dia);
+        row.querySelector('.m-jornada').value = h?.jornada || '';
+        row.querySelector('.m-hora-entrada').value = h?.hora_entrada || '';
+        row.querySelector('.m-hora-salida').value = h?.hora_salida || '';
+        row.querySelector('.m-piso').value = h?.piso_laboratorio || '';
+        row.querySelector('.m-recurso').value = h?.recurso_movil || '';
+        row.querySelector('.m-horas-dia').value = h?.horas_dia ?? '';
+        row.querySelector('.m-hora-salida').classList.remove('is-invalid');
+    });
+
+    // Reset tabs
+    document.querySelectorAll('.modal-tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.modal-tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelector('[data-tab="horario"]').classList.add('active');
+    document.getElementById('tab-horario').classList.add('active');
+
+    // Calcular y actualizar semáforo
+    recalcularHorasModal();
+
+    modalDetalle.show();
+}
+
+/* ═══════════════════════════════════════
+   CÁLCULO AUTOMÁTICO DE HORAS Y SEMÁFORO
+   ═══════════════════════════════════════ */
+function normalizarHoraInput(str) {
+    if (!str) return '';
+    str = str.trim().replace('.', ':');
+    if (/^\d{1,2}$/.test(str)) {
+        const n = parseInt(str, 10);
+        if (n >= 0 && n <= 23) return String(n).padStart(2, '0') + ':00';
+    }
+    if (/^\d{3}$/.test(str)) {
+        return '0' + str[0] + ':' + str.slice(1);
+    }
+    if (/^\d{4}$/.test(str)) {
+        return str.slice(0, 2) + ':' + str.slice(2);
+    }
+    if (/^\d{1}:\d{2}$/.test(str)) {
+        return '0' + str;
+    }
+    return str;
+}
+
+function parseHoraEnMinutos(str) {
+    if (!str) return null;
+    str = normalizarHoraInput(str);
+    const parts = str.split(':');
+    if (parts.length !== 2) return null;
+    const h = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+    if (isNaN(h) || isNaN(m) || h < 0 || h > 23 || m < 0 || m > 59) return null;
+    return h * 60 + m;
+}
+
+function recalcularHorasModal() {
+    let totalCalculado = 0;
+    
+    document.querySelectorAll('#modalHorarioTable .horario-row').forEach(row => {
+        const inputEntrada = row.querySelector('.m-hora-entrada');
+        const inputSalida = row.querySelector('.m-hora-salida');
+        const inputHoras = row.querySelector('.m-horas-dia');
+        
+        const entStr = inputEntrada.value.trim();
+        const salStr = inputSalida.value.trim();
+
+        if (entStr && salStr) {
+            const minEnt = parseHoraEnMinutos(entStr);
+            const minSal = parseHoraEnMinutos(salStr);
+
+            if (minEnt !== null && minSal !== null) {
+                if (minSal > minEnt) {
+                    inputSalida.classList.remove('is-invalid');
+                    const diffHoras = Math.round(((minSal - minEnt) / 60) * 100) / 100;
+                    inputHoras.value = diffHoras;
+                    totalCalculado += diffHoras;
+                } else {
+                    inputSalida.classList.add('is-invalid');
+                    inputSalida.title = 'La hora de salida debe ser posterior a la de entrada';
+                    inputHoras.value = '';
+                }
+            } else {
+                inputSalida.classList.remove('is-invalid');
+                const hManual = parseFloat(inputHoras.value);
+                if (!isNaN(hManual) && hManual > 0) totalCalculado += hManual;
+            }
+        } else {
+            inputSalida.classList.remove('is-invalid');
+            const hManual = parseFloat(inputHoras.value);
+            if (!isNaN(hManual) && hManual > 0) totalCalculado += hManual;
+        }
+    });
+
+    totalCalculado = Math.round(totalCalculado * 100) / 100;
+
+    // Actualizar badge de horas calculadas
+    const badgeHoras = document.getElementById('modalHorasCalculadasBadge');
+    if (badgeHoras) badgeHoras.textContent = totalCalculado.toFixed(1) + 'h';
+
+    // Comparar contra meta semanal
+    const meta = parseInt(document.getElementById('modalTotalHoras')?.value) || 42;
+    const metaTexto = document.getElementById('modalMetaHorasTexto');
+    if (metaTexto) metaTexto.textContent = meta + 'h';
+
+    const estadoCont = document.getElementById('modalSemaforoEstado');
+    if (estadoCont) {
+        const diff = Math.round((totalCalculado - meta) * 10) / 10;
+        if (Math.abs(diff) <= 0.2) {
+            estadoCont.innerHTML = `
+                <span class="badge bg-success-subtle text-success border border-success px-3 py-2" style="font-size:0.82rem;">
+                    <i class="bi bi-check-circle-fill me-1"></i>Meta Cumplida (${totalCalculado}h / ${meta}h)
+                </span>`;
+        } else if (diff < 0) {
+            estadoCont.innerHTML = `
+                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning px-3 py-2" style="font-size:0.82rem;">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i>Faltan ${Math.abs(diff).toFixed(1)}h (${totalCalculado}h / ${meta}h)
+                </span>`;
+        } else {
+            estadoCont.innerHTML = `
+                <span class="badge bg-primary-subtle text-primary border border-primary px-3 py-2" style="font-size:0.82rem;">
+                    <i class="bi bi-info-circle-fill me-1"></i>Excedente: +${diff.toFixed(1)}h (${totalCalculado}h / ${meta}h)
+                </span>`;
+        }
+    }
+}
+
+// Escuchar cambios en las horas para auto-calcular
+document.getElementById('modalHorarioTable')?.addEventListener('input', function(e) {
+    if (e.target.matches('.m-hora-entrada, .m-hora-salida, .m-horas-dia')) {
+        recalcularHorasModal();
+    }
+});
+document.getElementById('modalHorarioTable')?.addEventListener('blur', function(e) {
+    if (e.target.matches('.m-hora-entrada, .m-hora-salida')) {
+        const norm = normalizarHoraInput(e.target.value);
+        if (norm && norm !== e.target.value) {
+            e.target.value = norm;
+            recalcularHorasModal();
+        }
+    }
+}, true);
+document.getElementById('modalTotalHoras')?.addEventListener('input', recalcularHorasModal);
+
+/* ═══════════════════════════════════════
+   PLANTILLAS RÁPIDAS (PRESETS DE HORARIO)
+   ═══════════════════════════════════════ */
+document.querySelectorAll('.btn-preset-horario').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const preset = this.dataset.preset;
+        const rows = document.querySelectorAll('#modalHorarioTable .horario-row');
+
+        if (preset === 'manana') {
+            rows.forEach(row => {
+                const dia = row.dataset.dia;
+                if (['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes'].includes(dia)) {
+                    row.querySelector('.m-jornada').value = 'Mañana';
+                    row.querySelector('.m-hora-entrada').value = '06:30';
+                    row.querySelector('.m-hora-salida').value = '13:15';
+                    row.querySelector('.m-horas-dia').value = '6.75';
+                } else if (dia === 'Sabado') {
+                    row.querySelector('.m-jornada').value = 'Mañana';
+                    row.querySelector('.m-hora-entrada').value = '06:30';
+                    row.querySelector('.m-hora-salida').value = '14:45';
+                    row.querySelector('.m-horas-dia').value = '8.25';
+                } else {
+                    row.querySelector('.m-jornada').value = '';
+                    row.querySelector('.m-hora-entrada').value = '';
+                    row.querySelector('.m-hora-salida').value = '';
+                    row.querySelector('.m-horas-dia').value = '';
+                }
+                row.querySelector('.m-hora-salida').classList.remove('is-invalid');
+            });
+            document.getElementById('modalHorarioTexto').value = 'Lunes a viernes 6:30 am a 1:15 pm (6.75h), Sábado de 6:30 am a 2:45 pm (8.25h).';
+            document.getElementById('modalTotalHoras').value = 42;
+            showToast('success', 'Plantilla Turno Mañana (42h) aplicada');
+        } else if (preset === 'tarde') {
+            rows.forEach(row => {
+                const dia = row.dataset.dia;
+                if (['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes'].includes(dia)) {
+                    row.querySelector('.m-jornada').value = 'Tarde';
+                    row.querySelector('.m-hora-entrada').value = '13:15';
+                    row.querySelector('.m-hora-salida').value = '20:00';
+                    row.querySelector('.m-horas-dia').value = '6.75';
+                } else if (dia === 'Sabado') {
+                    row.querySelector('.m-jornada').value = 'Tarde';
+                    row.querySelector('.m-hora-entrada').value = '13:45';
+                    row.querySelector('.m-hora-salida').value = '22:00';
+                    row.querySelector('.m-horas-dia').value = '8.25';
+                } else {
+                    row.querySelector('.m-jornada').value = '';
+                    row.querySelector('.m-hora-entrada').value = '';
+                    row.querySelector('.m-hora-salida').value = '';
+                    row.querySelector('.m-horas-dia').value = '';
+                }
+                row.querySelector('.m-hora-salida').classList.remove('is-invalid');
+            });
+            document.getElementById('modalHorarioTexto').value = 'Lunes a viernes 1:15 pm a 8:00 pm (6.75h), Sábado de 1:45 pm a 10:00 pm (8.25h).';
+            document.getElementById('modalTotalHoras').value = 42;
+            showToast('success', 'Plantilla Turno Tarde (42h) aplicada');
+        } else if (preset === 'completo') {
+            rows.forEach(row => {
+                const dia = row.dataset.dia;
+                if (['Lunes', 'Martes', 'Miercoles', 'Jueves'].includes(dia)) {
+                    row.querySelector('.m-jornada').value = 'Continua';
+                    row.querySelector('.m-hora-entrada').value = '07:00';
+                    row.querySelector('.m-hora-salida').value = '16:30';
+                    row.querySelector('.m-horas-dia').value = '9.5';
+                } else if (dia === 'Viernes') {
+                    row.querySelector('.m-jornada').value = 'Continua';
+                    row.querySelector('.m-hora-entrada').value = '07:00';
+                    row.querySelector('.m-hora-salida').value = '11:00';
+                    row.querySelector('.m-horas-dia').value = '4.0';
+                } else {
+                    row.querySelector('.m-jornada').value = '';
+                    row.querySelector('.m-hora-entrada').value = '';
+                    row.querySelector('.m-hora-salida').value = '';
+                    row.querySelector('.m-horas-dia').value = '';
+                }
+                row.querySelector('.m-hora-salida').classList.remove('is-invalid');
+            });
+            document.getElementById('modalHorarioTexto').value = 'Lunes a jueves 7:00 am a 4:30 pm (9.5h), Viernes 7:00 am a 11:00 am (4.0h).';
+            document.getElementById('modalTotalHoras').value = 42;
+            showToast('success', 'Plantilla Jornada Continua (42h) aplicada');
+        } else if (preset === 'oficina') {
+            rows.forEach(row => {
+                const dia = row.dataset.dia;
+                if (['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes'].includes(dia)) {
+                    row.querySelector('.m-jornada').value = 'Oficina';
+                    row.querySelector('.m-hora-entrada').value = '08:00';
+                    row.querySelector('.m-hora-salida').value = '17:00';
+                    row.querySelector('.m-horas-dia').value = '8.0';
+                } else {
+                    row.querySelector('.m-jornada').value = '';
+                    row.querySelector('.m-hora-entrada').value = '';
+                    row.querySelector('.m-hora-salida').value = '';
+                    row.querySelector('.m-horas-dia').value = '';
+                }
+                row.querySelector('.m-hora-salida').classList.remove('is-invalid');
+            });
+            document.getElementById('modalHorarioTexto').value = 'Lunes a viernes 8:00 am a 5:00 pm (con 1 hora de almuerzo).';
+            document.getElementById('modalTotalHoras').value = 40;
+            showToast('success', 'Plantilla Oficina L-V (40h) aplicada');
+        } else if (preset === 'limpiar') {
+            rows.forEach(row => {
+                row.querySelector('.m-jornada').value = '';
+                row.querySelector('.m-hora-entrada').value = '';
+                row.querySelector('.m-hora-salida').value = '';
+                row.querySelector('.m-piso').value = '';
+                row.querySelector('.m-recurso').value = '';
+                row.querySelector('.m-horas-dia').value = '';
+                row.querySelector('.m-hora-salida').classList.remove('is-invalid');
+            });
+            document.getElementById('modalHorarioTexto').value = '';
+            showToast('info', 'Horario limpiado');
+        }
+
+        recalcularHorasModal();
+    });
+});
+
+/* ═══════════════════════════════════════
+   GUARDAR HORARIO
+   ═══════════════════════════════════════ */
+document.getElementById('btnGuardarHorarioModal')?.addEventListener('click', async function () {
+    const horarios = [];
+    let hayError = false;
+
+    document.querySelectorAll('#modalHorarioTable .horario-row').forEach(row => {
+        const dia = row.dataset.dia;
+        const ent = row.querySelector('.m-hora-entrada').value.trim() || null;
+        const sal = row.querySelector('.m-hora-salida').value.trim() || null;
+        const hrs = parseFloat(row.querySelector('.m-horas-dia').value) || null;
+
+        if (ent && sal) {
+            const minEnt = parseHoraEnMinutos(ent);
+            const minSal = parseHoraEnMinutos(sal);
+            if (minEnt !== null && minSal !== null && minSal <= minEnt) {
+                row.querySelector('.m-hora-salida').classList.add('is-invalid');
+                hayError = true;
+            }
+        }
+
+        horarios.push({
+            dia,
+            jornada:          row.querySelector('.m-jornada').value.trim() || null,
+            hora_entrada:     ent,
+            hora_salida:      sal,
+            piso_laboratorio: row.querySelector('.m-piso').value.trim() || null,
+            recurso_movil:    row.querySelector('.m-recurso').value.trim() || null,
+            horas_dia:        hrs,
+        });
+    });
+
+    if (hayError) {
+        showToast('danger', 'Corrige las horas de salida que son anteriores o iguales a las de entrada');
+        return;
+    }
+
+    const payload = {
+        horarios,
+        total_horas_semana: parseInt(document.getElementById('modalTotalHoras').value) || 42,
+    };
+    const r = await fetch(`/colaboradores/api/colaboradores/${colabActualId}/horarios`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+        body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+
+    if (!d.success) {
+        showToast('danger', d.message);
+        return;
+    }
+
+    // También guardar horario_texto y fecha_inicio
+    await fetch(`/colaboradores/api/colaboradores/${colabActualId}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+        body: JSON.stringify({
+            nombre_completo: document.getElementById('detalleNombreModal').textContent,
+            horario_texto: document.getElementById('modalHorarioTexto').value.trim(),
+            fecha_inicio_horario: document.getElementById('modalFechaInicio').value.trim(),
+            total_horas_semana: parseInt(document.getElementById('modalTotalHoras').value) || 42,
+        })
+    });
+
+    showToast('success', 'Horario guardado correctamente');
+    setTimeout(() => location.reload(), 900);
+});
+
+/* ═══════════════════════════════════════
+   TAREAS
+   ═══════════════════════════════════════ */
+async function cargarTareas(id) {
+    const r = await fetch(`/colaboradores/api/colaboradores/${id}/tareas`);
+    const { tareas } = await r.json();
+    const cont = document.getElementById('listaTareas');
+    if (!tareas.length) {
+        cont.innerHTML = '<p class="text-center text-muted py-4"><i class="bi bi-list-task me-2"></i>Sin tareas asignadas</p>';
+        return;
+    }
+    cont.innerHTML = tareas.map(t => `
+        <div class="tarea-item" data-tid="${t.id}">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="tarea-titulo">${t.titulo}</div>
+                    <div class="tarea-meta">${t.descripcion || ''}</div>
+                    <div class="mt-1">
+                        <span class="badge badge-${t.estado} me-1">${t.estado.replace('_',' ')}</span>
+                        <span class="badge badge-${t.prioridad}">${t.prioridad}</span>
+                        ${t.fecha_vencimiento ? `<span class="ms-2 text-muted" style="font-size:.72rem;"><i class="bi bi-calendar3"></i> ${t.fecha_vencimiento}</span>` : ''}
+                    </div>
+                </div>
+                <div class="d-flex gap-1">
+                    <select class="form-select form-select-sm tarea-estado-sel" style="width:130px;" onchange="cambiarEstadoTarea(${t.id}, this.value)">
+                        <option value="pendiente" ${t.estado==='pendiente'?'selected':''}>Pendiente</option>
+                        <option value="en_progreso" ${t.estado==='en_progreso'?'selected':''}>En progreso</option>
+                        <option value="completada" ${t.estado==='completada'?'selected':''}>Completada</option>
+                    </select>
+                    <button class="btn btn-sm btn-outline-danger" onclick="eliminarTarea(${t.id})">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+document.getElementById('btnAgregarTarea')?.addEventListener('click', async function () {
+    const titulo = document.getElementById('nuevaTareaTitulo').value.trim();
+    if (!titulo) { alert('Ingresa un título'); return; }
+    const payload = {
+        titulo,
+        descripcion: document.getElementById('nuevaTareaDesc').value.trim(),
+        estado: document.getElementById('nuevaTareaEstado').value,
+        prioridad: document.getElementById('nuevaTareaPrioridad').value,
+        fecha_vencimiento: document.getElementById('nuevaTareaVence').value || null,
+    };
+    const r = await fetch(`/colaboradores/api/colaboradores/${colabActualId}/tareas`, {
+        method: 'POST', headers: {'Content-Type':'application/json', 'X-CSRFToken': csrfToken},
+        body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if (d.success) {
+        document.getElementById('nuevaTareaTitulo').value = '';
+        document.getElementById('nuevaTareaDesc').value = '';
+        cargarTareas(colabActualId);
+        showToast('success', 'Tarea agregada');
+    } else {
+        alert(d.message);
+    }
+});
+
+async function cambiarEstadoTarea(tid, estado) {
+    await fetch(`/colaboradores/api/tareas/${tid}`, {
+        method: 'PUT', headers: {'Content-Type':'application/json', 'X-CSRFToken': csrfToken},
+        body: JSON.stringify({ estado })
+    });
+    showToast('success', 'Estado actualizado');
+}
+
+async function eliminarTarea(tid) {
+    if (!confirm('¿Eliminar esta tarea?')) return;
+    const r = await fetch(`/colaboradores/api/tareas/${tid}`, { method: 'DELETE', headers: { 'X-CSRFToken': csrfToken } });
+    const d = await r.json();
+    if (d.success) { cargarTareas(colabActualId); showToast('success', 'Tarea eliminada'); }
+}
+
+/* ═══════════════════════════════════════
+   PERMISOS
+   ═══════════════════════════════════════ */
+async function cargarPermisos(id) {
+    const r = await fetch(`/colaboradores/api/colaboradores/${id}/permisos`);
+    const { permisos } = await r.json();
+    document.querySelectorAll('#listaPermisos .permiso-row').forEach(row => {
+        const mod = row.dataset.modulo;
+        const p   = permisos.find(x => x.modulo === mod) || {};
+        row.querySelector('.perm-ver').checked     = p.puede_ver || false;
+        row.querySelector('.perm-crear').checked   = p.puede_crear || false;
+        row.querySelector('.perm-editar').checked  = p.puede_editar || false;
+        row.querySelector('.perm-eliminar').checked= p.puede_eliminar || false;
+    });
+}
+
+document.getElementById('btnGuardarPermisos')?.addEventListener('click', async function () {
+    const permisos = [];
+    document.querySelectorAll('#listaPermisos .permiso-row').forEach(row => {
+        permisos.push({
+            modulo:         row.dataset.modulo,
+            puede_ver:      row.querySelector('.perm-ver').checked,
+            puede_crear:    row.querySelector('.perm-crear').checked,
+            puede_editar:   row.querySelector('.perm-editar').checked,
+            puede_eliminar: row.querySelector('.perm-eliminar').checked,
+        });
+    });
+    const r = await fetch(`/colaboradores/api/colaboradores/${colabActualId}/permisos`, {
+        method: 'PUT', headers: {'Content-Type':'application/json', 'X-CSRFToken': csrfToken},
+        body: JSON.stringify({ permisos })
+    });
+    const d = await r.json();
+    showToast(d.success ? 'success' : 'danger', d.message);
+});
+
+/* ═══════════════════════════════════════
+   CREAR / EDITAR COLABORADOR
+   ═══════════════════════════════════════ */
+document.getElementById('btnNuevoColab')?.addEventListener('click', function () {
+    document.getElementById('colabId').value = '';
+    document.getElementById('colabNombre').value = '';
+    document.getElementById('colabDoc').value = '';
+    document.getElementById('colabCargo').value = '';
+    document.getElementById('colabCorreo').value = '';
+    document.getElementById('colabTel').value = '';
+    document.getElementById('colabSede').value = '';
+    document.getElementById('colabHoras').value = 42;
+    document.getElementById('colabFechaInicio').value = '';
+    document.getElementById('colabObs').value = '';
+    document.getElementById('modalColabTitulo').innerHTML = '<i class="bi bi-person-plus me-2"></i>Nuevo Colaborador';
+    modalColab.show();
+});
+
+async function abrirEditar(id) {
+    const r = await fetch(`/colaboradores/api/colaboradores/${id}`);
+    const { colaborador: c } = await r.json();
+    document.getElementById('colabId').value = c.id;
+    document.getElementById('colabNombre').value = c.nombre_completo || '';
+    document.getElementById('colabDoc').value = c.documento || '';
+    document.getElementById('colabCargo').value = c.cargo || '';
+    document.getElementById('colabCorreo').value = c.correo || '';
+    document.getElementById('colabTel').value = c.telefono || '';
+    document.getElementById('colabSede').value = c.sede_id || '';
+    document.getElementById('colabHoras').value = c.total_horas_semana || 42;
+    document.getElementById('colabFechaInicio').value = c.fecha_inicio_horario || '';
+    document.getElementById('colabObs').value = c.observaciones || '';
+    document.getElementById('modalColabTitulo').innerHTML = '<i class="bi bi-pencil me-2"></i>Editar Colaborador';
+    modalColab.show();
+}
+
+document.getElementById('btnGuardarColab').addEventListener('click', async function () {
+    const id = document.getElementById('colabId').value;
+    const payload = {
+        nombre_completo:     document.getElementById('colabNombre').value.trim(),
+        documento:           document.getElementById('colabDoc').value.trim(),
+        cargo:               document.getElementById('colabCargo').value.trim(),
+        correo:              document.getElementById('colabCorreo').value.trim(),
+        telefono:            document.getElementById('colabTel').value.trim(),
+        sede_id:             document.getElementById('colabSede').value || null,
+        total_horas_semana:  parseInt(document.getElementById('colabHoras').value) || 42,
+        fecha_inicio_horario:document.getElementById('colabFechaInicio').value.trim(),
+        observaciones:       document.getElementById('colabObs').value.trim(),
+    };
+    const url    = id ? `/colaboradores/api/colaboradores/${id}` : '/colaboradores/api/colaboradores';
+    const method = id ? 'PUT' : 'POST';
+    const r = await fetch(url, {
+        method, headers: {'Content-Type':'application/json', 'X-CSRFToken': csrfToken},
+        body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if (d.success) {
+        modalColab.hide();
+        showToast('success', d.message);
+        setTimeout(() => location.reload(), 800);
+    } else {
+        alert(d.message);
+    }
+}); // end btnGuardarColab
+
+/* ═══════════════════════════════════════
+   TOAST
+   ═══════════════════════════════════════ */
+function showToast(type, msg) {
+    let cont = document.getElementById('toast-container');
+    if (!cont) {
+        cont = document.createElement('div');
+        cont.id = 'toast-container';
+        cont.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;';
+        document.body.appendChild(cont);
+    }
+    const t = document.createElement('div');
+    t.className = `alert alert-${type} shadow d-flex align-items-center gap-2 mb-2`;
+    t.style.cssText = 'min-width:250px;animation:fadeIn .3s;border-radius:10px;';
+    t.innerHTML = `<i class="bi bi-${type==='success'?'check-circle':'exclamation-circle'}"></i><span>${msg}</span>`;
+    cont.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+}
+</script>
+
+{% include 'components/footer.html' %}

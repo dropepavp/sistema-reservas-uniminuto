@@ -1,0 +1,532 @@
+{
+  "auxiliares": {
+    "columnas": [
+      {
+        "nombre": "documento",
+        "tipo": "VARCHAR",
+        "not_null": true,
+        "default": null,
+        "primary_key": true
+      },
+      {
+        "nombre": "nombre_completo",
+        "tipo": "VARCHAR",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "correo",
+        "tipo": "VARCHAR",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "contraseña",
+        "tipo": "VARCHAR",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "rol",
+        "tipo": "VARCHAR",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      }
+    ],
+    "indices": [
+      {
+        "nombre": "sqlite_autoindex_auxiliares_2",
+        "unique": true,
+        "origin": "u"
+      },
+      {
+        "nombre": "sqlite_autoindex_auxiliares_1",
+        "unique": true,
+        "origin": "pk"
+      }
+    ],
+    "foreign_keys": [],
+    "sample_data": {
+      "columns": [
+        "documento",
+        "nombre_completo",
+        "correo",
+        "contraseña",
+        "rol"
+      ],
+      "count": 3
+    }
+  },
+  "festivos": {
+    "columnas": [
+      {
+        "nombre": "fecha",
+        "tipo": "DATE",
+        "not_null": true,
+        "default": null,
+        "primary_key": true
+      },
+      {
+        "nombre": "descripcion",
+        "tipo": "VARCHAR",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      }
+    ],
+    "indices": [
+      {
+        "nombre": "sqlite_autoindex_festivos_1",
+        "unique": true,
+        "origin": "pk"
+      }
+    ],
+    "foreign_keys": [],
+    "sample_data": {
+      "columns": [
+        "fecha",
+        "descripcion"
+      ],
+      "count": 3
+    }
+  },
+  "inventario": {
+    "columnas": [
+      {
+        "nombre": "id",
+        "tipo": "INTEGER",
+        "not_null": true,
+        "default": null,
+        "primary_key": true
+      },
+      {
+        "nombre": "categoria",
+        "tipo": "VARCHAR",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "item",
+        "tipo": "VARCHAR",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "marca_modelo",
+        "tipo": "VARCHAR",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "serial",
+        "tipo": "VARCHAR",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "activo_fijo",
+        "tipo": "VARCHAR",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "numero_inventario",
+        "tipo": "VARCHAR",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "ubicacion_permanente",
+        "tipo": "VARCHAR",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "estado",
+        "tipo": "VARCHAR(16)",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "observaciones",
+        "tipo": "TEXT",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      }
+    ],
+    "indices": [
+      {
+        "nombre": "sqlite_autoindex_inventario_1",
+        "unique": true,
+        "origin": "u"
+      }
+    ],
+    "foreign_keys": [],
+    "sample_data": {
+      "columns": [
+        "id",
+        "categoria",
+        "item",
+        "marca_modelo",
+        "serial",
+        "activo_fijo",
+        "numero_inventario",
+        "ubicacion_permanente",
+        "estado",
+        "observaciones"
+      ],
+      "count": 3
+    }
+  },
+  "prestamos_equipos": {
+    "columnas": [
+      {
+        "nombre": "id_prestamo",
+        "tipo": "INTEGER",
+        "not_null": true,
+        "default": null,
+        "primary_key": true
+      },
+      {
+        "nombre": "id_grupo_prestamo",
+        "tipo": "INTEGER",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "cedula_profesor",
+        "tipo": "INTEGER",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "numero_inventario_equipo",
+        "tipo": "VARCHAR",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "equipo_prestado",
+        "tipo": "VARCHAR",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "nombre_profesor",
+        "tipo": "VARCHAR",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "ubicacion",
+        "tipo": "VARCHAR",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "fecha_prestamo",
+        "tipo": "DATE",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "jornada",
+        "tipo": "VARCHAR",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "hora_inicio",
+        "tipo": "TIME",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "hora_fin",
+        "tipo": "TIME",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "horas_academicas",
+        "tipo": "FLOAT",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "auxiliar_entrega",
+        "tipo": "VARCHAR",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "auxiliar_recibe",
+        "tipo": "VARCHAR",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "hora_devolucion_real",
+        "tipo": "TIME",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "fecha_devolucion",
+        "tipo": "DATE",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "observaciones",
+        "tipo": "TEXT",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "estado",
+        "tipo": "VARCHAR(8)",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      }
+    ],
+    "indices": [],
+    "foreign_keys": [
+      {
+        "from_column": "numero_inventario_equipo",
+        "to_table": "inventario",
+        "to_column": "numero_inventario"
+      },
+      {
+        "from_column": "cedula_profesor",
+        "to_table": "profesores",
+        "to_column": "cedula"
+      }
+    ],
+    "sample_data": {
+      "columns": [
+        "id_prestamo",
+        "id_grupo_prestamo",
+        "cedula_profesor",
+        "numero_inventario_equipo",
+        "equipo_prestado",
+        "nombre_profesor",
+        "ubicacion",
+        "fecha_prestamo",
+        "jornada",
+        "hora_inicio",
+        "hora_fin",
+        "horas_academicas",
+        "auxiliar_entrega",
+        "auxiliar_recibe",
+        "hora_devolucion_real",
+        "fecha_devolucion",
+        "observaciones",
+        "estado"
+      ],
+      "count": 3
+    }
+  },
+  "profesores": {
+    "columnas": [
+      {
+        "nombre": "cedula",
+        "tipo": "INTEGER",
+        "not_null": true,
+        "default": null,
+        "primary_key": true
+      },
+      {
+        "nombre": "nombre_completo",
+        "tipo": "VARCHAR",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "correo",
+        "tipo": "VARCHAR",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "telefono",
+        "tipo": "VARCHAR",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "programa",
+        "tipo": "VARCHAR",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      }
+    ],
+    "indices": [],
+    "foreign_keys": [],
+    "sample_data": {
+      "columns": [
+        "cedula",
+        "nombre_completo",
+        "correo",
+        "telefono",
+        "programa"
+      ],
+      "count": 3
+    }
+  },
+  "reservas": {
+    "columnas": [
+      {
+        "nombre": "id_reserva",
+        "tipo": "INTEGER",
+        "not_null": true,
+        "default": null,
+        "primary_key": true
+      },
+      {
+        "nombre": "cedula_profesor",
+        "tipo": "INTEGER",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "nombre_profesor",
+        "tipo": "VARCHAR",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "nrc",
+        "tipo": "VARCHAR",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "recurso_tipo",
+        "tipo": "VARCHAR",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "recurso_nombre",
+        "tipo": "VARCHAR",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "fecha",
+        "tipo": "DATE",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "jornada",
+        "tipo": "VARCHAR",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "hora_inicio",
+        "tipo": "TIME",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "hora_fin",
+        "tipo": "TIME",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "tipo_reserva",
+        "tipo": "VARCHAR",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "estado",
+        "tipo": "VARCHAR(10)",
+        "not_null": true,
+        "default": null,
+        "primary_key": false
+      },
+      {
+        "nombre": "observaciones",
+        "tipo": "TEXT",
+        "not_null": false,
+        "default": null,
+        "primary_key": false
+      }
+    ],
+    "indices": [],
+    "foreign_keys": [
+      {
+        "from_column": "cedula_profesor",
+        "to_table": "profesores",
+        "to_column": "cedula"
+      }
+    ],
+    "sample_data": {
+      "columns": [
+        "id_reserva",
+        "cedula_profesor",
+        "nombre_profesor",
+        "nrc",
+        "recurso_tipo",
+        "recurso_nombre",
+        "fecha",
+        "jornada",
+        "hora_inicio",
+        "hora_fin",
+        "tipo_reserva",
+        "estado",
+        "observaciones"
+      ],
+      "count": 3
+    }
+  }
+}

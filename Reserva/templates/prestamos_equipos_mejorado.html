@@ -1,0 +1,1881 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<div class="prestamos-ui container-fluid py-4">
+    <!-- Header principal -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-primary text-white p-3 rounded-3"
+                    style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-laptop2" style="font-size: 1.8rem;"></i>
+                </div>
+                <div>
+                    <h1 class="section-title mb-1">Gestión de Préstamos de Equipos</h1>
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-geo-alt"></i> {{ current_user.sede.nombre if current_user and current_user.sede
+                        else 'Todas las Sedes' }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 d-flex gap-2 flex-wrap align-items-center justify-content-end">
+            <a href="#collapsePrestamoForm" class="btn btn-success" data-bs-toggle="collapse">
+                <i class="bi bi-plus-circle"></i> Nuevo Préstamo
+            </a>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-download"></i> Descargar
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item"
+                            href="{{ url_for('prestamos.exportar_prestamos_activos', formato='excel') }}">
+                            <i class="bi bi-file-earmark-excel"></i> Excel
+                        </a></li>
+                    <li><a class="dropdown-item"
+                            href="{{ url_for('prestamos.exportar_prestamos_activos', formato='csv') }}">
+                            <i class="bi bi-file-earmark-csv"></i> CSV
+                        </a></li>
+                </ul>
+            </div>
+            <a href="{{ url_for('prestamos.prestamos_historial') }}" class="btn btn-outline-info">
+                <i class="bi bi-clock-history"></i> Historial
+            </a>
+        </div>
+    </div>
+
+    <!-- Notificaciones de Préstamos Vencidos -->
+    {% if prestamos_vencidos and prestamos_vencidos is defined %}
+    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+        <div class="d-flex align-items-start gap-3">
+            <div>
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            <div class="flex-grow-1">
+                <h5 class="alert-heading">⚠️ Préstamo(s) Vencido(s)</h5>
+                <p class="mb-2">Las siguientes personas superaron su hora de devolución:</p>
+                <ul class="mb-0">
+                    {% for datos in prestamos_vencidos_agrupados %}
+                    <li>{{ datos.nombre }} — {{ datos.cantidad }} elemento(s) (Hora fin: {{ datos.hora_fin }})</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+
+    <!-- Resumen de inventario - Cards mejoradas -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4 col-lg-2 col-6">
+            <div class="card resumen-card bg-gradient"
+                style="background: linear-gradient(135deg, #10b981, #059669) !important;">
+                <div class="card-body">
+                    <div>
+                        <h6 class="card-title text-white-50 mb-1">Portátiles</h6>
+                        <div class="fs-1 fw-bold text-white">{{ disponibles.portatiles.disponible }}</div>
+                        {% if disponibles.portatiles.total > 0 %}
+                        <div class="text-white-50" style="font-size:0.75rem;">de {{ disponibles.portatiles.total }} total</div>
+                        {% endif %}
+                    </div>
+                    <i class="bi bi-laptop opacity-25"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2 col-6">
+            <div class="card resumen-card" style="background: linear-gradient(135deg, #f59e0b, #d97706) !important;">
+                <div class="card-body">
+                    <div>
+                        <h6 class="card-title text-white-50 mb-1">Cargadores</h6>
+                        <div class="fs-1 fw-bold text-white">{{ disponibles.cargadores.disponible }}</div>
+                        {% if disponibles.cargadores.total > 0 %}
+                        <div class="text-white-50" style="font-size:0.75rem;">de {{ disponibles.cargadores.total }} total</div>
+                        {% endif %}
+                    </div>
+                    <i class="bi bi-lightning-charge opacity-25"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2 col-6">
+            <div class="card resumen-card" style="background: linear-gradient(135deg, #ec4899, #be185d) !important;">
+                <div class="card-body">
+                    <div>
+                        <h6 class="card-title text-white-50 mb-1">HDMI</h6>
+                        <div class="fs-1 fw-bold text-white">{{ disponibles.hdmi.disponible }}</div>
+                        {% if disponibles.hdmi.total > 0 %}
+                        <div class="text-white-50" style="font-size:0.75rem;">de {{ disponibles.hdmi.total }} total</div>
+                        {% endif %}
+                    </div>
+                    <i class="bi bi-usb-c opacity-25"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2 col-6">
+            <div class="card resumen-card" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9) !important;">
+                <div class="card-body">
+                    <div>
+                        <h6 class="card-title text-white-50 mb-1">Controles</h6>
+                        <div class="fs-1 fw-bold text-white">{{ disponibles.controles.disponible }}</div>
+                        {% if disponibles.controles.total > 0 %}
+                        <div class="text-white-50" style="font-size:0.75rem;">de {{ disponibles.controles.total }} total</div>
+                        {% endif %}
+                    </div>
+                    <i class="bi bi-remote opacity-25"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2 col-6">
+            <div class="card resumen-card" style="background: linear-gradient(135deg, #0ea5e9, #0369a1) !important;">
+                <div class="card-body">
+                    <div>
+                        <h6 class="card-title text-white-50 mb-1">Teclados</h6>
+                        <div class="fs-1 fw-bold text-white">{{ disponibles.teclados.disponible }}</div>
+                        {% if disponibles.teclados.total > 0 %}
+                        <div class="text-white-50" style="font-size:0.75rem;">de {{ disponibles.teclados.total }} total</div>
+                        {% endif %}
+                    </div>
+                    <i class="bi bi-keyboard opacity-25"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas de Préstamos -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="bg-success bg-opacity-10 p-3 rounded-3">
+                        <i class="bi bi-check-circle text-success" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                        <p class="text-muted mb-1">Activos Ahora</p>
+                        <h3 class="mb-0">{{ total_activos or 0 }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded-3">
+                        <i class="bi bi-arrow-return-left text-primary" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                        <p class="text-muted mb-1">Devueltos</p>
+                        <h3 class="mb-0">{{ total_devueltos or 0 }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="bg-danger bg-opacity-10 p-3 rounded-3">
+                        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                        <p class="text-muted mb-1">Vencidos</p>
+                        <h3 class="mb-0">{{ total_vencidos or 0 }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="bg-secondary bg-opacity-10 p-3 rounded-3">
+                        <i class="bi bi-graph-up text-secondary" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                        <p class="text-muted mb-1">Total Realizados</p>
+                        <h3 class="mb-0">{{ total_realizados or 0 }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de Préstamo (Colapsible) -->
+    <!-- Formulario de Préstamo (Colapsible) -->
+    <div class="card mb-4 border-0 shadow-sm rounded-3">
+        <a class="card-header text-white text-decoration-none d-flex justify-content-between align-items-center cursor-pointer py-3"
+            style="background: linear-gradient(135deg, #1e3a5f, #2d6a9f); border-radius: 12px 12px 0 0;" data-bs-toggle="collapse"
+            href="#collapsePrestamoForm" role="button">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-plus-circle me-2"></i>Registrar Nuevo Préstamo</h5>
+            <i class="bi bi-chevron-down transition"></i>
+        </a>
+        <div class="collapse show" id="collapsePrestamoForm">
+            <div class="card-body p-4">
+                <form id="formPrestamo">
+                    <div class="row g-3 mb-4">
+                        <!-- Profesor -->
+                        <div class="col-md-6 position-relative">
+                            <label class="form-label fw-bold" for="busqueda_profesor">
+                                <i class="bi bi-person-badge text-primary me-1"></i> Profesor (Nombre o Cédula / Carnet)
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-upc-scan"></i></span>
+                                <input type="text" class="form-control form-control-lg" id="busqueda_profesor"
+                                    placeholder="Escanear carnet o escribir cédula/nombre..." autocomplete="off" required>
+                                <button class="btn btn-outline-secondary" type="button" id="btnLimpiarProfesor" title="Limpiar">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                            <input type="hidden" id="cedula_profesor" name="cedula">
+                            <div id="sugerenciasProfesores" class="list-group position-absolute w-100 shadow-lg"
+                                style="display:none; max-height: 220px; overflow-y: auto; z-index: 1050;">
+                            </div>
+
+                            <!-- Alerta de Mora / Préstamos Activos del Docente -->
+                            <div id="alertaMoraDocente" class="mt-2" style="display:none;"></div>
+                        </div>
+
+                        <!-- Ubicación -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" for="ubicacion">
+                                <i class="bi bi-geo-alt text-danger me-1"></i> Ubicación / Salón
+                            </label>
+                            <input type="text" class="form-control form-control-lg" id="ubicacion"
+                                placeholder="Ej: A501, B202, LS5..." list="lista-salones-sugeridos" required>
+                            <datalist id="lista-salones-sugeridos">
+                                <option value="A201"></option><option value="A205"></option><option value="A301"></option><option value="A305"></option><option value="A401"></option><option value="A501"></option>
+                                <option value="B201"></option><option value="B202"></option><option value="B301"></option><option value="B305"></option><option value="B401"></option><option value="B501"></option>
+                                <option value="C301"></option><option value="C401"></option><option value="C501"></option><option value="BIBLIOTECA"></option><option value="CRAII"></option>
+                            </datalist>
+                            <div class="d-flex align-items-center justify-content-between mt-1">
+                                <div id="marca_preview" style="min-height:18px;"></div>
+                                <div class="small">
+                                    <span class="text-muted">Control sugerido:</span>
+                                    <span class="badge bg-secondary" id="badgeControlSugerido">No definido</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Horarios -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" for="hora_inicio">
+                                <i class="bi bi-clock text-info me-1"></i> Hora Inicio
+                            </label>
+                            <input type="text" class="form-control form-control-lg text-center fw-bold" id="hora_inicio" placeholder="HH:MM"
+                                pattern="^([01]\d|2[0-3]):[0-5]\d$" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" for="hora_fin">
+                                <i class="bi bi-hourglass-end text-warning me-1"></i> Hora Fin
+                            </label>
+                            <input type="text" class="form-control form-control-lg text-center fw-bold" id="hora_fin" placeholder="HH:MM"
+                                pattern="^([01]\d|2[0-3]):[0-5]\d$" required>
+                        </div>
+
+                        <!-- Observaciones -->
+                        <div class="col-12">
+                            <label class="form-label fw-semibold" for="observaciones">
+                                <i class="bi bi-chat-dots me-1"></i> Observaciones (Opcional)
+                            </label>
+                            <textarea class="form-control" id="observaciones" rows="2" maxlength="500"
+                                placeholder="Notas adicionales del préstamo..."></textarea>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="col-12 mt-3">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary flex-grow-1 fw-bold py-2 shadow-sm" id="btnAgregarPrestamo" style="font-size:1rem;">
+                                    <i class="bi bi-table me-1"></i> Agregar a tabla (Digitar Equipos)
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary py-2 px-3" id="btnCancelarForm"
+                                    onclick="document.getElementById('collapsePrestamoForm')?.classList.remove('show')">
+                                    <i class="bi bi-x-lg me-1"></i> Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Préstamos Activos -->
+    <div class="card">
+        <div class="card-header" style="background: linear-gradient(135deg, #0dcaf0, #0a8fa3);">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <h5 class="mb-0 text-white"><i class="bi bi-activity"></i> Préstamos Activos</h5>
+                <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-light filtro-btn-activo" id="btnFiltroActivos"
+                        data-filtro="activos">
+                        🟢 Activos ({{ total_activos or 0 }})
+                    </button>
+                    <button type="button" class="btn btn-light" id="btnFiltroDevueltos" data-filtro="devueltos">
+                        🔵 Devueltos ({{ total_devueltos or 0 }})
+                    </button>
+                    <button type="button" class="btn btn-light" id="btnFiltroVencidos" data-filtro="vencidos">
+                        🔴 Vencidos ({{ total_vencidos or 0 }})
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive" id="tablaPrestamosActivosWrap">
+                <table class="table table-hover mb-0" id="tablaPrestamosActivos">
+                    <thead class="table-light text-dark">
+                        <tr>
+                            <th class="text-dark">ID</th>
+                            <th class="text-dark">Profesor</th>
+                            <th class="text-dark">Ubicación</th>
+                            <th class="text-dark">Horario</th>
+                            <th class="text-dark">Equipos</th>
+                            <th class="text-dark">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {% for prestamo in prestamos_activos %}
+                        <tr>
+                            <td><span class="badge bg-dark">{{ prestamo.id_grupo }}</span></td>
+                            <td>
+                                <strong>{{ prestamo.nombre_profesor or '--' }}</strong>
+                            </td>
+                            <td>{{ prestamo.ubicacion or '--' }}</td>
+                            <td>
+                                <div class="fw-bold text-dark">
+                                    <i class="bi bi-clock me-1 text-teal" style="color:#0f766e;"></i>
+                                    {{ prestamo.hora_inicio.strftime('%H:%M') if prestamo.hora_inicio else '--' }} - {{ prestamo.hora_fin.strftime('%H:%M') if prestamo.hora_fin else '--' }}
+                                </div>
+                                <div class="mt-1">
+                                    <span class="badge timer-badge border shadow-xs" 
+                                          data-fecha="{{ prestamo.fecha_prestamo.strftime('%Y-%m-%d') if prestamo.fecha_prestamo else '' }}"
+                                          data-fin="{{ prestamo.hora_fin.strftime('%H:%M') if prestamo.hora_fin else '' }}"
+                                          style="font-size:0.75rem; background:#f8fafc; color:#334155;">
+                                        <i class="bi bi-hourglass-split me-1"></i>Calculando...
+                                    </span>
+                                </div>
+                            </td>
+                            <td style="min-width: 250px;">
+                                <div class="d-flex flex-wrap gap-2">
+                                    {% if prestamo.equipos.portatiles %}
+                                        {% for eq in prestamo.equipos.portatiles %}
+                                            <span class="badge bg-success" title="Portátil">
+                                                <i class="bi bi-laptop"></i> {{ eq.numero_corto or eq.numero }}
+                                            </span>
+                                        {% endfor %}
+                                    {% endif %}
+                                    
+                                    {% if prestamo.equipos.cargadores %}
+                                        {% for eq in prestamo.equipos.cargadores %}
+                                            <span class="badge bg-warning text-dark" title="Cargador">
+                                                <i class="bi bi-lightning-charge"></i> {{ eq.numero_corto or eq.numero }}
+                                            </span>
+                                        {% endfor %}
+                                    {% endif %}
+
+                                    {% if prestamo.equipos.teclados %}
+                                        {% for eq in prestamo.equipos.teclados %}
+                                            <span class="badge bg-primary" title="Teclado">
+                                                <i class="bi bi-keyboard"></i> {{ eq.numero_corto or eq.numero }}
+                                            </span>
+                                        {% endfor %}
+                                    {% endif %}
+
+                                    {% if prestamo.equipos.controles %}
+                                        <span class="badge bg-secondary" title="Controles">
+                                            <i class="bi bi-remote"></i> {{ prestamo.equipos.controles|length }}
+                                        </span>
+                                    {% endif %}
+
+                                    {% if prestamo.equipos.hdmi %}
+                                        <span class="badge bg-info" title="Cables HDMI">
+                                            <i class="bi bi-usb-c"></i> {{ prestamo.equipos.hdmi|length }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <div class="mt-1 small text-muted italic" style="font-size: 0.65rem;">
+                                    Elementos: 
+                                    {% set listado = [] %}
+                                    {% if prestamo.equipos.portatiles %}{% set listado = listado + ["Portátiles (" ~ prestamo.equipos.portatiles|length ~ ")"] %}{% endif %}
+                                    {% if prestamo.equipos.cargadores %}{% set listado = listado + ["Cargadores (" ~ prestamo.equipos.cargadores|length ~ ")"] %}{% endif %}
+                                    {% if prestamo.equipos.teclados %}{% set listado = listado + ["Teclados (" ~ prestamo.equipos.teclados|length ~ ")"] %}{% endif %}
+                                    {% if prestamo.equipos.controles %}{% set listado = listado + ["Controles (" ~ prestamo.equipos.controles|length ~ ")"] %}{% endif %}
+                                    {% if prestamo.equipos.hdmi %}{% set listado = listado + ["Cables HDMI (" ~ prestamo.equipos.hdmi|length ~ ")"] %}{% endif %}
+                                    {{ listado|join(', ') }}
+                                </div>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-info text-white"
+                                    onclick="renovarPrestamo('{{ prestamo.id_grupo }}')" title="Renovar +1 Hora">
+                                    <i class="bi bi-clock-history"></i>
+                                </button>
+                                <button class="btn btn-sm btn-primary"
+                                    onclick="editarPrestamo('{{ prestamo.id_grupo }}')" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-success" data-equipos='{{ prestamo.equipos|tojson|safe }}'
+                                    onclick="abrirModalDevolucion('{{ prestamo.id_grupo }}', this)" title="Devolver">
+                                    <i class="bi bi-arrow-return-left"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tabla Devueltos (Ordenados del más reciente al más antiguo con fecha y hora) -->
+            <div id="tablaPrestamosDevueltosWrap" style="display:none;">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" id="tablaPrestamosDevueltos">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 70px;">ID</th>
+                                <th>Profesor</th>
+                                <th>Ubicación</th>
+                                <th>Fecha y Horario Préstamo</th>
+                                <th><i class="bi bi-calendar-check text-success me-1"></i>Fecha y Hora Devolución</th>
+                                <th>Equipos Devueltos</th>
+                                <th>Recibido Por</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prestamo in prestamos_devueltos %}
+                            <tr>
+                                <td><span class="badge bg-secondary">#{{ prestamo.id_grupo }}</span></td>
+                                <td>
+                                    <div class="fw-bold text-dark">{{ prestamo.nombre_profesor or '--' }}</div>
+                                    {% if prestamo.telefono and prestamo.telefono != '--' %}
+                                    <small class="text-muted"><i class="bi bi-telephone me-1"></i>{{ prestamo.telefono }}</small>
+                                    {% endif %}
+                                </td>
+                                <td><span class="badge bg-light text-dark border">{{ prestamo.ubicacion or '--' }}</span></td>
+                                <td>
+                                    <div class="small fw-semibold text-secondary">
+                                        <i class="bi bi-calendar-event me-1"></i>{{ prestamo.fecha_prestamo.strftime('%d/%m/%Y') if prestamo.fecha_prestamo else '--' }}
+                                    </div>
+                                    <span class="badge bg-primary text-white mt-1">
+                                        <i class="bi bi-clock me-1"></i>{{ prestamo.hora_inicio.strftime('%H:%M') if prestamo.hora_inicio else '--' }} - {{ prestamo.hora_fin.strftime('%H:%M') if prestamo.hora_fin else '--' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if prestamo.fecha_devolucion or prestamo.hora_devolucion_real %}
+                                    <div class="fw-bold text-success">
+                                        <i class="bi bi-check2-circle me-1"></i>{{ prestamo.fecha_devolucion.strftime('%d/%m/%Y') if prestamo.fecha_devolucion else (prestamo.fecha_prestamo.strftime('%d/%m/%Y') if prestamo.fecha_prestamo else '--') }}
+                                    </div>
+                                    <div class="badge bg-success-subtle text-success border border-success-subtle mt-1 fs-6">
+                                        <i class="bi bi-clock-history me-1"></i>{{ prestamo.hora_devolucion_real.strftime('%H:%M') if prestamo.hora_devolucion_real else (prestamo.hora_fin.strftime('%H:%M') if prestamo.hora_fin else '--') }}
+                                    </div>
+                                    {% else %}
+                                    <span class="badge bg-success text-white">✓ Devuelto</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        {% if prestamo.equipos.portatiles %}
+                                            {% for eq in prestamo.equipos.portatiles %}
+                                            <span class="badge bg-success" title="Portátil: {{ eq.item }}"><i class="bi bi-laptop me-1"></i>Portátil {{ eq.numero_corto or eq.numero }}</span>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if prestamo.equipos.cargadores %}
+                                            {% for eq in prestamo.equipos.cargadores %}
+                                            <span class="badge bg-warning text-dark" title="Cargador: {{ eq.item }}"><i class="bi bi-lightning-charge me-1"></i>Cargador {{ eq.numero_corto or eq.numero }}</span>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if prestamo.equipos.hdmi %}
+                                            {% for eq in prestamo.equipos.hdmi %}
+                                            <span class="badge bg-info text-dark" title="HDMI"><i class="bi bi-usb-c me-1"></i>HDMI</span>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if prestamo.equipos.controles %}
+                                            {% for eq in prestamo.equipos.controles %}
+                                            <span class="badge bg-secondary" title="Control: {{ eq.item }}"><i class="bi bi-remote me-1"></i>Control {{ eq.numero_corto or eq.numero }}</span>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if prestamo.equipos.teclados %}
+                                            {% for eq in prestamo.equipos.teclados %}
+                                            <span class="badge bg-primary" title="Teclado"><i class="bi bi-keyboard me-1"></i>Teclado {{ eq.numero_corto or eq.numero }}</span>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if prestamo.equipos.otros %}
+                                            {% for eq in prestamo.equipos.otros %}
+                                            <span class="badge bg-dark" title="{{ eq.item }}"><i class="bi bi-box me-1"></i>{{ eq.item }}</span>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="small text-muted">
+                                        <i class="bi bi-person-check me-1"></i>{{ prestamo.auxiliar_recibe or prestamo.auxiliar_entrega or 'Sistema' }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tabla Vencidos -->
+            <div id="tablaPrestamosVencidosWrap" style="display:none;" class="p-3">
+                <div class="alert alert-danger mb-0">
+                    {% if prestamos_vencidos and prestamos_vencidos is defined %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Profesor</th>
+                                    <th>Equipo</th>
+                                    <th>Vencimiento</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for p in prestamos_vencidos %}
+                                <tr>
+                                    <td><span class="badge bg-danger">{{ p.id_prestamo }}</span></td>
+                                    <td>{{ p.nombre_profesor }}</td>
+                                    <td>{{ p.equipo_prestado }}</td>
+                                    <td><strong>{{ p.hora_fin }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="mb-0"><i class="bi bi-check-circle"></i> No hay préstamos vencidos.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Edición -->
+<div class="modal fade" id="modalEditarPrestamo" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #1e3a5f, #2d6a9f);">
+                <h5 class="modal-title text-white"><i class="bi bi-pencil-square"></i> Editar Préstamo</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditarPrestamo">
+                    <input type="hidden" id="edit_id_grupo">
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Ubicación</label>
+                            <input type="text" class="form-control" id="edit_ubicacion">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="edit_fecha_prestamo">
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Hora Inicio</label>
+                            <input type="time" class="form-control" id="edit_hora_inicio">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Hora Fin</label>
+                            <input type="time" class="form-control" id="edit_hora_fin">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Observaciones</label>
+                        <textarea class="form-control" id="edit_observaciones" rows="2"></textarea>
+                    </div>
+
+                    <hr>
+                    <h6 class="mb-3"><i class="bi bi-box-seam"></i> Equipos Prestados</h6>
+                    <div id="edit_items_container" class="border rounded p-3 bg-light">
+                        <!-- Los items se cargarán dinámicamente aquí -->
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="guardarEdicionPrestamo()">
+                    <i class="bi bi-save"></i> Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Devolución Parcial -->
+<div class="modal fade" id="modalDevolucion" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="bi bi-arrow-return-left"></i> Devolver Préstamo</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formDevolucion">
+                    <input type="hidden" id="devolucion_id_grupo">
+                    
+                    <!-- Escaneo rápido en devolución -->
+                    <div class="mb-3 p-2 bg-light rounded border">
+                        <label class="form-label fw-bold small text-muted text-uppercase mb-1" for="scan_devolucion_codigo">
+                            <i class="bi bi-upc-scan text-success me-1"></i>Escanear Placa / Código para Devolver:
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="bi bi-barcode"></i></span>
+                            <input type="text" class="form-control" id="scan_devolucion_codigo"
+                                   placeholder="Escanear o escribir placa..." autocomplete="off">
+                            <button class="btn btn-outline-success" type="button" id="btnMarcarDevuelto">
+                                <i class="bi bi-check2"></i> Marcar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold small text-dark">Equipos de este préstamo:</span>
+                        <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" id="btnMarcarTodosDevolucion">
+                            Marcar todos
+                        </button>
+                    </div>
+
+                    <div id="listaEquiposDevolver" class="mb-3 list-group" style="max-height:220px; overflow-y:auto;">
+                        <!-- Generado por JS -->
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small" for="devolucion_observaciones">Novedades / Observaciones (Opcional)</label>
+                        <textarea class="form-control" id="devolucion_observaciones" rows="2"
+                            placeholder="Ej: Equipo entregado en perfecto estado..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="confirmarDevolucion()">Confirmar
+                    Devolución</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CSS del módulo -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/prestamos_mejorado.css') }}">
+
+<!-- Scripts originales del prestamos_equipos_nuevo.html -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Inicializar horas por defecto
+        const now = new Date();
+        const pad = (n) => String(n).padStart(2, '0');
+        const horaActual = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+        
+        const hInicioInput = document.getElementById('hora_inicio');
+        const hFinInput = document.getElementById('hora_fin');
+        
+        if (hInicioInput && !hInicioInput.value) {
+            hInicioInput.value = horaActual;
+        }
+        
+        if (hFinInput && !hFinInput.value) {
+            const hFin = new Date(now.getTime() + (2 * 60 * 60 * 1000));
+            hFinInput.value = `${pad(hFin.getHours())}:${pad(hFin.getMinutes())}`;
+        }
+
+        // Mostrar sección de equipos cuando se selecciona profesor
+        function mostrarSeccionEquipos() {
+            const seccionEquipos = document.getElementById('seccion_equipos');
+            const seccionTablaEquipos = document.getElementById('seccion_tabla_equipos');
+            if (seccionEquipos) seccionEquipos.style.display = 'block';
+            if (seccionTablaEquipos) seccionTablaEquipos.style.display = 'block';
+        }
+
+        mostrarSeccionEquipos();
+
+        // Funciones de notificación mejorada
+        function mostrarNotificacion(mensaje, tipo) {
+            const alerta = document.createElement('div');
+            alerta.className = `alert alert-${tipo} alert-dismissible fade show position-fixed prestamo-toast`;
+            alerta.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alerta.innerHTML = `
+            ${mensaje}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+            document.body.appendChild(alerta);
+            setTimeout(() => alerta.remove(), 3500);
+        }
+
+        // Filtros de tabla
+        function setFiltroPrestamos(which) {
+            const wA = document.getElementById('tablaPrestamosActivosWrap');
+            const wD = document.getElementById('tablaPrestamosDevueltosWrap');
+            const wV = document.getElementById('tablaPrestamosVencidosWrap');
+
+            const btnA = document.getElementById('btnFiltroActivos');
+            const btnD = document.getElementById('btnFiltroDevueltos');
+            const btnV = document.getElementById('btnFiltroVencidos');
+
+            [btnA, btnD, btnV].forEach(b => b?.classList.remove('filtro-btn-activo'));
+
+            if (which === 'activos') {
+                if (wA) wA.style.display = 'block';
+                if (wD) wD.style.display = 'none';
+                if (wV) wV.style.display = 'none';
+                if (btnA) btnA.classList.add('filtro-btn-activo');
+            } else if (which === 'devueltos') {
+                if (wA) wA.style.display = 'none';
+                if (wD) wD.style.display = 'block';
+                if (wV) wV.style.display = 'none';
+                if (btnD) btnD.classList.add('filtro-btn-activo');
+            } else if (which === 'vencidos') {
+                if (wA) wA.style.display = 'none';
+                if (wD) wD.style.display = 'none';
+                if (wV) wV.style.display = 'block';
+                if (btnV) btnV.classList.add('filtro-btn-activo');
+            }
+        }
+
+        document.getElementById('btnFiltroActivos')?.addEventListener('click', () => setFiltroPrestamos('activos'));
+        document.getElementById('btnFiltroDevueltos')?.addEventListener('click', () => setFiltroPrestamos('devueltos'));
+        document.getElementById('btnFiltroVencidos')?.addEventListener('click', () => setFiltroPrestamos('vencidos'));
+
+        setFiltroPrestamos('activos');
+
+        // === AUTOCOMPLETADO Y DETECCIÓN DE MORA DE PROFESORES ===
+        const inputProfesor = document.getElementById('busqueda_profesor');
+        const sugerencias = document.getElementById('sugerenciasProfesores');
+        const cedulaHidden = document.getElementById('cedula_profesor');
+        const alertaMora = document.getElementById('alertaMoraDocente');
+
+        function ocultarSugerencias() {
+            if (sugerencias) sugerencias.style.display = 'none';
+        }
+
+        async function verificarEstadoDocente(cedula) {
+            if (!alertaMora || !cedula) return;
+            alertaMora.style.display = 'none';
+            alertaMora.innerHTML = '';
+
+            try {
+                const res = await fetch(`/prestamos/api/docente-estado/${encodeURIComponent(cedula)}`);
+                const data = await res.json();
+
+                if (data && data.success) {
+                    if (data.tiene_mora) {
+                        const itemsTxt = data.vencidos.map(v => `<b>${v.equipo}</b> (${v.numero_corto || v.numero}) - Vencido hace ${v.retraso_minutos} min`).join('<br>');
+                        alertaMora.className = 'alert alert-danger py-2 px-3 small border border-danger mb-0 rounded shadow-xs';
+                        alertaMora.innerHTML = `
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="bi bi-exclamation-octagon-fill fs-5 text-danger flex-shrink-0"></i>
+                                <div>
+                                    <strong class="d-block text-danger">🚨 ATENCIÓN: Docente con Préstamo(s) Vencido(s)</strong>
+                                    <div class="mt-1">${itemsTxt}</div>
+                                    <span class="text-muted small">Requiere devolución de elementos anteriores.</span>
+                                </div>
+                            </div>
+                        `;
+                        alertaMora.style.display = 'block';
+                    } else if (data.tiene_activos) {
+                        const itemsTxt = data.activos.map(a => `<b>${a.equipo}</b> (${a.numero_corto || a.numero}) - Salón ${a.ubicacion}`).join(', ');
+                        alertaMora.className = 'alert alert-warning py-2 px-3 small border border-warning mb-0 rounded shadow-xs';
+                        alertaMora.innerHTML = `
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-info-circle-fill text-warning flex-shrink-0"></i>
+                                <div>
+                                    <strong>Nota:</strong> El docente ya tiene ${data.total_activos} equipo(s) activo(s): <span class="text-muted">${itemsTxt}</span>
+                                </div>
+                            </div>
+                        `;
+                        alertaMora.style.display = 'block';
+                    }
+                }
+            } catch (e) {
+                console.error("Error al verificar estado docente:", e);
+            }
+        }
+
+        function seleccionarProfesor(p) {
+            if (inputProfesor) inputProfesor.value = `${p.nombre_completo || p.nombre} (${p.cedula})`;
+            if (cedulaHidden) cedulaHidden.value = p.cedula;
+            ocultarSugerencias();
+            verificarEstadoDocente(p.cedula);
+            document.getElementById('ubicacion')?.focus();
+        }
+
+        document.getElementById('btnLimpiarProfesor')?.addEventListener('click', () => {
+            if (inputProfesor) inputProfesor.value = '';
+            if (cedulaHidden) cedulaHidden.value = '';
+            if (alertaMora) { alertaMora.style.display = 'none'; alertaMora.innerHTML = ''; }
+            ocultarSugerencias();
+            inputProfesor?.focus();
+        });
+
+        function mostrarSugerencias(items) {
+            if (!sugerencias) return;
+            sugerencias.innerHTML = '';
+            if (!items || items.length === 0) {
+                ocultarSugerencias();
+                return;
+            }
+            items.forEach(p => {
+                const a = document.createElement('button');
+                a.type = 'button';
+                a.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center py-2';
+                a.innerHTML = `
+                    <div>
+                        <strong class="d-block">${p.nombre_completo || p.nombre}</strong>
+                        <span class="text-muted small"><i class="bi bi-card-text"></i> ${p.cedula} ${p.programa ? '· ' + p.programa : ''}</span>
+                    </div>
+                    <span class="badge bg-light text-dark border">Seleccionar</span>
+                `;
+                a.addEventListener('click', () => seleccionarProfesor(p));
+                sugerencias.appendChild(a);
+            });
+            sugerencias.style.display = 'block';
+        }
+
+        async function buscarProfesores(query) {
+            if (!query || query.trim().length < 1) {
+                ocultarSugerencias();
+                return;
+            }
+            try {
+                const res = await fetch(`/profesores/buscar?q=${encodeURIComponent(query.trim())}`);
+                const data = await res.json();
+                const profesores = Array.isArray(data?.profesores) ? data.profesores : Array.isArray(data?.results) ? data.results : [];
+                if (data && data.success && profesores.length > 0) {
+                    mostrarSugerencias(profesores);
+                } else {
+                    ocultarSugerencias();
+                }
+            } catch (e) {
+                ocultarSugerencias();
+            }
+        }
+
+        let timeoutProfes;
+        if (inputProfesor) {
+            inputProfesor.addEventListener('input', function (e) {
+                clearTimeout(timeoutProfes);
+                timeoutProfes = setTimeout(() => buscarProfesores(e.target.value), 250);
+            });
+
+            // Soporte para Código de Barras / Lector en Cédula (Enter)
+            inputProfesor.addEventListener('keydown', async function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const query = e.target.value.trim();
+                    if (!query) return;
+
+                    try {
+                        const res = await fetch(`/profesores/buscar?q=${encodeURIComponent(query)}`);
+                        const data = await res.json();
+                        const profesores = Array.isArray(data?.profesores) ? data.profesores : Array.isArray(data?.results) ? data.results : [];
+                        if (data && data.success && profesores.length > 0) {
+                            const exactMatch = profesores.find(p => String(p.cedula).trim() === query);
+                            const p = exactMatch || profesores[0];
+                            seleccionarProfesor(p);
+                        } else {
+                            mostrarNotificacion('Profesor no encontrado con documento: ' + query, 'warning');
+                        }
+                    } catch (err) {
+                        console.error(err);
+                    }
+                }
+            });
+
+            inputProfesor.addEventListener('blur', function () {
+                setTimeout(ocultarSugerencias, 250);
+            });
+        }
+
+        // === MAPEO DE SALONES Y CONTROL REMOTO SUGERIDO ===
+        const roomBrandMap = {
+            'A205':'SAMSUNG','A301':'PANASONIC','A304':'SAMSUNG','A403':'SAMSUNG',
+            'A501':'PANASONIC','A502':'PANASONIC','A503':'PANASONIC','A504':'PANASONIC','A505':'SAMSUNG',
+            'A506':'PANASONIC','A507':'PANASONIC','A508':'PANASONIC','A509':'PANASONIC','A510':'PANASONIC',
+            'B101':'PANASONIC','B102':'PANASONIC','B103':'PANASONIC','B104':'PANASONIC','B105':'PANASONIC',
+            'B106':'SAMSUNG','B107':'PANASONIC','B108':'PANASONIC','B109':'PANASONIC','B110':'SAMSUNG',
+            'B201':'PANASONIC','B202':'LG','B203':'PANASONIC','B204':'PANASONIC',
+            'B301':'PANASONIC','B302':'PANASONIC','B303':'SAMSUNG','B304':'PANASONIC','B305':'PANASONIC','B306':'SAMSUNG',
+            'B307':'PANASONIC','B308':'PANASONIC','B309':'PANASONIC','B310':'PANASONIC',
+            'B401':'PANASONIC','B402':'PANASONIC','B403':'PANASONIC','B404':'PANASONIC','B405':'PANASONIC',
+            'B406':'SAMSUNG','B407':'PANASONIC','B408':'PANASONIC','B409':'PANASONIC','B410':'SAMSUNG',
+            'B501':'SAMSUNG','B502':'PANASONIC','B503':'PANASONIC','B504':'PANASONIC','B505':'PANASONIC','B506':'PANASONIC',
+            'B602':'PANASONIC','B603':'SAMSUNG','B604':'PANASONIC','B605':'PANASONIC','B606':'PANASONIC','B607':'PANASONIC',
+            'C301':'SAMSUNG','C302':'SAMSUNG','C303':'SAMSUNG','C304':'SAMSUNG','C305':'SAMSUNG',
+            'C306':'PANASONIC','C307':'PANASONIC','C308':'SAMSUNG','C309':'PANASONIC','C310':'PANASONIC','C311':'PANASONIC','C312':'PANASONIC',
+            'C401':'SAMSUNG','C402':'SAMSUNG','C403':'SAMSUNG','C404':'PANASONIC','C405':'SAMSUNG','C406':'PANASONIC',
+            'C407':'SAMSUNG','C408':'SAMSUNG','C409':'SAMSUNG','C410':'PANASONIC','C411':'SAMSUNG','C412':'PANASONIC',
+            'C501':'SAMSUNG','C502':'SAMSUNG','C503':'PANASONIC','C504':'SAMSUNG','C505':'PANASONIC','C506':'SAMSUNG',
+            'C507':'PANASONIC','C508':'PANASONIC','C509':'SAMSUNG','C510':'PANASONIC',
+            'C601':'SAMSUNG','C602':'SAMSUNG','C603':'SAMSUNG','C604':'SAMSUNG','C605':'PANASONIC','C606':'PANASONIC','C607':'PANASONIC','C608':'SAMSUNG','C609':'SAMSUNG',
+            'D501':'SAMSUNG','D502':'PANASONIC','D503':'PANASONIC','D504':'PANASONIC','D505':'PANASONIC','D506':'PANASONIC',
+            'D601':'PANASONIC','D602':'PANASONIC','D603':'SAMSUNG','D605':'PANASONIC','D606':'PANASONIC','D607':'PANASONIC',
+            'LS1':'PANASONIC','LS2':'PANASONIC','LS3':'PANASONIC'
+        };
+
+        function getBrandsForUbicacion(text) {
+            if (!text) return [];
+            const found = new Set();
+            const cleanText = text.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            Object.keys(roomBrandMap).forEach(room => {
+                const cleanRoom = room.replace(/[^A-Z0-9]/g, '');
+                if (cleanText.includes(cleanRoom)) {
+                    found.add(roomBrandMap[room]);
+                }
+            });
+            return Array.from(found);
+        }
+
+        const inputUbicacion = document.getElementById('ubicacion');
+        if (inputUbicacion) {
+            inputUbicacion.addEventListener('input', function() {
+                const marcas = getBrandsForUbicacion(this.value);
+                const badgeCtrl = document.getElementById('badgeControlSugerido');
+                const previewEl = document.getElementById('marca_preview');
+                if (marcas.length > 0) {
+                    if (badgeCtrl) { badgeCtrl.className = 'badge bg-dark fw-bold'; badgeCtrl.textContent = marcas.join(', '); }
+                    if (previewEl) { previewEl.innerHTML = marcas.map(m => `<span class="badge bg-dark me-1"><i class="bi bi-remote"></i> Control ${m}</span>`).join(''); }
+                } else {
+                    if (badgeCtrl) { badgeCtrl.className = 'badge bg-secondary'; badgeCtrl.textContent = 'No definido'; }
+                    if (previewEl) { previewEl.innerHTML = ''; }
+                }
+            });
+        }
+
+        // === FORMULARIO DE PRÉSTAMO → AGREGAR FILA BORRADOR A LA TABLA (FLUJO ULTRARRÁPIDO) ===
+        document.getElementById('formPrestamo')?.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const cedula      = (cedulaHidden && cedulaHidden.value) ? cedulaHidden.value.trim() : '';
+            const nombreProf  = document.getElementById('busqueda_profesor')?.value?.trim() || '';
+            const ubicacion   = document.getElementById('ubicacion')?.value?.trim() || '';
+            const horaInicio  = document.getElementById('hora_inicio')?.value?.trim() || '';
+            const horaFin     = document.getElementById('hora_fin')?.value?.trim() || '';
+            const observ      = document.getElementById('observaciones')?.value?.trim() || '';
+
+            if (!cedula) { mostrarNotificacion('Seleccione o escanee un profesor', 'warning'); return; }
+            if (!ubicacion) { mostrarNotificacion('Ingrese la ubicación o salón', 'warning'); return; }
+            if (!horaInicio || !horaFin) { mostrarNotificacion('Ingrese hora de inicio y hora de fin', 'warning'); return; }
+
+            // ID único para la fila borrador
+            const draftId = 'draft_' + Date.now();
+            const marcasRequeridas = getBrandsForUbicacion(ubicacion);
+
+            // Construir lista de campos dinámicos
+            let camposDinamicos = [
+                { id: 'port', label: 'Portátil', icono: 'bi-laptop', color: '#198754', tipo: 'PORTATIL' },
+                { id: 'carg', label: 'Cargador', icono: 'bi-lightning-charge', color: '#b45309', tipo: 'CARGADOR' },
+            ];
+
+            // Si hay marcas requeridas para el salón, sugerir control con marca
+            if (marcasRequeridas.length > 0) {
+                marcasRequeridas.forEach((m, idx) => {
+                    camposDinamicos.push({ 
+                        id: `ctrl_${idx}`, 
+                        label: `Control ${m}`, 
+                        icono: 'bi-remote', 
+                        color: '#6c757d', 
+                        tipo: 'CONTROL',
+                        marca: m 
+                    });
+                });
+            } else {
+                camposDinamicos.push({ id: 'ctrl', label: 'Control', icono: 'bi-remote', color: '#6c757d', tipo: 'CONTROL' });
+            }
+
+            camposDinamicos.push({ id: 'tecl', label: 'Teclado', icono: 'bi-keyboard', color: '#6f42c1', tipo: 'TECLADO' });
+
+            // Construir celdas de equipos con input para digitar número directo o escanear placa
+            const celdasEq = camposDinamicos.map(c => `
+                <div class="p-1 rounded bg-white border" style="border-color:${c.color}40 !important;">
+                    <label class="d-flex align-items-center gap-1 mb-1" style="font-size:0.72rem;color:${c.color};font-weight:700;">
+                        <input type="checkbox" class="form-check-input m-0 draft-chk" id="${draftId}_chk_${c.id}" checked style="width:13px;height:13px;">
+                        <i class="bi ${c.icono}"></i> ${c.label}
+                    </label>
+                    <input type="text" class="form-control form-control-sm draft-eq-input text-center fw-bold" id="${draftId}_num_${c.id}"
+                        placeholder="N° / Placa" autocomplete="off" data-tipo="${c.tipo}" data-draftid="${draftId}" data-field="${c.id}"
+                        ${c.marca ? `data-marca="${c.marca}"` : ''}
+                        style="border-color:${c.color};font-size:0.85rem;">
+                    <div id="${draftId}_fb_${c.id}" class="mt-1" style="font-size:0.68rem;min-height:16px;"></div>
+                    <input type="hidden" id="${draftId}_id_${c.id}">
+                </div>
+            `);
+
+            // Fila HDMI (Sí/No)
+            const hdmiCell = `
+                <div class="p-1 rounded bg-white border" style="border-color:#0891b240 !important;">
+                    <label class="d-flex align-items-center gap-1 mb-1" style="font-size:0.72rem;color:#0891b2;font-weight:700;">
+                        <i class="bi bi-usb-c"></i> HDMI
+                    </label>
+                    <div class="d-flex justify-content-center gap-2 mt-1">
+                        <div class="form-check form-check-inline m-0">
+                            <input class="form-check-input" type="radio" name="${draftId}_hdmi" id="${draftId}_hdmi_si" value="si" style="accent-color:#0891b2;">
+                            <label class="form-check-label fw-bold" for="${draftId}_hdmi_si" style="font-size:0.78rem;color:#0891b2;">Sí</label>
+                        </div>
+                        <div class="form-check form-check-inline m-0">
+                            <input class="form-check-input" type="radio" name="${draftId}_hdmi" id="${draftId}_hdmi_no" value="no" checked>
+                            <label class="form-check-label text-muted" for="${draftId}_hdmi_no" style="font-size:0.78rem;">No</label>
+                        </div>
+                    </div>
+                    <div id="${draftId}_fb_hdmi" class="mt-1 text-center" style="font-size:0.68rem;min-height:16px;"></div>
+                </div>
+            `;
+
+            // Selector de tabla robusto
+            const tableWrap = document.getElementById('tablaPrestamosActivosWrap');
+            const tbody = tableWrap ? tableWrap.querySelector('tbody') : (document.querySelector('#tablaPrestamosActivos tbody') || document.querySelector('table.table-hover tbody'));
+            if (!tbody) { mostrarNotificacion('No se encontró la tabla de préstamos', 'danger'); return; }
+
+            // Eliminar borrador anterior si existe
+            document.querySelectorAll('.draft-row').forEach(r => r.remove());
+
+            const fila = document.createElement('tr');
+            fila.id = draftId;
+            fila.className = 'draft-row table-primary align-middle border-bottom border-primary';
+            fila.innerHTML = `
+                <td class="text-center"><i class="bi bi-hourglass-split text-primary fs-5" title="Borrador Activo"></i></td>
+                <td style="min-width:180px;">
+                    <strong class="text-primary fs-6">${nombreProf}</strong>
+                    <input type="hidden" id="${draftId}_cedula" value="${cedula}">
+                </td>
+                <td><span class="badge bg-light text-dark border fw-bold">${ubicacion || 'Sin salón'}</span></td>
+                <td><span class="badge bg-primary text-white">${horaInicio} - ${horaFin}</span></td>
+                <td style="min-width:580px; padding:6px 8px;">
+                    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;">
+                        ${celdasEq.slice(0,2).join('')}
+                        ${hdmiCell}
+                        ${celdasEq.slice(2).join('')}
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex flex-column gap-1">
+                        <button class="btn btn-sm btn-success fw-bold draft-prestar-btn py-2 shadow-sm" data-draftid="${draftId}"
+                            data-cedula="${cedula}" data-hinicio="${horaInicio}" data-hfin="${horaFin}"
+                            data-ubicacion="${encodeURIComponent(ubicacion)}" data-observ="${encodeURIComponent(observ)}">
+                            <i class="bi bi-check2-circle me-1"></i> Prestar
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="document.getElementById('${draftId}')?.remove()" title="Cancelar borrador">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
+
+            // Insertar la fila borrador al inicio del tbody
+            tbody.insertBefore(fila, tbody.firstChild);
+
+            // Colapsar el formulario y enfocar el primer input
+            document.getElementById('collapsePrestamoForm')?.classList.remove('show');
+            fila.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            mostrarNotificacion(`Borrador listo para ${nombreProf}. Digita los números y pulsa Prestar.`, 'info');
+
+            // Enfocar input de portátil inmediatamente
+            const primerInput = fila.querySelector('.draft-eq-input');
+            if (primerInput) setTimeout(() => primerInput.focus(), 300);
+
+            // --- Búsqueda y validación instantánea al digitar número o escanear placa ---
+            fila.querySelectorAll('.draft-eq-input').forEach(async inputEl => {
+                const dId    = inputEl.getAttribute('data-draftid');
+                const field  = inputEl.getAttribute('data-field');
+                const tipo   = inputEl.getAttribute('data-tipo');
+                const marca  = inputEl.getAttribute('data-marca');
+                
+                const fbEl   = fila.querySelector(`#${dId}_fb_${field}`);
+                const hidEl  = fila.querySelector(`#${dId}_id_${field}`);
+                const chkEl  = fila.querySelector(`#${dId}_chk_${field}`);
+
+                // Si es un control con marca requerida por salón, pre-cargar automáticamente
+                if (marca && tipo === 'CONTROL') {
+                    if (fbEl) fbEl.innerHTML = '<span class="text-muted small"><i class="bi bi-search"></i> Buscando...</span>';
+                    try {
+                        const data = await fetch(`/prestamos/buscar-equipos?tipo_equipo=CONTROL&marca=${marca}`).then(r => r.json());
+                        if (data?.success && data.equipos?.length > 0) {
+                            const eq = data.equipos[0];
+                            const identificador = (eq.activo_fijo && String(eq.activo_fijo).trim()) ? eq.activo_fijo : eq.numero_inventario;
+                            inputEl.value = eq.numero_corto || eq.numero_inventario;
+                            if (hidEl) hidEl.value = identificador;
+                            if (fbEl) fbEl.innerHTML = `<span class="text-success fw-bold" style="font-size:0.68rem;"><i class="bi bi-check-circle-fill"></i> ${eq.item}</span>`;
+                        } else {
+                            if (fbEl) fbEl.innerHTML = '<span class="text-warning small" style="font-size:0.68rem;"><i class="bi bi-exclamation-triangle"></i> No disponible</span>';
+                        }
+                    } catch (e) { console.error("Error buscando control:", e); }
+                }
+
+                // Checkbox toggle
+                if (chkEl) {
+                    chkEl.addEventListener('change', () => {
+                        inputEl.disabled = !chkEl.checked;
+                        inputEl.style.opacity = chkEl.checked ? '1' : '0.4';
+                        if (!chkEl.checked) { inputEl.value = ''; hidEl.value = ''; if(fbEl) fbEl.innerHTML = ''; }
+                    });
+                }
+
+                let _dt;
+                inputEl.addEventListener('input', function () {
+                    clearTimeout(_dt);
+                    const num = this.value.trim();
+                    if (hidEl) hidEl.value = '';
+                    if (!num) { if (fbEl) fbEl.innerHTML = ''; return; }
+                    if (fbEl) fbEl.innerHTML = '<span class="text-muted"><i class="bi bi-hourglass-split"></i></span>';
+                    _dt = setTimeout(async () => {
+                        try {
+                            // Buscar tanto por filtro como por escaneo unificado
+                            const params = new URLSearchParams({ numero_inventario: num, tipo_equipo: tipo });
+                            const data = await fetch(`/prestamos/buscar-equipos?${params}`).then(r => r.json());
+                            if (data?.success && data.equipos?.length > 0) {
+                                const eq = data.equipos[0];
+                                const id = (eq.activo_fijo && String(eq.activo_fijo).trim()) ? eq.activo_fijo : eq.numero_inventario;
+                                if (hidEl) hidEl.value = id;
+                                if (fbEl) fbEl.innerHTML = `<span class="text-success fw-bold" style="font-size:0.68rem;"><i class="bi bi-check-circle-fill"></i> ${eq.item} ${eq.marca ? '· ' + eq.marca : ''}</span>`;
+                            } else {
+                                if (fbEl) fbEl.innerHTML = '<span class="text-danger" style="font-size:0.68rem;"><i class="bi bi-x-circle-fill"></i> No disponible</span>';
+                            }
+                        } catch { if (fbEl) fbEl.innerHTML = '<span class="text-danger">Error</span>'; }
+                    }, 300);
+                });
+
+                // Soporte para tecla Enter al escanear código en el input: salta al siguiente campo
+                inputEl.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const inputs = Array.from(fila.querySelectorAll('.draft-eq-input:not([disabled])'));
+                        const idx = inputs.indexOf(inputEl);
+                        if (idx >= 0 && idx < inputs.length - 1) {
+                            inputs[idx + 1].focus();
+                        } else {
+                            fila.querySelector('.draft-prestar-btn')?.focus();
+                        }
+                    }
+                });
+            });
+
+            // --- BOTÓN PRESTAR DE LA FILA BORRADOR ---
+            fila.querySelector('.draft-prestar-btn')?.addEventListener('click', async function () {
+                const dId       = this.getAttribute('data-draftid');
+                const cedula    = this.getAttribute('data-cedula');
+                const hInicio   = this.getAttribute('data-hinicio');
+                const hFin      = this.getAttribute('data-hfin');
+                const ubicEnc   = this.getAttribute('data-ubicacion');
+                const observEnc = this.getAttribute('data-observ');
+
+                // Recolectar items con inventario
+                const items = [];
+                fila.querySelectorAll('input[id^="' + dId + '_id_"]').forEach(hid => {
+                    const fieldId = hid.id.replace(dId + '_id_', '');
+                    const chk = document.getElementById(`${dId}_chk_${fieldId}`);
+                    if (chk && chk.checked && hid.value.trim()) {
+                        items.push(hid.value.trim());
+                    }
+                });
+
+                // HDMI Si/No
+                const hdmiSi = document.getElementById(`${dId}_hdmi_si`)?.checked;
+                const fbHdmi = document.getElementById(`${dId}_fb_hdmi`);
+                if (hdmiSi) {
+                    const hdmiRes = await fetch('/prestamos/buscar-equipos?tipo_equipo=HDMI').then(r=>r.json()).catch(()=>null);
+                    if (hdmiRes?.success && hdmiRes.equipos?.length > 0) {
+                        const eq = hdmiRes.equipos[0];
+                        items.push((eq.activo_fijo && String(eq.activo_fijo).trim()) ? eq.activo_fijo : eq.numero_inventario);
+                        if (fbHdmi) fbHdmi.innerHTML = `<span style="color:#198754;"><i class="bi bi-check-circle-fill"></i> ${eq.item}</span>`;
+                    } else {
+                        if (fbHdmi) fbHdmi.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle-fill"></i> Sin HDMI</span>';
+                        mostrarNotificacion('No hay cables HDMI disponibles', 'warning');
+                        return;
+                    }
+                }
+
+                if (items.length === 0) {
+                    mostrarNotificacion('Digite al menos un número de equipo válido antes de prestar', 'warning');
+                    return;
+                }
+
+                const payload = {
+                    cedula: cedula,
+                    items: items,
+                    hora_inicio: hInicio,
+                    hora_fin: hFin,
+                    ubicacion: decodeURIComponent(ubicEnc),
+                    observaciones: decodeURIComponent(observEnc)
+                };
+
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+                LoadingUI.show('Registrando préstamo...');
+
+                fetch('/prestamos/nuevo', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
+                .then(r => r.json())
+                .then(json => {
+                    LoadingUI.hide();
+                    if (json?.success) {
+                        LoadingUI.toast(`Préstamo registrado con éxito`, 'success');
+                        setTimeout(() => location.reload(), 800);
+                    } else {
+                        LoadingUI.toast(json?.message || 'Error al guardar préstamo', 'danger');
+                        this.disabled = false;
+                        this.innerHTML = '<i class="bi bi-check2-circle me-1"></i> Prestar';
+                    }
+                })
+                .catch(() => {
+                    LoadingUI.hide();
+                    LoadingUI.toast('Error de conexión', 'danger');
+                    this.disabled = false;
+                    this.innerHTML = '<i class="bi bi-check2-circle me-1"></i> Prestar';
+                });
+            });
+        });
+
+        // === AUTO-CARGA DESDE RESERVAS (1-CLIC CONVERSIÓN A PRÉSTAMO) ===
+        const urlParams = new URLSearchParams(window.location.search);
+        const autoCedula    = urlParams.get('cedula');
+        const autoProfesor  = urlParams.get('profesor');
+        const autoUbicacion = urlParams.get('ubicacion');
+        const autoHInicio   = urlParams.get('hora_inicio');
+        const autoHFin      = urlParams.get('hora_fin');
+        const autoObs       = urlParams.get('observaciones');
+        const autoBorrador  = urlParams.get('auto_borrador');
+
+        if (autoCedula || autoProfesor) {
+            if (cedulaHidden) cedulaHidden.value = autoCedula || '';
+            if (inputProfesor) {
+                inputProfesor.value = autoProfesor ? `${autoProfesor} (${autoCedula})` : autoCedula;
+            }
+            if (document.getElementById('ubicacion') && autoUbicacion) {
+                const uEl = document.getElementById('ubicacion');
+                uEl.value = autoUbicacion;
+                uEl.dispatchEvent(new Event('input'));
+            }
+            if (document.getElementById('hora_inicio') && autoHInicio) document.getElementById('hora_inicio').value = autoHInicio;
+            if (document.getElementById('hora_fin') && autoHFin) document.getElementById('hora_fin').value = autoHFin;
+            if (document.getElementById('observaciones') && autoObs) document.getElementById('observaciones').value = autoObs;
+
+            if (autoBorrador === '1') {
+                setTimeout(() => {
+                    const formPrestamoEl = document.getElementById('formPrestamo');
+                    if (formPrestamoEl) {
+                        formPrestamoEl.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                    }
+                }, 350);
+            }
+        }
+
+        // === TEMPORIZADOR EN VIVO / LIVE COUNTDOWN TIMERS ===
+        function actualizarTemporizadores() {
+            const badges = document.querySelectorAll('.timer-badge');
+            const now = new Date();
+
+            badges.forEach(badge => {
+                const fechaStr = badge.getAttribute('data-fecha');
+                const finStr   = badge.getAttribute('data-fin');
+
+                if (!fechaStr || !finStr) {
+                    badge.innerHTML = '<i class="bi bi-dash"></i>';
+                    return;
+                }
+
+                // Crear timestamp límite
+                const [anio, mes, dia] = fechaStr.split('-').map(Number);
+                const [hora, min]      = finStr.split(':').map(Number);
+                const deadline = new Date(anio, mes - 1, dia, hora, min, 0);
+
+                const diffMs = deadline - now;
+                const diffMins = Math.round(diffMs / 60000);
+
+                if (diffMins > 30) {
+                    const h = Math.floor(diffMins / 60);
+                    const m = diffMins % 60;
+                    badge.className = 'badge bg-success text-white timer-badge shadow-xs';
+                    badge.innerHTML = `<i class="bi bi-clock-history me-1"></i>${h > 0 ? h + 'h ' : ''}${m}m restantes`;
+                } else if (diffMins >= 0 && diffMins <= 30) {
+                    badge.className = 'badge bg-warning text-dark timer-badge fw-bold shadow-xs';
+                    badge.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-1"></i>Por vencer: ${diffMins}m`;
+                } else {
+                    const retraso = Math.abs(diffMins);
+                    const h = Math.floor(retraso / 60);
+                    const m = retraso % 60;
+                    badge.className = 'badge bg-danger text-white timer-badge fw-bold shadow-xs';
+                    badge.innerHTML = `<i class="bi bi-alarm-fill me-1"></i>Vencido (+${h > 0 ? h + 'h ' : ''}${m}m)`;
+                }
+            });
+        }
+
+        // Ejecutar inmediatamente y cada 30 segundos
+        actualizarTemporizadores();
+        setInterval(actualizarTemporizadores, 30000);
+
+        // === MODAL DE DEVOLUCIÓN EXPRESS CON ESCÁNER ===
+        window.abrirModalDevolucion = function (idGrupo, btnElement) {
+            document.getElementById('devolucion_id_grupo').value = idGrupo;
+            document.getElementById('devolucion_observaciones').value = '';
+
+            const listaCont = document.getElementById('listaEquiposDevolver');
+            listaCont.innerHTML = '';
+
+            try {
+                const equiposDict = JSON.parse(btnElement.getAttribute('data-equipos'));
+                let count = 0;
+                Object.values(equiposDict).forEach(listaEq => {
+                    listaEq.forEach(eq => {
+                        count++;
+                        const idCb = 'cb_dev_' + eq.numero;
+                        listaCont.innerHTML += `
+                            <label class="list-group-item list-group-item-action d-flex align-items-center justify-content-between p-2" 
+                                   id="lbl_${eq.numero}" data-num="${eq.numero}" data-corto="${eq.numero_corto || ''}">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input class="form-check-input dev-item-cb" type="checkbox" value="${eq.numero}" id="${idCb}" checked>
+                                    <div>
+                                        <code class="fw-bold text-dark fs-6">${eq.numero_corto || eq.numero}</code>
+                                        <span class="ms-1">${eq.item}</span>
+                                    </div>
+                                </div>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle estado-dev-badge">✓ Marcado</span>
+                            </label>
+                        `;
+                    });
+                });
+                if (count === 0) listaCont.innerHTML = '<div class="text-muted p-2">No hay equipos listados</div>';
+            } catch (e) { console.error(e); }
+
+            const scanDevInput = document.getElementById('scan_devolucion_codigo');
+            if (scanDevInput) {
+                scanDevInput.value = '';
+                setTimeout(() => scanDevInput.focus(), 400);
+            }
+
+            new bootstrap.Modal(document.getElementById('modalDevolucion')).show();
+        };
+
+        // Escáner en Devolución
+        function marcarEquipoEnDevolucion(codigo) {
+            const q = (codigo || '').trim().toLowerCase();
+            if (!q) return;
+
+            const labels = document.querySelectorAll('#listaEquiposDevolver label');
+            let match = false;
+
+            labels.forEach(lbl => {
+                const num = (lbl.getAttribute('data-num') || '').toLowerCase();
+                const corto = (lbl.getAttribute('data-corto') || '').toLowerCase();
+                const cb = lbl.querySelector('.dev-item-cb');
+
+                if (num === q || corto === q || num.includes(q)) {
+                    if (cb) {
+                        cb.checked = true;
+                        lbl.classList.add('bg-success-subtle');
+                        match = true;
+                    }
+                }
+            });
+
+            const scanDevInput = document.getElementById('scan_devolucion_codigo');
+            if (match) {
+                mostrarNotificacion(`Equipo marcado para devolución`, 'success');
+                if (scanDevInput) { scanDevInput.value = ''; scanDevInput.focus(); }
+            } else {
+                mostrarNotificacion(`El código ${codigo} no pertenece a este préstamo`, 'warning');
+            }
+        }
+
+        document.getElementById('scan_devolucion_codigo')?.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                marcarEquipoEnDevolucion(this.value);
+            }
+        });
+
+        document.getElementById('btnMarcarDevuelto')?.addEventListener('click', function() {
+            const scanDevInput = document.getElementById('scan_devolucion_codigo');
+            if (scanDevInput) marcarEquipoEnDevolucion(scanDevInput.value);
+        });
+
+        document.getElementById('btnMarcarTodosDevolucion')?.addEventListener('click', function() {
+            const cbs = document.querySelectorAll('.dev-item-cb');
+            const todosMarcados = Array.from(cbs).every(c => c.checked);
+            cbs.forEach(c => c.checked = !todosMarcados);
+            this.textContent = todosMarcados ? 'Marcar todos' : 'Desmarcar todos';
+        });
+        window.renovarPrestamo = function (idGrupo) {
+            if (!confirm(`¿Renovar préstamo ${idGrupo} por +1 hora?`)) return;
+            LoadingUI.show('Renovando préstamo...');
+            fetch(`/prestamos/renovar/${idGrupo}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ horas_extra: 1 })
+            })
+                .then(r => r.json())
+                .then(json => {
+                    LoadingUI.hide();
+                    if (json && json.success) {
+                        LoadingUI.toast('Préstamo renovado', 'success');
+                        setTimeout(() => location.reload(), 600);
+                    } else {
+                        LoadingUI.toast(json.message || 'Error', 'danger');
+                    }
+                })
+                .catch(() => { LoadingUI.hide(); LoadingUI.toast('Error de conexión', 'danger'); });
+        };
+
+        window.abrirModalDevolucion = function (idGrupo, btnElement) {
+            document.getElementById('devolucion_id_grupo').value = idGrupo;
+            document.getElementById('devolucion_observaciones').value = '';
+
+            const listaCont = document.getElementById('listaEquiposDevolver');
+            listaCont.innerHTML = '';
+
+            try {
+                const equiposDict = JSON.parse(btnElement.getAttribute('data-equipos'));
+                let vacio = true;
+                Object.values(equiposDict).forEach(listaEq => {
+                    listaEq.forEach(eq => {
+                        vacio = false;
+                        const idCb = 'cb_dev_' + eq.numero;
+                        listaCont.innerHTML += `
+                        <label class="list-group-item d-flex align-items-center gap-2" style="cursor: pointer;">
+                            <input class="form-check-input flex-shrink-0 dev-item-cb" type="checkbox" value="${eq.numero}" id="${idCb}" checked>
+                            <span>
+                                <strong>${eq.numero_corto}</strong> - ${eq.item}
+                            </span>
+                        </label>
+                    `;
+                    });
+                });
+                if (vacio) listaCont.innerHTML = '<div class="text-muted">No hay equipos listados</div>';
+            } catch (e) { console.error(e); }
+
+            new bootstrap.Modal(document.getElementById('modalDevolucion')).show();
+        };
+
+        window.confirmarDevolucion = function () {
+            const idGrupo = document.getElementById('devolucion_id_grupo').value;
+            const obs = document.getElementById('devolucion_observaciones').value.trim();
+
+            const cbs = document.querySelectorAll('.dev-item-cb:checked');
+            if (cbs.length === 0) {
+                mostrarNotificacion('Seleccione al menos un equipo para devolver', 'warning');
+                return;
+            }
+            const items_devolver = Array.from(cbs).map(cb => cb.value);
+
+            LoadingUI.show('Procesando devolución...');
+            fetch(`/prestamos/devolver/${idGrupo}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ items_devolver: items_devolver, observaciones: obs })
+            })
+                .then(r => r.json())
+                .then(json => {
+                    LoadingUI.hide();
+                    if (json && json.success) {
+                        LoadingUI.toast('Devolución exitosa', 'success');
+                        bootstrap.Modal.getInstance(document.getElementById('modalDevolucion')).hide();
+                        setTimeout(() => location.reload(), 600);
+                    } else {
+                        LoadingUI.toast(json.message || 'Error', 'danger');
+                    }
+                })
+                .catch(() => { LoadingUI.hide(); LoadingUI.toast('Error de conexión', 'danger'); });
+        };
+
+        window.editarPrestamo = function (idGrupo) {
+            console.log('🔧 editarPrestamo llamado con idGrupo:', idGrupo);
+            
+            fetch(`/prestamos/editar/${idGrupo}`)
+                .then(r => r.json())
+                .then(data => {
+                    console.log('📦 Datos recibidos:', data);
+                    
+                    if (data && data.success && data.prestamo) {
+                        const p = data.prestamo;
+                        console.log('✅ Préstamo cargado:', p);
+                        
+                        document.getElementById('edit_id_grupo').value = idGrupo;
+                        document.getElementById('edit_ubicacion').value = p.ubicacion || '';
+                        document.getElementById('edit_fecha_prestamo').value = p.fecha_prestamo || '';
+                        document.getElementById('edit_hora_inicio').value = p.hora_inicio || '';
+                        document.getElementById('edit_hora_fin').value = p.hora_fin || '';
+                        document.getElementById('edit_observaciones').value = p.observaciones || '';
+
+                        // Cargar equipos con números cortos
+                        const container = document.getElementById('edit_items_container');
+                        console.log('🔍 Container encontrado:', !!container);
+                        
+                        if (container) {
+                            container.innerHTML = '';
+                            const categorias = [
+                                { key: 'portatiles', label: '💻 Portátil',   tipo: 'PORTATIL', color: '#198754' },
+                                { key: 'cargadores', label: '⚡ Cargador',   tipo: 'CARGADOR', color: '#b45309' },
+                                { key: 'hdmi',       label: '🔌 HDMI',       tipo: 'HDMI',     color: '#0891b2' },
+                                { key: 'controles',  label: '🎮 Control',    tipo: 'CONTROL',  color: '#6c757d' },
+                                { key: 'teclados',   label: '⌨️ Teclado',   tipo: 'TECLADO',  color: '#6f42c1' },
+                            ];
+
+                            let hayEquipos = false;
+                            categorias.forEach(cat => {
+                                const lista = p.equipos && p.equipos[cat.key];
+                                if (!lista || lista.length === 0) return;
+                                hayEquipos = true;
+
+                                lista.forEach(eq => {
+                                    // Número corto: solo los dígitos finales sin ceros iniciales
+                                    const numCorto = String(parseInt((eq.numero_inventario || '').replace(/^[^0-9]*/, '') || '0', 10) || eq.numero_inventario || '');
+                                    const row = document.createElement('div');
+                                    row.className = 'item-edit-row d-flex align-items-center gap-2 mb-2 p-2 rounded';
+                                    row.dataset.id = eq.id_prestamo;
+                                    row.style.background = '#f8f9fa';
+                                    row.innerHTML = `
+                                        <span class="badge" style="background:${cat.color};min-width:80px;text-align:center;">${cat.label}</span>
+                                        <div class="flex-grow-1 position-relative">
+                                            <input type="text" class="form-control form-control-sm edit-item-display"
+                                                value="${numCorto}"
+                                                placeholder="Número..."
+                                                data-tipo="${cat.tipo}"
+                                                autocomplete="off"
+                                                style="font-weight:bold;font-size:1rem;">
+                                            <input type="hidden" class="edit-item-num"
+                                                value="${eq.numero_inventario || ''}"
+                                                data-original="${eq.numero_inventario || ''}">
+                                            <div class="edit-item-fb small mt-1" style="min-height:14px;"></div>
+                                            <div class="edit-item-sugerencias list-group position-absolute w-100 shadow"
+                                                style="display:none;z-index:2000;max-height:160px;overflow-y:auto;top:100%;left:0;"></div>
+                                        </div>
+                                    `;
+                                    container.appendChild(row);
+
+                                    const display = row.querySelector('.edit-item-display');
+                                    const hidden  = row.querySelector('.edit-item-num');
+                                    const fb      = row.querySelector('.edit-item-fb');
+                                    const sug     = row.querySelector('.edit-item-sugerencias');
+                                    let _t;
+
+                                    display.addEventListener('input', function() {
+                                        clearTimeout(_t);
+                                        const q = this.value.trim();
+                                        fb.innerHTML = '';
+                                        sug.style.display = 'none';
+                                        hidden.value = '';  // limpiar hasta que seleccione
+                                        if (q.length < 1) return;
+                                        fb.innerHTML = '<span class="text-muted"><i class="bi bi-hourglass-split"></i></span>';
+                                        _t = setTimeout(async () => {
+                                            try {
+                                                const params = new URLSearchParams({ numero_inventario: q, tipo_equipo: cat.tipo });
+                                                const res = await fetch('/prestamos/buscar-equipos?' + params).then(r => r.json());
+                                                if (res?.success && res.equipos?.length > 0) {
+                                                    sug.innerHTML = '';
+                                                    res.equipos.slice(0, 8).forEach(e => {
+                                                        const corto = String(parseInt((e.numero_inventario || '').replace(/^[^0-9]*/, '') || '0', 10) || e.numero_inventario);
+                                                        const btn = document.createElement('button');
+                                                        btn.type = 'button';
+                                                        btn.className = 'list-group-item list-group-item-action py-1 px-2 small';
+                                                        const estado = e.disponible
+                                                            ? '<span class="text-success fw-bold">✓ Disponible</span>'
+                                                            : '<span class="text-danger">✗ Prestado</span>';
+                                                        btn.innerHTML = `<strong>${corto}</strong> <span class="text-muted">(${e.numero_inventario})</span> — ${e.item} ${estado}`;
+                                                        btn.addEventListener('click', () => {
+                                                            display.value = corto;
+                                                            hidden.value  = e.numero_inventario;
+                                                            fb.innerHTML  = `<span class="text-success"><i class="bi bi-check-circle-fill"></i> ${e.item}</span>`;
+                                                            sug.style.display = 'none';
+                                                        });
+                                                        sug.appendChild(btn);
+                                                    });
+                                                    sug.style.display = 'block';
+                                                    fb.innerHTML = '';
+                                                } else {
+                                                    fb.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle"></i> No encontrado</span>';
+                                                    sug.style.display = 'none';
+                                                }
+                                            } catch { fb.innerHTML = '<span class="text-danger">Error</span>'; }
+                                        }, 350);
+                                    });
+                                    document.addEventListener('click', e => { if (!row.contains(e.target)) sug.style.display = 'none'; });
+                                });
+                            });
+
+                            if (!hayEquipos) {
+                                container.innerHTML = '<div class="text-muted small">No hay equipos asignados</div>';
+                            }
+                        }
+
+                        new bootstrap.Modal(document.getElementById('modalEditarPrestamo')).show();
+                    }
+                })
+                .catch(err => {
+                    console.error('❌ Error:', err);
+                });
+        };
+
+        window.guardarEdicionPrestamo = function () {
+            const idGrupo = document.getElementById('edit_id_grupo').value;
+            
+            // Recolectar items actualizados
+            const items = [];
+            document.querySelectorAll('.item-edit-row').forEach(row => {
+                const hidden = row.querySelector('.edit-item-num');
+                const numCompleto = (hidden.value || '').trim() || (hidden.dataset.original || '').trim();
+                console.log('🔍 item-edit-row id:', row.dataset.id, '| hidden.value:', hidden.value, '| data-original:', hidden.dataset.original, '| numCompleto:', numCompleto);
+                if (numCompleto) {
+                    items.push({
+                        id_prestamo: parseInt(row.dataset.id),
+                        numero_inventario: numCompleto
+                    });
+                }
+            });
+
+            console.log('📤 items a enviar:', items);
+
+            const formData = {
+                ubicacion: document.getElementById('edit_ubicacion').value,
+                fecha_prestamo: document.getElementById('edit_fecha_prestamo').value,
+                hora_inicio: document.getElementById('edit_hora_inicio').value,
+                hora_fin: document.getElementById('edit_hora_fin').value,
+                observaciones: document.getElementById('edit_observaciones').value,
+                items: items
+            };
+
+            console.log('📤 formData completo:', formData);
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+            LoadingUI.show('Guardando cambios...');
+            fetch(`/prestamos/editar/${idGrupo}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(r => {
+                    if (!r.ok && r.status === 400 && r.headers.get('content-type')?.includes('text/html')) {
+                        LoadingUI.hide();
+                        LoadingUI.toast('Error de seguridad (CSRF). Recarga la página e intenta de nuevo.', 'danger');
+                        return null;
+                    }
+                    return r.json();
+                })
+                .then(data => {
+                    if (!data) return;
+                    LoadingUI.hide();
+                    if (data && data.success) {
+                        LoadingUI.toast('Préstamo y equipos actualizados', 'success');
+                        bootstrap.Modal.getInstance(document.getElementById('modalEditarPrestamo')).hide();
+                        setTimeout(() => location.reload(), 600);
+                    } else {
+                        LoadingUI.toast(data && data.message || 'Error al guardar', 'danger');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error guardarEdicionPrestamo:', err);
+                    LoadingUI.hide();
+                    LoadingUI.toast('Error al guardar cambios. Recarga la página e intenta de nuevo.', 'danger');
+                });
+        };
+
+        // === LÓGICA PRÉSTAMO RÁPIDO ===
+        const qrInputProfesor = document.getElementById('qr_busqueda_profesor');
+        const qrSugerencias   = document.getElementById('qr_sugerenciasProfesores');
+        const qrCedulaHidden  = document.getElementById('qr_cedula_profesor');
+        const qrTelefono      = document.getElementById('qr_profesor_telefono');
+        const btnQuickAdd     = document.getElementById('btnQuickAdd');
+
+        // Campos con número de inventario (HDMI usa radio Sí/No y se trata aparte)
+        const qrCampos = [
+            { inputId: 'qr_num_portatil', fbId: 'qr_fb_portatil', hiddenId: 'qr_id_portatil', checkId: 'chk_portatil', tipo: 'PORTATIL' },
+            { inputId: 'qr_num_cargador', fbId: 'qr_fb_cargador', hiddenId: 'qr_id_cargador', checkId: 'chk_cargador', tipo: 'CARGADOR' },
+            { inputId: 'qr_num_control',  fbId: 'qr_fb_control',  hiddenId: 'qr_id_control',  checkId: 'chk_control',  tipo: 'CONTROL'  },
+            { inputId: 'qr_num_teclado',  fbId: 'qr_fb_teclado',  hiddenId: 'qr_id_teclado',  checkId: 'chk_teclado',  tipo: 'TECLADO'  },
+        ];
+
+        // --- Autocomplete Profesor ---
+        function qrOcultarSugerencias() {
+            if (qrSugerencias) qrSugerencias.style.display = 'none';
+        }
+        function qrMostrarSugerencias(items) {
+            if (!qrSugerencias) return;
+            qrSugerencias.innerHTML = '';
+            if (!items || items.length === 0) { qrOcultarSugerencias(); return; }
+            items.forEach(p => {
+                const a = document.createElement('button');
+                a.type = 'button';
+                a.className = 'list-group-item list-group-item-action py-1 px-2 small';
+                a.textContent = `${p.nombre_completo} (${p.cedula})`;
+                a.addEventListener('click', () => {
+                    if (qrInputProfesor) qrInputProfesor.value = p.nombre_completo;
+                    if (qrCedulaHidden)  qrCedulaHidden.value  = p.cedula;
+                    if (qrTelefono)      qrTelefono.textContent = p.telefono || 'Sin tel';
+                    qrOcultarSugerencias();
+                });
+                qrSugerencias.appendChild(a);
+            });
+            qrSugerencias.style.display = 'block';
+        }
+        let _tQrProf;
+        if (qrInputProfesor) {
+            qrInputProfesor.addEventListener('input', function (e) {
+                clearTimeout(_tQrProf);
+                _tQrProf = setTimeout(async () => {
+                    const q = e.target.value.trim();
+                    if (q.length < 1) return qrOcultarSugerencias();
+                    try {
+                        const res  = await fetch(`/profesores/buscar?q=${encodeURIComponent(q)}`);
+                        const data = await res.json();
+                        if (data && data.success) qrMostrarSugerencias(data.profesores);
+                    } catch { }
+                }, 250);
+            });
+            qrInputProfesor.addEventListener('blur', () => setTimeout(qrOcultarSugerencias, 200));
+        }
+
+        // --- Checkboxes: activar / desactivar campo ---
+        qrCampos.forEach(campo => {
+            const chkEl    = document.getElementById(campo.checkId);
+            const inputEl  = document.getElementById(campo.inputId);
+            const fbEl     = document.getElementById(campo.fbId);
+            const hiddenEl = document.getElementById(campo.hiddenId);
+            if (!chkEl || !inputEl) return;
+
+            function aplicarEstadoCheck() {
+                const activo = chkEl.checked;
+                inputEl.disabled = !activo;
+                inputEl.style.opacity = activo ? '1' : '0.4';
+                if (!activo) {
+                    inputEl.value  = '';
+                    hiddenEl.value = '';
+                    if (fbEl) fbEl.innerHTML = '';
+                }
+            }
+            chkEl.addEventListener('change', aplicarEstadoCheck);
+            aplicarEstadoCheck(); // estado inicial
+        });
+
+        // --- Búsqueda de equipo con feedback inline ---
+        qrCampos.forEach(campo => {
+            const inputEl  = document.getElementById(campo.inputId);
+            const fbEl     = document.getElementById(campo.fbId);
+            const hiddenEl = document.getElementById(campo.hiddenId);
+            const chkEl    = document.getElementById(campo.checkId);
+            if (!inputEl || !fbEl || !hiddenEl) return;
+
+            let _t;
+            inputEl.addEventListener('input', function (e) {
+                clearTimeout(_t);
+                const num = e.target.value.trim();
+                hiddenEl.value = '';
+
+                if (!num) { fbEl.innerHTML = ''; return; }
+
+                fbEl.innerHTML = '<span class="text-muted"><i class="bi bi-hourglass-split"></i> Buscando...</span>';
+
+                _t = setTimeout(async () => {
+                    try {
+                        const params = new URLSearchParams({ numero_inventario: num, tipo_equipo: campo.tipo });
+                        const req    = await fetch(`/prestamos/buscar-equipos?${params}`);
+                        const data   = await req.json();
+                        if (data && data.success && data.equipos && data.equipos.length > 0) {
+                            const eq = data.equipos[0];
+                            const id = (eq.activo_fijo && String(eq.activo_fijo).trim()) ? eq.activo_fijo : eq.numero_inventario;
+                            hiddenEl.value = id;
+                            fbEl.innerHTML = `<span style="color:#198754;"><i class="bi bi-check-circle-fill"></i> <strong>${eq.item}</strong> ${eq.marca ? '· ' + eq.marca : ''}</span>`;
+                        } else {
+                            fbEl.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle-fill"></i> No encontrado o no disponible</span>';
+                        }
+                    } catch {
+                        fbEl.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-triangle"></i> Error al buscar</span>';
+                    }
+                }, 450);
+            });
+        });
+
+        // --- Botón Prestar ---
+        if (btnQuickAdd) {
+            btnQuickAdd.addEventListener('click', async function () {
+                const cedula    = qrCedulaHidden ? qrCedulaHidden.value.trim() : '';
+                const ubicacion = document.getElementById('qr_ubicacion')?.value || '';
+
+                if (!cedula) {
+                    mostrarNotificacion('Seleccione un profesor válido', 'warning');
+                    return;
+                }
+
+                // Campos con inventario: solo los que tienen checkbox marcado y ID resuelto
+                const items = qrCampos
+                    .filter(c => {
+                        const chk = document.getElementById(c.checkId);
+                        return chk && chk.checked;
+                    })
+                    .map(c => document.getElementById(c.hiddenId)?.value?.trim())
+                    .filter(Boolean);
+
+                // HDMI: si eligió "Sí" buscar un cable HDMI disponible y agregarlo
+                const hdmiSi = document.getElementById('qr_hdmi_si')?.checked;
+                const fbHdmi = document.getElementById('qr_fb_hdmi');
+                if (hdmiSi) {
+                    // Buscar cualquier cable HDMI disponible para reservarlo
+                    const hdmiRes = await fetch('/prestamos/buscar-equipos?tipo_equipo=HDMI').then(r => r.json()).catch(() => null);
+                    if (hdmiRes && hdmiRes.success && hdmiRes.equipos && hdmiRes.equipos.length > 0) {
+                        const eq = hdmiRes.equipos[0];
+                        const hdmiId = (eq.activo_fijo && String(eq.activo_fijo).trim()) ? eq.activo_fijo : eq.numero_inventario;
+                        items.push(hdmiId);
+                        if (fbHdmi) fbHdmi.innerHTML = `<span style="color:#198754;"><i class="bi bi-check-circle-fill"></i> ${eq.item}</span>`;
+                    } else {
+                        if (fbHdmi) fbHdmi.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle-fill"></i> Sin cables HDMI disponibles</span>';
+                        mostrarNotificacion('No hay cables HDMI disponibles en este momento', 'warning');
+                        return;
+                    }
+                }
+
+                if (items.length === 0) {
+                    mostrarNotificacion('Ingrese al menos un equipo válido o seleccione HDMI = Sí', 'warning');
+                    return;
+                }
+
+                const now = new Date();
+                const pad = n => String(n).padStart(2, '0');
+                const h1  = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+                now.setHours(now.getHours() + 2);
+                const h2  = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+                const payload = {
+                    cedula, items,
+                    hora_inicio: h1, hora_fin: h2,
+                    ubicacion, observaciones: 'Préstamo Exprés'
+                };
+
+                btnQuickAdd.disabled = true;
+                btnQuickAdd.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Guardando...';
+                LoadingUI.show('Registrando préstamo exprés...');
+
+                fetch('/prestamos/nuevo', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
+                    .then(r => r.text().then(text => { let json=null; try { json = text ? JSON.parse(text) : null; } catch(e) { json = null; } return { ok: r.ok, status: r.status, text: text, json: json }; }))
+                    .then(({ ok, status, text, json }) => {
+                        LoadingUI.hide();
+                        if (json && json.success) {
+                            LoadingUI.toast('Préstamo Exprés registrado', 'success');
+                            setTimeout(() => location.reload(), 700);
+                        } else {
+                            LoadingUI.toast(json.message || 'Error al guardar', 'danger');
+                            btnQuickAdd.disabled = false;
+                            btnQuickAdd.innerHTML = '<i class="bi bi-plus-lg"></i> Prestar';
+                        }
+                    })
+                    .catch(() => {
+                        LoadingUI.hide();
+                        LoadingUI.toast('Error de conexión', 'danger');
+                        btnQuickAdd.disabled = false;
+                        btnQuickAdd.innerHTML = '<i class="bi bi-plus-lg"></i> Prestar';
+                    });
+            });
+        }
+    });
+
+</script>
+
+{% include 'components/footer.html' %}

@@ -1,0 +1,539 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<style>
+    .report-card {
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(30, 58, 95, 0.1);
+        border: none;
+    }
+    .report-form {
+        background: linear-gradient(135deg, #1e3a5f 0%, #2d6a9f 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 30px;
+    }
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 1px solid #ddd;
+    }
+    .btn-custom {
+        border-radius: 10px;
+        padding: 12px 30px;
+        font-weight: bold;
+    }
+    .results-container {
+        max-height: 600px;
+        overflow-y: auto;
+    }
+    .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.9);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        border-radius: 15px;
+    }
+    .export-buttons {
+        display: none;
+        margin-top: 20px;
+    }
+    .alert-custom {
+        border-radius: 10px;
+        border: none;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    
+    <!-- Header de la sección -->
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-primary text-white p-3 rounded-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-file-earmark-bar-graph" style="font-size: 1.8rem;"></i>
+                </div>
+                <div>
+                    <h1 class="h3 mb-1">Reportes Personalizados</h1>
+                    <p class="text-muted mb-0">Genera y exporta reportes del sistema</p>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('estadisticas.dashboard') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-chart-bar me-1"></i>Dashboard
+                </a>
+                <a href="{{ url_for('estadisticas.metricas') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-tachometer-alt me-1"></i>Métricas
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Formulario de Configuración de Reportes -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="report-form">
+                <h3 class="mb-4">
+                    <i class="fas fa-cogs me-2"></i>
+                    Configurar Reporte
+                </h3>
+                
+                <form id="reporteForm">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label for="fechaInicio" class="form-label">Fecha Inicio</label>
+                            <input type="date" class="form-control" id="fechaInicio" required>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label for="fechaFin" class="form-label">Fecha Fin</label>
+                            <input type="date" class="form-control" id="fechaFin" required>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label for="tipoReporte" class="form-label">Tipo de Reporte</label>
+                            <select class="form-select" id="tipoReporte" required>
+                                <option value="">Seleccionar tipo...</option>
+                                <option value="general">Resumen General</option>
+                                <option value="prestamos">Préstamos Detallados</option>
+                                <option value="reservas">Reservas Detalladas</option>
+                                <option value="profesores">Actividad de Profesores</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-light btn-custom">
+                                    <i class="fas fa-search me-2"></i>
+                                    Generar Reporte
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros Rápidos -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card report-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-filter me-2"></i>
+                        Filtros Rápidos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="btn-group flex-wrap" role="group">
+                        <button type="button" class="btn btn-outline-primary me-2 mb-2" onclick="aplicarFiltroRapido('hoy')">
+                            <i class="fas fa-calendar-day me-1"></i>Hoy
+                        </button>
+                        <button type="button" class="btn btn-outline-primary me-2 mb-2" onclick="aplicarFiltroRapido('semana')">
+                            <i class="fas fa-calendar-week me-1"></i>Esta Semana
+                        </button>
+                        <button type="button" class="btn btn-outline-primary me-2 mb-2" onclick="aplicarFiltroRapido('mes')">
+                            <i class="fas fa-calendar me-1"></i>Este Mes
+                        </button>
+                        <button type="button" class="btn btn-outline-primary me-2 mb-2" onclick="aplicarFiltroRapido('trimestre')">
+                            <i class="fas fa-calendar-alt me-1"></i>Este Trimestre
+                        </button>
+                        <button type="button" class="btn btn-outline-success me-2 mb-2" onclick="aplicarFiltroRapido('prestamos')">
+                            <i class="fas fa-handshake me-1"></i>Solo Préstamos
+                        </button>
+                        <button type="button" class="btn btn-outline-info me-2 mb-2" onclick="aplicarFiltroRapido('reservas')">
+                            <i class="fas fa-calendar-check me-1"></i>Solo Reservas
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Área de Resultados -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card report-card position-relative">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0" id="tituloResultados">
+                        <i class="fas fa-table me-2"></i>
+                        Resultados del Reporte
+                    </h5>
+                    
+                    <!-- Botones de Exportación -->
+                    <div class="export-buttons" id="exportButtons">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-success btn-sm" onclick="exportarDatos('excel')">
+                                <i class="fas fa-file-excel me-1"></i>Excel
+                            </button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="exportarDatos('csv')">
+                                <i class="fas fa-file-csv me-1"></i>CSV
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="exportarDatos('pdf')">
+                                <i class="fas fa-file-pdf me-1"></i>PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Loading Overlay -->
+                    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary mb-3" role="status"></div>
+                            <p>Generando reporte...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Mensaje inicial -->
+                    <div id="mensajeInicial" class="text-center py-5">
+                        <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">Selecciona los filtros y genera un reporte</h4>
+                        <p class="text-muted">Configura las fechas y el tipo de reporte que deseas visualizar</p>
+                    </div>
+                    
+                    <!-- Área de resultados -->
+                    <div id="resultadosContainer" style="display: none;">
+                        <div class="results-container">
+                            <table id="tablaResultados" class="table table-striped table-hover" style="width:100%">
+                            </table>
+                        </div>
+                        
+                        <!-- Estadísticas del reporte -->
+                        <div id="estadisticasReporte" class="mt-4 p-3 bg-light rounded">
+                        </div>
+                    </div>
+                    
+                    <!-- Mensaje de error -->
+                    <div id="mensajeError" class="alert alert-danger alert-custom" style="display: none;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span id="textoError"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript del módulo -->
+<script>
+    document.title = 'Reportes Personalizados - Sistema Integrado';
+    let currentReportData = null;
+    let dataTable = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const hoy = new Date();
+        const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+        
+        document.getElementById('fechaInicio').value = inicioMes.toISOString().split('T')[0];
+        document.getElementById('fechaFin').value = hoy.toISOString().split('T')[0];
+        
+        document.getElementById('reporteForm').addEventListener('submit', generarReporte);
+    });
+
+    function aplicarFiltroRapido(tipo) {
+        const hoy = new Date();
+        let fechaInicio, fechaFin, tipoReporte = '';
+        
+        switch(tipo) {
+            case 'hoy':
+                fechaInicio = fechaFin = hoy;
+                break;
+            case 'semana':
+                fechaInicio = new Date(hoy.getTime() - (hoy.getDay() * 24 * 60 * 60 * 1000));
+                fechaFin = hoy;
+                break;
+            case 'mes':
+                fechaInicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+                fechaFin = hoy;
+                break;
+            case 'trimestre':
+                const mes = hoy.getMonth();
+                const inicioTrimestre = Math.floor(mes / 3) * 3;
+                fechaInicio = new Date(hoy.getFullYear(), inicioTrimestre, 1);
+                fechaFin = hoy;
+                break;
+            case 'prestamos':
+                tipoReporte = 'prestamos';
+                fechaInicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+                fechaFin = hoy;
+                break;
+            case 'reservas':
+                tipoReporte = 'reservas';
+                fechaInicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+                fechaFin = hoy;
+                break;
+        }
+        
+        document.getElementById('fechaInicio').value = fechaInicio.toISOString().split('T')[0];
+        document.getElementById('fechaFin').value = fechaFin.toISOString().split('T')[0];
+        
+        if (tipoReporte) {
+            document.getElementById('tipoReporte').value = tipoReporte;
+        }
+        
+        if (document.getElementById('tipoReporte').value) {
+            generarReporte(new Event('submit'));
+        }
+    }
+
+    async function generarReporte(event) {
+        event.preventDefault();
+        
+        const fechaInicio = document.getElementById('fechaInicio').value;
+        const fechaFin = document.getElementById('fechaFin').value;
+        const tipoReporte = document.getElementById('tipoReporte').value;
+        
+        if (!fechaInicio || !fechaFin || !tipoReporte) {
+            mostrarError('Todos los campos son obligatorios');
+            return;
+        }
+        
+        mostrarLoading(true);
+        ocultarError();
+        
+        try {
+            const response = await fetch('/estadisticas/api/reporte/personalizado', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    fecha_inicio: fechaInicio,
+                    fecha_fin: fechaFin,
+                    tipo: tipoReporte
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                currentReportData = data.data;
+                mostrarResultados(data.data, tipoReporte, fechaInicio, fechaFin);
+            } else {
+                mostrarError(data.message || 'Error al generar el reporte');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            mostrarError('Error de conexión al generar el reporte');
+        } finally {
+            mostrarLoading(false);
+        }
+    }
+
+    function mostrarResultados(data, tipo, fechaInicio, fechaFin) {
+        document.getElementById('mensajeInicial').style.display = 'none';
+        document.getElementById('resultadosContainer').style.display = 'block';
+        document.getElementById('exportButtons').style.display = 'block';
+        
+        const titulo = getTituloReporte(tipo, fechaInicio, fechaFin);
+        document.getElementById('tituloResultados').innerHTML = `<i class="fas fa-table me-2"></i>${titulo}`;
+        
+        if (dataTable) {
+            dataTable.destroy();
+        }
+        
+        generarTabla(data, tipo);
+        generarEstadisticas(data, tipo);
+    }
+
+    function getTituloReporte(tipo, fechaInicio, fechaFin) {
+        const tipos = {
+            'general': 'Resumen General',
+            'prestamos': 'Préstamos Detallados',
+            'reservas': 'Reservas Detalladas',
+            'profesores': 'Actividad de Profesores'
+        };
+        return `${tipos[tipo]} (${fechaInicio} - ${fechaFin})`;
+    }
+
+    function generarTabla(data, tipo) {
+        const tabla = document.getElementById('tablaResultados');
+        tabla.innerHTML = '';
+        
+        if (!data || data.length === 0) {
+            tabla.innerHTML = '<thead><tr><th>Sin Datos</th></tr></thead><tbody><tr><td>No se encontraron registros para los filtros seleccionados</td></tr></tbody>';
+            return;
+        }
+        
+        let columnas = [];
+        let columnConfig = [];
+        
+        switch(tipo) {
+            case 'prestamos':
+                columnas = ['ID', 'Profesor', 'Equipo', 'Fecha Préstamo', 'Fecha Devolución', 'Estado', 'Jornada'];
+                columnConfig = [
+                    { data: 'id' },
+                    { data: 'profesor_nombre' },
+                    { data: 'equipo_nombre' },
+                    { data: 'fecha_prestamo' },
+                    { data: 'fecha_devolucion' },
+                    { data: 'estado' },
+                    { data: 'jornada' }
+                ];
+                break;
+            case 'reservas':
+                columnas = ['ID', 'Profesor', 'Recurso', 'Fecha', 'Hora Inicio', 'Hora Fin', 'Estado'];
+                columnConfig = [
+                    { data: 'id' },
+                    { data: 'profesor_nombre' },
+                    { data: 'recurso_nombre' },
+                    { data: 'fecha' },
+                    { data: 'hora_inicio' },
+                    { data: 'hora_fin' },
+                    { data: 'estado' }
+                ];
+                break;
+            case 'profesores':
+                columnas = ['Cédula', 'Nombre', 'Programa', 'Total Préstamos', 'Total Reservas'];
+                columnConfig = [
+                    { data: 'cedula' },
+                    { data: 'nombre' },
+                    { data: 'programa' },
+                    { data: 'total_prestamos' },
+                    { data: 'total_reservas' }
+                ];
+                break;
+            default:
+                columnas = ['Tipo', 'Total Préstamos', 'Total Reservas', 'Período'];
+                columnConfig = [
+                    { data: 'tipo' },
+                    { data: 'total_prestamos' },
+                    { data: 'total_reservas' },
+                    { data: 'fecha_inicio' }
+                ];
+        }
+        
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        columnas.forEach(col => {
+            const th = document.createElement('th');
+            th.textContent = col;
+            headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+        tabla.appendChild(thead);
+        
+        dataTable = $('#tablaResultados').DataTable({
+            data: data,
+            columns: columnConfig,
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/Spanish.json'
+            },
+            responsive: true,
+            pageLength: 25,
+            dom: 'Bfrtip',
+            scrollX: true
+        });
+    }
+
+    function generarEstadisticas(data, tipo) {
+        const container = document.getElementById('estadisticasReporte');
+        let html = '<h6><i class="fas fa-chart-bar me-2"></i>Estadísticas del Reporte</h6><div class="row">';
+        
+        html += `<div class="col-md-4"><strong>Total de Registros:</strong> ${data.length}</div>`;
+        
+        if (tipo === 'prestamos') {
+            const activos = data.filter(p => p.estado === 'prestado').length;
+            const devueltos = data.filter(p => p.estado === 'devuelto').length;
+            html += `<div class="col-md-4"><strong>Activos:</strong> ${activos}</div>`;
+            html += `<div class="col-md-4"><strong>Devueltos:</strong> ${devueltos}</div>`;
+        } else if (tipo === 'reservas') {
+            const activas = data.filter(r => r.estado === 'activa').length;
+            const canceladas = data.filter(r => r.estado === 'cancelada').length;
+            html += `<div class="col-md-4"><strong>Activas:</strong> ${activas}</div>`;
+            html += `<div class="col-md-4"><strong>Canceladas:</strong> ${canceladas}</div>`;
+        } else if (tipo === 'profesores') {
+            const totalPrestamos = data.reduce((sum, p) => sum + (p.total_prestamos || 0), 0);
+            const totalReservas = data.reduce((sum, p) => sum + (p.total_reservas || 0), 0);
+            html += `<div class="col-md-4"><strong>Total Préstamos:</strong> ${totalPrestamos}</div>`;
+            html += `<div class="col-md-4"><strong>Total Reservas:</strong> ${totalReservas}</div>`;
+        }
+        
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    function exportarDatos(formato) {
+        if (!currentReportData) {
+            mostrarError('No hay datos para exportar');
+            return;
+        }
+        
+        switch(formato) {
+            case 'excel':
+                exportarExcel();
+                break;
+            case 'csv':
+                exportarCSV();
+                break;
+            case 'pdf':
+                exportarPDF();
+                break;
+        }
+    }
+
+    function exportarCSV() {
+        const csv = convertirACSV(currentReportData);
+        descargarArchivo(csv, 'reporte.csv', 'text/csv');
+    }
+
+    function convertirACSV(data) {
+        if (!data || data.length === 0) return '';
+        
+        const headers = Object.keys(data[0]);
+        const csvContent = [
+            headers.join(','),
+            ...data.map(row => 
+                headers.map(header => 
+                    JSON.stringify(row[header] || '')
+                ).join(',')
+            )
+        ].join('\n');
+        
+        return csvContent;
+    }
+
+    function descargarArchivo(content, filename, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    }
+
+    function exportarExcel() {
+        const csv = convertirACSV(currentReportData);
+        descargarArchivo(csv, 'reporte.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    }
+
+    function exportarPDF() {
+        window.print();
+    }
+
+    function mostrarLoading(mostrar) {
+        document.getElementById('loadingOverlay').style.display = mostrar ? 'flex' : 'none';
+    }
+
+    function mostrarError(mensaje) {
+        document.getElementById('textoError').textContent = mensaje;
+        document.getElementById('mensajeError').style.display = 'block';
+    }
+
+    function ocultarError() {
+        document.getElementById('mensajeError').style.display = 'none';
+    }
+</script>
+
+{% include 'components/footer.html' %}

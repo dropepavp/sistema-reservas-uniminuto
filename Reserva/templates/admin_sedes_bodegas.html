@@ -1,0 +1,369 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.usuarios_main') }}">Panel Admin</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Configuración del Sistema</li>
+                </ol>
+            </nav>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h2"><i class="bi bi-gear-fill text-primary"></i> Configuración Global</h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensajes Flash -->
+    <div class="row">
+        <div class="col-12">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Panel Sedes -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-building"></i> Sedes</h5>
+                    <button class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#modalAgregarSede">
+                        <i class="bi bi-plus-circle"></i> Nueva Sede
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="max-height: 400px;">
+                        <table class="table table-sm table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nombre Sede</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sede in sedes %}
+                                <tr>
+                                    <td><strong>{{ sede.nombre }}</strong></td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary"
+                                                onclick="abrirEditarSede('{{ sede.id }}', '{{ sede.nombre }}')"
+                                                title="Editar">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger"
+                                                onclick="confirmarEliminarSede('{{ sede.id }}', '{{ sede.nombre }}')"
+                                                title="Eliminar">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted">No hay sedes</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Bodegas -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-box-seam"></i> Bodegas</h5>
+                    <button class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#modalAgregarBodega">
+                        <i class="bi bi-plus-circle"></i> Nueva Bodega
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="max-height: 400px;">
+                        <table class="table table-sm table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Bodega (Sede)</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for bodega in bodegas %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ bodega.nombre }}</strong><br>
+                                        <small class="text-muted">{{ bodega.sede.nombre }}</small>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary"
+                                                onclick="abrirEditarBodega('{{ bodega.id }}', '{{ bodega.nombre }}', '{{ bodega.sede_id }}')"
+                                                title="Editar">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger"
+                                                onclick="confirmarEliminarBodega('{{ bodega.id }}', '{{ bodega.nombre }}')"
+                                                title="Eliminar">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted">No hay bodegas</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Categorías -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-tags"></i> Categorías Inv.</h5>
+                    <button class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#modalAgregarCategoria">
+                        <i class="bi bi-plus-circle"></i> Nueva Cat.
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="max-height: 400px;">
+                        <table class="table table-sm table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nombre Categoría</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cat in categorias %}
+                                <tr>
+                                    <td><strong>{{ cat.nombre }}</strong></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-danger"
+                                            onclick="confirmarEliminarCategoria('{{ cat.id }}', '{{ cat.nombre }}')"
+                                            title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted">No hay categorías</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Forms ocultos para eliminación -->
+<form id="formEliminarSede" method="POST" style="display:none;"></form>
+<form id="formEliminarBodega" method="POST" style="display:none;"></form>
+<form id="formEliminarCategoria" method="POST" style="display:none;"></form>
+
+<!-- Modal Agregar Categoría -->
+<div class="modal fade" id="modalAgregarCategoria" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('admin.agregar_categoria') }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nueva Categoría</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre de la Categoría</label>
+                        <input type="text" name="nombre" class="form-control" placeholder="Ej: AUDIFONOS" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Categoría</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Agregar Sede -->
+<div class="modal fade" id="modalAgregarSede" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('admin.agregar_sede') }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nueva Sede</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre de la Sede</label>
+                        <input type="text" name="nombre" class="form-control" placeholder="Ej: PERDOMO" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Sede</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Agregar Bodega -->
+<div class="modal fade" id="modalAgregarBodega" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('admin.agregar_bodega') }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nueva Bodega</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre de la Bodega</label>
+                        <input type="text" name="nombre" class="form-control" placeholder="Ej: BODEGA TECNOLOGÍA"
+                            required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sede Asociada</label>
+                        <select name="sede_id" class="form-select" required>
+                            <option value="">Seleccione una sede...</option>
+                            {% for sede in sedes %}
+                            <option value="{{ sede.id }}">{{ sede.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear Bodega</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Sede -->
+<div class="modal fade" id="modalEditarSede" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('admin.editar_sede') }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Sede</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="editSedeId">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre de la Sede</label>
+                        <input type="text" name="nombre" id="editSedeNombre" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Actualizar Sede</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Bodega -->
+<div class="modal fade" id="modalEditarBodega" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('admin.editar_bodega') }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Bodega</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="editBodegaId">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre de la Bodega</label>
+                        <input type="text" name="nombre" id="editBodegaNombre" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sede Asociada</label>
+                        <select name="sede_id" id="editBodegaSedeId" class="form-select" required>
+                            {% for sede in sedes %}
+                            <option value="{{ sede.id }}">{{ sede.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Actualizar Bodega</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Sedes
+    function abrirEditarSede(id, nombre) {
+        document.getElementById('editSedeId').value = id;
+        document.getElementById('editSedeNombre').value = nombre;
+        new bootstrap.Modal(document.getElementById('modalEditarSede')).show();
+    }
+
+    function confirmarEliminarSede(id, nombre) {
+        if (confirm(`¿Está seguro de que desea eliminar la sede "${nombre}"?\nEsta acción es irreversible y solo funcionará si no hay bodegas ni auxiliares asociados.`)) {
+            const form = document.getElementById('formEliminarSede');
+            form.action = "{{ url_for('admin.eliminar_sede', id=0) }}".replace('/0', '/' + id);
+            form.submit();
+        }
+    }
+
+    // Bodegas
+    function abrirEditarBodega(id, nombre, sedeId) {
+        document.getElementById('editBodegaId').value = id;
+        document.getElementById('editBodegaNombre').value = nombre;
+        document.getElementById('editBodegaSedeId').value = sedeId;
+        new bootstrap.Modal(document.getElementById('modalEditarBodega')).show();
+    }
+
+    function confirmarEliminarBodega(id, nombre) {
+        if (confirm(`¿Está seguro de que desea eliminar la bodega "${nombre}"?\nSolo podrá eliminarse si no contiene equipos en el inventario.`)) {
+            const form = document.getElementById('formEliminarBodega');
+            form.action = "{{ url_for('admin.eliminar_bodega', id=0) }}".replace('/0', '/' + id);
+            form.submit();
+        }
+    }
+
+    // Categorias
+    function confirmarEliminarCategoria(id, nombre) {
+        if (confirm(`¿Está seguro de que desea eliminar la categoría "${nombre}"?\nSolo podrá eliminarse si no hay equipos asociados a ella en el inventario.`)) {
+            const form = document.getElementById('formEliminarCategoria');
+            form.action = "{{ url_for('admin.eliminar_categoria', id=0) }}".replace('/0', '/' + id);
+            form.submit();
+        }
+    }
+</script>
+
+{% include 'components/footer.html' %}

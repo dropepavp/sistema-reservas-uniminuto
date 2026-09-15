@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test de Caché - Botón Cargador</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .btn {
+            padding: 10px 20px;
+            margin: 10px 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: black; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-info { background: #17a2b8; color: white; }
+        .console {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #00ff00;
+            padding-left: 10px;
+        }
+        .alert {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .alert-info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Test de Caché - Sistema de Préstamos</h1>
+        
+        <div class="alert alert-info">
+            <strong>Instrucciones:</strong><br>
+            1. Haz clic en cada botón<br>
+            2. Verifica en la consola de abajo qué tipo de equipo está buscando<br>
+            3. Si el botón "Cargador" busca "TECLADO", el navegador tiene caché antiguo
+        </div>
+
+        <div style="margin: 20px 0;">
+            <button id="btnStdPortatil" class="btn btn-primary">🖥️ Portátil</button>
+            <button id="btnStdCargador" class="btn btn-success">🔌 Cargador</button>
+            <button id="btnStdHdmi" class="btn btn-warning">📺 HDMI</button>
+            <button id="btnStdControl" class="btn btn-danger">🎮 Control</button>
+            <button id="btnStdTeclado" class="btn btn-info">⌨️ Teclado</button>
+        </div>
+
+        <div style="margin: 20px 0;">
+            <button onclick="clearConsole()" class="btn" style="background: #6c757d; color: white;">🗑️ Limpiar Consola</button>
+            <button onclick="location.reload(true)" class="btn" style="background: #fd7e14; color: white;">🔄 Recargar Página (Forzar)</button>
+        </div>
+
+        <h3>📋 Consola de Debug:</h3>
+        <div id="console" class="console">
+            <div class="log-entry">Esperando interacción...</div>
+        </div>
+    </div>
+
+    <script>
+        const consoleDiv = document.getElementById('console');
+        
+        function addLog(message, color = '#00ff00') {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.style.borderLeftColor = color;
+            entry.style.color = color;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            consoleDiv.appendChild(entry);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+        
+        function clearConsole() {
+            consoleDiv.innerHTML = '<div class="log-entry">Consola limpiada...</div>';
+        }
+        
+        // Simular la función buscarEquiposDesdeInventario
+        window.buscarEquiposDesdeInventario = function(filtros) {
+            const tipo = filtros.tipo_equipo || 'DESCONOCIDO';
+            addLog(`🔍 buscarEquiposDesdeInventario llamada con: ${JSON.stringify(filtros)}`, '#00ffff');
+            addLog(`📦 Tipo de equipo: ${tipo}`, tipo === 'CARGADOR' ? '#00ff00' : '#ff0000');
+            
+            if (tipo === 'CARGADOR') {
+                addLog('✅ CORRECTO: Buscando CARGADOR', '#00ff00');
+            } else if (tipo === 'TECLADO' && filtros !== 'TECLADO') {
+                addLog('❌ ERROR: Debería buscar CARGADOR pero está buscando TECLADO', '#ff0000');
+                addLog('⚠️ Tu navegador tiene CACHÉ ANTIGUO', '#ff9900');
+            }
+        };
+        
+        addLog('🚀 Script de test cargado - Versión: 2026-03-12 14:30:00', '#ffff00');
+        addLog('✅ Función buscarEquiposDesdeInventario simulada', '#00ff00');
+        
+        // Event listeners
+        document.getElementById('btnStdPortatil').addEventListener('click', function() {
+            addLog('🔵 BOTÓN PORTÁTIL CLICKEADO', '#0099ff');
+            window.buscarEquiposDesdeInventario({ tipo_equipo: 'PORTATIL' });
+        });
+        
+        document.getElementById('btnStdCargador').addEventListener('click', function() {
+            addLog('🔵 BOTÓN CARGADOR CLICKEADO', '#0099ff');
+            window.buscarEquiposDesdeInventario({ tipo_equipo: 'CARGADOR' });
+        });
+        
+        document.getElementById('btnStdHdmi').addEventListener('click', function() {
+            addLog('🔵 BOTÓN HDMI CLICKEADO', '#0099ff');
+            window.buscarEquiposDesdeInventario({ tipo_equipo: 'HDMI' });
+        });
+        
+        document.getElementById('btnStdControl').addEventListener('click', function() {
+            addLog('🔵 BOTÓN CONTROL CLICKEADO', '#0099ff');
+            window.buscarEquiposDesdeInventario({ tipo_equipo: 'CONTROL' });
+        });
+        
+        document.getElementById('btnStdTeclado').addEventListener('click', function() {
+            addLog('🔵 BOTÓN TECLADO CLICKEADO', '#0099ff');
+            window.buscarEquiposDesdeInventario({ tipo_equipo: 'TECLADO' });
+        });
+        
+        addLog('✅ Todos los event listeners configurados', '#00ff00');
+        addLog('👉 Haz clic en el botón "Cargador" para probar', '#ffff00');
+    </script>
+</body>
+</html>

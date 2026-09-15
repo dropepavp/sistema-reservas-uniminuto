@@ -1,0 +1,314 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<div class="container-fluid mt-4 px-4">
+    <div class="row">
+        <div class="col-12 d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0"><i class="bi bi-bar-chart-line-fill"></i> Panel de Estadísticas</h2>
+            <div class="btn-group" role="group">
+                <a href="{{ url_for('estadisticas.historial_prestamos') }}" class="btn btn-primary">
+                    <i class="bi bi-clock-history"></i> Ver Historial Completo
+                </a>
+                <a href="{{ url_for('estadisticas.exportar_estadisticas', formato='excel') }}" class="btn btn-success">
+                    <i class="bi bi-file-earmark-excel"></i> Exportar Excel
+                </a>
+                <a href="{{ url_for('estadisticas.exportar_estadisticas', formato='csv') }}" class="btn btn-info">
+                    <i class="bi bi-file-earmark-text"></i> Exportar CSV
+                </a>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-house-door"></i> Volver al Inicio
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtro por Jornada -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body d-flex justify-content-center align-items-center flex-wrap">
+                    <h5 class="mb-0 me-3">Filtrar por Jornada:</h5>
+                    <div class="btn-group" role="group" aria-label="Filtrar por Jornada">
+                        <a href="{{ url_for('estadisticas') }}" class="btn btn-outline-secondary {% if not jornada_actual %}active{% endif %}">Todas</a>
+                        <a href="{{ url_for('estadisticas', jornada='MAÑANA') }}" class="btn btn-outline-secondary {% if jornada_actual == 'MAÑANA' %}active{% endif %}">Mañana</a>
+                        <a href="{{ url_for('estadisticas', jornada='TARDE') }}" class="btn btn-outline-secondary {% if jornada_actual == 'TARDE' %}active{% endif %}">Tarde</a>
+                        <a href="{{ url_for('estadisticas', jornada='NOCHE') }}" class="btn btn-outline-secondary {% if jornada_actual == 'NOCHE' %}active{% endif %}">Noche</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NUEVA SECCIÓN: Resumen de Totales -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-left-primary">
+                <div class="card-body">
+                    <h6 class="text-uppercase font-weight-bold text-primary mb-1">Total Préstamos</h6>
+                    <h3 class="mb-0" id="kpi-total-prestamos">—</h3>
+                    <small class="text-muted">desde inicio del sistema</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card border-left-success">
+                <div class="card-body">
+                    <h6 class="text-uppercase font-weight-bold text-success mb-1">Préstamos Activos</h6>
+                    <h3 class="mb-0" id="kpi-prestamos-activos">—</h3>
+                    <small class="text-muted">sin devolver aún</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card border-left-warning">
+                <div class="card-body">
+                    <h6 class="text-uppercase font-weight-bold text-warning mb-1">Equipos Disponibles</h6>
+                    <h3 class="mb-0" id="kpi-equipos-disponibles">—</h3>
+                    <small class="text-muted">listos para usar</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card border-left-info">
+                <div class="card-body">
+                    <h6 class="text-uppercase font-weight-bold text-info mb-1">Profesores Activos</h6>
+                    <h3 class="mb-0" id="kpi-profesores-activos">—</h3>
+                    <small class="text-muted">en el sistema</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de Préstamos -->
+    <h4 class="mb-3 fw-bold text-dark"><i class="bi bi-laptop text-primary me-2"></i>Estadísticas de Préstamos</h4>
+    <div class="row">
+        <!-- Top 10 Equipos -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-laptop text-primary me-2"></i> Top 10 Equipos Más Prestados</h5>
+                </div>
+                <div class="card-body">
+                    {% if stats_prestamos.get('top_equipos') %}
+                    <canvas id="topEquiposChart"></canvas>
+                    {% else %}
+                    <p class="text-muted text-center py-4">No hay datos de préstamos de equipos para mostrar.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Top 10 Profesores -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-person-check-fill text-primary me-2"></i> Top 10 Profesores con Más Préstamos</h5>
+                </div>
+                <div class="card-body">
+                    {% if stats_prestamos.get('top_profesores') %}
+                    <canvas id="topProfesoresChart"></canvas>
+                    {% else %}
+                    <p class="text-muted text-center py-4">No hay datos de préstamos de profesores para mostrar.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Préstamos por Mes -->
+        <div class="col-12 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-calendar-month text-primary me-2"></i> Total de Préstamos por Mes</h5>
+                </div>
+                <div class="card-body">
+                    {% if stats_prestamos.get('prestamos_mes') %}
+                    <canvas id="prestamosMesChart"></canvas>
+                    {% else %}
+                    <p class="text-muted text-center py-4">No hay datos de préstamos por mes para mostrar.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de Reservas -->
+    <h4 class="mb-3 mt-4 fw-bold text-dark"><i class="bi bi-calendar-check text-primary me-2"></i>Estadísticas de Reservas</h4>
+    <div class="row">
+        <!-- Reservas por Tipo -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-pie-chart-fill text-primary me-2"></i> Distribución de Reservas por Tipo</h5>
+                </div>
+                <div class="card-body d-flex justify-content-center align-items-center">
+                    {% if stats_reservas.get('reservas_tipo') %}
+                    <div style="max-width: 400px; width: 100%;">
+                        <canvas id="reservasTipoChart"></canvas>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-4">No hay datos de reservas para mostrar.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Préstamos por Jornada -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-sun-fill text-primary me-2"></i> Distribución de Préstamos por Jornada</h5>
+                </div>
+                <div class="card-body d-flex justify-content-center align-items-center">
+                    {% if stats_prestamos.get('prestamos_jornada') %}
+                    <div style="max-width: 400px; width: 100%;">
+                        <canvas id="prestamosJornadaChart"></canvas>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-4">No hay datos de préstamos por jornada para mostrar.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bloque de datos JSON desde el servidor -->
+<script id="stats-data" type="application/json">
+    {{ {
+        "prestamos": stats_prestamos or {},
+        "reservas": stats_reservas or {}
+    } | tojson | safe }}
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Función para crear un gráfico de barras
+    function createBarChart(ctx, labels, data, label, backgroundColor) {
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    backgroundColor: backgroundColor,
+                    borderColor: backgroundColor.replace('0.6', '1'),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    // 1. Leer los datos de forma segura desde el bloque JSON
+    let statsData = {};
+    try {
+        statsData = JSON.parse(document.getElementById('stats-data').textContent);
+    } catch (e) {
+        console.error("Error al leer los datos de estadísticas:", e);
+        return; // Detener si los datos están corruptos
+    }
+
+    // 1.1. Cargar KPIs de estadísticas totales
+    fetch('{{ url_for("estadisticas.estadisticas_totales") }}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('kpi-total-prestamos').textContent = data.prestamos.total;
+                document.getElementById('kpi-prestamos-activos').textContent = data.prestamos.activos;
+                document.getElementById('kpi-equipos-disponibles').textContent = data.inventario.disponibles;
+                document.getElementById('kpi-profesores-activos').textContent = data.profesores.total;
+            }
+        })
+        .catch(error => console.error('Error cargando KPIs:', error));
+
+    // Gráfico: Top 10 Equipos
+    const topEquiposData = statsData.prestamos.top_equipos;
+    if (topEquiposData && topEquiposData.labels) {
+        const ctxEquipos = document.getElementById('topEquiposChart').getContext('2d');
+        createBarChart(ctxEquipos, topEquiposData.labels, topEquiposData.data, 'Nº de Préstamos', 'rgba(54, 162, 235, 0.6)');
+    }
+
+    // Gráfico: Top 10 Profesores
+    const topProfesoresData = statsData.prestamos.top_profesores;
+    if (topProfesoresData && topProfesoresData.labels) {
+        const ctxProfesores = document.getElementById('topProfesoresChart').getContext('2d');
+        createBarChart(ctxProfesores, topProfesoresData.labels, topProfesoresData.data, 'Nº de Préstamos', 'rgba(75, 192, 192, 0.6)');
+    }
+
+    // Gráfico: Préstamos por Mes
+    const prestamosMesData = statsData.prestamos.prestamos_mes;
+    if (prestamosMesData && prestamosMesData.labels) {
+        const ctxMes = document.getElementById('prestamosMesChart').getContext('2d');
+        new Chart(ctxMes, {
+            type: 'line',
+            data: {
+                labels: prestamosMesData.labels,
+                datasets: [{
+                    label: 'Total de Préstamos',
+                    data: prestamosMesData.data,
+                    fill: false,
+                    borderColor: 'rgb(255, 99, 132)',
+                    tension: 0.1
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+    }
+
+    // Gráfico: Reservas por Tipo
+    const reservasTipoData = statsData.reservas.reservas_tipo;
+    if (reservasTipoData && reservasTipoData.labels) {
+        const ctxTipo = document.getElementById('reservasTipoChart').getContext('2d');
+        new Chart(ctxTipo, {
+            type: 'doughnut',
+            data: {
+                labels: reservasTipoData.labels,
+                datasets: [{
+                    label: 'Total de Reservas',
+                    data: reservasTipoData.data,
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.7)',
+                        'rgba(23, 162, 184, 0.7)',
+                        'rgba(255, 193, 7, 0.7)'
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+            options: { responsive: true }
+        });
+    }
+
+    // Gráfico: Préstamos por Jornada
+    const prestamosJornadaData = statsData.prestamos.prestamos_jornada;
+    if (prestamosJornadaData && prestamosJornadaData.labels) {
+        const ctxJornada = document.getElementById('prestamosJornadaChart').getContext('2d');
+        new Chart(ctxJornada, {
+            type: 'doughnut',
+            data: {
+                labels: prestamosJornadaData.labels,
+                datasets: [{
+                    label: 'Total de Préstamos',
+                    data: prestamosJornadaData.data,
+                    backgroundColor: [
+                        'rgba(255, 206, 86, 0.7)',  // Amarillo para Mañana
+                        'rgba(255, 159, 64, 0.7)',  // Naranja para Tarde
+                        'rgba(54, 162, 235, 0.7)'   // Azul para Noche
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+            options: { responsive: true }
+        });
+    }
+});
+</script>
+
+{% include 'components/footer.html' %}

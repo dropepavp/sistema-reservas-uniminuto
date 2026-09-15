@@ -1,0 +1,50 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0"><i class="bi bi-geo-alt-fill me-2"></i>Seleccionar Sede</h4>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <p class="text-muted mb-4">Selecciona la sede en la que vas a trabajar durante este turno.</p>
+
+                    <form method="post" action="/seleccionar-sede">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="mb-4">
+                            {% for sede in sedes %}
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="sede_id"
+                                           id="sede_{{ sede.id }}" value="{{ sede.id }}" required>
+                                    <label class="form-check-label fs-5" for="sede_{{ sede.id }}">
+                                        {{ sede.nombre }}
+                                    </label>
+                                </div>
+                            {% else %}
+                                <p class="text-warning">No tienes sedes asignadas.</p>
+                            {% endfor %}
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-check-circle me-1"></i>Confirmar Sede
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'components/footer.html' %}

@@ -1,0 +1,121 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <h2 class="mb-0"><i class="bi bi-gear-fill"></i> Configuración y Estado del Sistema</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Estadísticas Generales -->
+        <div class="col-md-8 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-bar-chart-fill"></i> Estadísticas Generales</h5>
+                    <span class="badge bg-primary">v{{ sistema_info.version }}</span>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center mb-4">
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="p-3 border rounded bg-light">
+                                <h3 class="text-primary">{{ stats.total_usuarios }}</h3>
+                                <small class="text-muted">Usuarios</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="p-3 border rounded bg-light">
+                                <h3 class="text-success">{{ stats.total_profesores }}</h3>
+                                <small class="text-muted">Profesores</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="p-3 border rounded bg-light">
+                                <h3 class="text-info">{{ stats.total_inventario }}</h3>
+                                <small class="text-muted">Inventario</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="p-3 border rounded bg-light">
+                                <h3 class="text-warning">{{ stats.festivos_configurados }}</h3>
+                                <small class="text-muted">Festivos</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm border">
+                            <tbody>
+                                <tr>
+                                    <th class="bg-light w-50">Préstamos Totales</th>
+                                    <td>{{ stats.total_prestamos }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">Préstamos Activos</th>
+                                    <td><span class="badge bg-danger">{{ stats.prestamos_activos }}</span></td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">Reservas Totales</th>
+                                    <td>{{ stats.total_reservas }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">Reservas Activas</th>
+                                    <td><span class="badge bg-success">{{ stats.reservas_activas }}</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del Sistema -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white text-center">
+                    <h5 class="mb-0"><i class="bi bi-info-circle-fill"></i> Estado Técnico</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Base de Datos
+                            <span
+                                class="badge bg-{{ 'success' if sistema_info.db_status == 'Conectado' else 'danger' }}">
+                                {{ sistema_info.db_status }}
+                            </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Ambiente
+                            <span class="badge bg-secondary">{{ sistema_info.ambiente }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Último Respaldo
+                            <small class="text-muted">{{ sistema_info.ultimo_respaldo }}</small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white text-center">
+                    <h5 class="mb-0"><i class="bi bi-database-fill-gear"></i> Mantenimiento</h5>
+                </div>
+                <div class="card-body text-center d-grid gap-2">
+                    <a href="{{ url_for('admin.backup_sistema') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-download"></i> Descargar Respaldo Excel
+                    </a>
+                    <a href="{{ url_for('inventario.importar_inventario') }}" class="btn btn-outline-warning">
+                        <i class="bi bi-upload"></i> Importar Datos (Inventario)
+                    </a>
+                    <hr>
+                    <a href="{{ url_for('admin.ver_logs') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-journal-text"></i> Ver Logs del Sistema
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'components/footer.html' %}

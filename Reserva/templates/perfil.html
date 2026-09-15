@@ -1,0 +1,311 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<style>
+    .perfil-hero {
+        background: linear-gradient(135deg, #1a3a5c 0%, #2d6a9f 100%);
+        color: white;
+        padding: 2rem 0 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .perfil-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, .2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.2rem;
+        border: 3px solid rgba(255, 255, 255, .4);
+    }
+
+    .card-perfil {
+        border: none;
+        border-radius: 14px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, .08);
+    }
+
+    .pwd-strength {
+        height: 4px;
+        border-radius: 4px;
+        transition: all .3s;
+    }
+
+    .strength-weak {
+        width: 33%;
+        background: #ef4444;
+    }
+
+    .strength-medium {
+        width: 66%;
+        background: #f59e0b;
+    }
+
+    .strength-strong {
+        width: 100%;
+        background: #10b981;
+    }
+
+    .toggle-pwd {
+        cursor: pointer;
+    }
+
+    .info-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        background: #f1f5f9;
+        border-radius: 999px;
+        padding: .3rem .9rem;
+        font-size: .85rem;
+        color: #475569;
+    }
+</style>
+
+<!-- Hero -->
+<div class="perfil-hero">
+    <div class="container">
+        <div class="d-flex align-items-center gap-3">
+            <div class="perfil-avatar"><i class="bi bi-person-fill"></i></div>
+            <div>
+                <h1 class="mb-0 fs-3 fw-bold">{{ usuario.nombre_completo }}</h1>
+                <div class="d-flex gap-2 mt-1 flex-wrap">
+                    <span class="info-chip" style="background:rgba(255,255,255,.2);color:#fff;">
+                        <i class="bi bi-person-badge"></i> {{ usuario.documento }}
+                    </span>
+                    <span class="info-chip" style="background:rgba(255,255,255,.2);color:#fff;">
+                        <i class="bi bi-envelope"></i> {{ usuario.correo }}
+                    </span>
+                    <span class="info-chip" style="background:rgba(255,255,255,.2);color:#fff;">
+                        <i class="bi bi-shield-check"></i> {{ usuario.rol|capitalize }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}{% for cat, msg in messages %}
+    <div class="alert alert-{{ cat }} alert-dismissible fade show">
+        {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}{% endif %}
+    {% endwith %}
+
+    <div class="row g-4 justify-content-center">
+
+        <!-- Info del usuario -->
+        <div class="col-lg-4">
+            <div class="card card-perfil h-100">
+                <div class="card-header bg-white border-bottom pt-4 pb-3 px-4">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-person-circle me-2 text-primary"></i>Mi Información</h5>
+                </div>
+                <div class="card-body px-4 py-3">
+                    <ul class="list-unstyled mb-0">
+                        <li class="py-2 border-bottom">
+                            <div class="text-muted small">Número de documento</div>
+                            <div class="fw-semibold">{{ usuario.documento }}</div>
+                        </li>
+                        <li class="py-2 border-bottom">
+                            <div class="text-muted small">Nombre completo</div>
+                            <div class="fw-semibold">{{ usuario.nombre_completo }}</div>
+                        </li>
+                        <li class="py-2 border-bottom">
+                            <div class="text-muted small">Correo electrónico</div>
+                            <div class="fw-semibold">{{ usuario.correo }}</div>
+                        </li>
+                        <li class="py-2">
+                            <div class="text-muted small">Rol en el sistema</div>
+                            <span
+                                class="badge {% if usuario.rol == 'admin' %}bg-danger{% else %}bg-primary{% endif %} fs-6 mt-1">
+                                {{ usuario.rol|capitalize }}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cambiar contraseña -->
+        <div class="col-lg-5">
+            <div class="card card-perfil">
+                <div class="card-header bg-white border-bottom pt-4 pb-3 px-4">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-key-fill me-2 text-warning"></i>Cambiar Contraseña</h5>
+                </div>
+                <div class="card-body px-4 py-4">
+
+                    <!-- Alerta resultado -->
+                    <div id="pwd-alert" class="d-none mb-3"></div>
+
+                    <form id="form-pwd" novalidate>
+                        <!-- Contraseña actual -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Contraseña actual</label>
+                            <div class="input-group">
+                                <input type="password" id="pwd-actual" class="form-control"
+                                    placeholder="Tu contraseña actual" autocomplete="current-password" required>
+                                <span class="input-group-text toggle-pwd" data-target="pwd-actual"><i
+                                        class="bi bi-eye"></i></span>
+                            </div>
+                        </div>
+
+                        <!-- Nueva contraseña -->
+                        <div class="mb-2">
+                            <label class="form-label fw-semibold">Nueva contraseña</label>
+                            <div class="input-group">
+                                <input type="password" id="pwd-nueva" class="form-control"
+                                    placeholder="Mín. 8 caracteres, letra y número" autocomplete="new-password" required
+                                    oninput="medirFuerza(this.value)">
+                                <span class="input-group-text toggle-pwd" data-target="pwd-nueva"><i
+                                        class="bi bi-eye"></i></span>
+                            </div>
+                            <!-- Barra de fortaleza -->
+                            <div class="mt-2 mb-1">
+                                <div class="bg-light rounded" style="height:4px;">
+                                    <div id="pwd-bar" class="pwd-strength rounded" style="width:0%"></div>
+                                </div>
+                            </div>
+                            <div id="pwd-fuerza-label" class="small text-muted">Ingresa una contraseña</div>
+                        </div>
+
+                        <!-- Reglas -->
+                        <div class="mb-3 p-2 bg-light rounded small text-muted">
+                            <div id="rule-min" class="d-flex align-items-center gap-1">
+                                <i class="bi bi-circle text-muted" id="ico-min"></i> Mínimo 8 caracteres
+                            </div>
+                            <div id="rule-letra" class="d-flex align-items-center gap-1">
+                                <i class="bi bi-circle text-muted" id="ico-letra"></i> Al menos 1 letra
+                            </div>
+                            <div id="rule-num" class="d-flex align-items-center gap-1">
+                                <i class="bi bi-circle text-muted" id="ico-num"></i> Al menos 1 número
+                            </div>
+                        </div>
+
+                        <!-- Confirmar -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Confirmar nueva contraseña</label>
+                            <div class="input-group">
+                                <input type="password" id="pwd-confirma" class="form-control"
+                                    placeholder="Repite la nueva contraseña" autocomplete="new-password" required>
+                                <span class="input-group-text toggle-pwd" data-target="pwd-confirma"><i
+                                        class="bi bi-eye"></i></span>
+                            </div>
+                            <div id="match-label" class="small mt-1"></div>
+                        </div>
+
+                        <button type="submit" id="btn-guardar" class="btn btn-warning w-100 fw-bold" disabled>
+                            <i class="bi bi-floppy2-fill me-1"></i>Actualizar contraseña
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Toggle visibilidad de contraseña
+    document.querySelectorAll('.toggle-pwd').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const input = document.getElementById(btn.dataset.target);
+            const icon = btn.querySelector('i');
+            input.type = input.type === 'password' ? 'text' : 'password';
+            icon.className = input.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+        });
+    });
+
+    function medirFuerza(pwd) {
+        const bar = document.getElementById('pwd-bar');
+        const label = document.getElementById('pwd-fuerza-label');
+
+        const tieneLetra = /[a-zA-Z]/.test(pwd);
+        const tieneNum = /[0-9]/.test(pwd);
+        const tieneEspec = /[^a-zA-Z0-9]/.test(pwd);
+        const largo = pwd.length >= 8;
+
+        setRegla('ico-min', largo);
+        setRegla('ico-letra', tieneLetra);
+        setRegla('ico-num', tieneNum);
+
+        const puntos = [largo, tieneLetra, tieneNum, tieneEspec].filter(Boolean).length;
+
+        bar.className = 'pwd-strength rounded';
+        if (pwd.length === 0) { bar.style.width = '0%'; label.textContent = 'Ingresa una contraseña'; return; }
+        if (puntos <= 2) { bar.classList.add('strength-weak'); label.textContent = 'Contraseña débil'; label.className = 'small text-danger'; }
+        else if (puntos === 3) { bar.classList.add('strength-medium'); label.textContent = 'Contraseña media'; label.className = 'small text-warning'; }
+        else { bar.classList.add('strength-strong'); label.textContent = 'Contraseña fuerte'; label.className = 'small text-success'; }
+
+        validarFormulario();
+    }
+
+    function setRegla(iconId, ok) {
+        const ico = document.getElementById(iconId);
+        ico.className = ok ? 'bi bi-check-circle-fill text-success' : 'bi bi-circle text-muted';
+    }
+
+    document.getElementById('pwd-confirma').addEventListener('input', function () {
+        const match = this.value === document.getElementById('pwd-nueva').value;
+        const lbl = document.getElementById('match-label');
+        lbl.textContent = this.value ? (match ? '✓ Las contraseñas coinciden' : '✗ No coinciden') : '';
+        lbl.className = 'small mt-1 ' + (match ? 'text-success' : 'text-danger');
+        validarFormulario();
+    });
+
+    document.getElementById('pwd-nueva').addEventListener('input', () => {
+        document.getElementById('pwd-confirma').dispatchEvent(new Event('input'));
+    });
+
+    function validarFormulario() {
+        const actual = document.getElementById('pwd-actual').value.trim();
+        const nueva = document.getElementById('pwd-nueva').value;
+        const confirma = document.getElementById('pwd-confirma').value;
+        const ok = actual && nueva.length >= 8 && /[a-zA-Z]/.test(nueva) && /[0-9]/.test(nueva) && nueva === confirma;
+        document.getElementById('btn-guardar').disabled = !ok;
+    }
+    document.getElementById('pwd-actual').addEventListener('input', validarFormulario);
+
+    // Submit
+    document.getElementById('form-pwd').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const btn = document.getElementById('btn-guardar');
+        const alert = document.getElementById('pwd-alert');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Guardando…';
+
+        try {
+            const res = await fetch('/perfil/cambiar-contrasena', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contrasena_actual: document.getElementById('pwd-actual').value,
+                    contrasena_nueva: document.getElementById('pwd-nueva').value,
+                    contrasena_confirma: document.getElementById('pwd-confirma').value,
+                })
+            });
+            const data = await res.json();
+
+            alert.className = `alert alert-${data.success ? 'success' : 'danger'} d-block`;
+            alert.innerHTML = `<i class="bi bi-${data.success ? 'check-circle' : 'exclamation-triangle'}-fill me-1"></i>${data.message}`;
+
+            if (data.success) {
+                document.getElementById('form-pwd').reset();
+                document.getElementById('pwd-bar').style.width = '0%';
+                document.getElementById('pwd-fuerza-label').textContent = 'Ingresa una contraseña';
+            }
+        } catch (err) {
+            alert.className = 'alert alert-danger d-block';
+            alert.innerHTML = 'Error de conexión. Intenta de nuevo.';
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-floppy2-fill me-1"></i>Actualizar contraseña';
+            validarFormulario();
+        }
+    });
+</script>
+
+{% include 'components/footer.html' %}

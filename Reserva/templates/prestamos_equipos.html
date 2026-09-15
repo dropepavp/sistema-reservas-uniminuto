@@ -1,0 +1,818 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<style>
+/* Estilos personalizados para sub-pestañas de préstamos */
+.nav-tabs .nav-link {
+    color: #495057;
+    font-weight: 500;
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: 12px 20px;
+    transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #2d6a9f;
+    border-bottom-color: #2d6a9f;
+    background-color: rgba(45, 106, 159, 0.05);
+}
+
+.nav-tabs .nav-link.active {
+    color: #2d6a9f;
+    background-color: white;
+    border-bottom: 3px solid #2d6a9f;
+    font-weight: 600;
+}
+
+.nav-tabs .nav-link i {
+    margin-right: 8px;
+}
+
+.tab-content {
+    background: white;
+    border-radius: 0 0 8px 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tab-pane {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tab-content .card {
+    border: none;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    transition: box-shadow 0.3s ease;
+}
+
+.tab-content .card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.estado-activo {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.estado-devuelto {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.estado-vencido {
+    background-color: #f8d7da;
+    color: #842029;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .nav-tabs .nav-link {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+    
+    .nav-tabs .nav-link i {
+        margin-right: 5px;
+    }
+}
+</style>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12 d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0"><i class="bi bi-laptop"></i> Gestión de Préstamos de Equipos - {{ current_user.sede.nombre
+                if current_user and current_user.sede else 'Todas las Sedes' }}</h2>
+            <div>
+                <a href="{{ url_for('prestamos.prestamos_historial') }}" class="btn btn-outline-info">
+                    <i class="bi bi-clock-history"></i> Ver Historial Completo
+                </a>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-house-door"></i> Volver al Inicio
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumen de Inventario por Sede -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm rounded-3 h-100 bg-white border-start border-4 border-primary">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted small text-uppercase fw-semibold">Portátiles</span>
+                            <h3 class="fw-bold mb-0 text-dark mt-1">{{ disponibles.portatiles.disponible if disponibles and disponibles.portatiles else 0 }}</h3>
+                            <small class="text-muted">Total: {{ disponibles.portatiles.total if disponibles and disponibles.portatiles else 0 }}</small>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle">
+                            <i class="bi bi-laptop fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm rounded-3 h-100 bg-white border-start border-4 border-warning">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted small text-uppercase fw-semibold">Cargadores</span>
+                            <h3 class="fw-bold mb-0 text-dark mt-1">{{ disponibles.cargadores.disponible if disponibles and disponibles.cargadores else 0 }}</h3>
+                            <small class="text-muted">Total: {{ disponibles.cargadores.total if disponibles and disponibles.cargadores else 0 }}</small>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-circle">
+                            <i class="bi bi-lightning-charge fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm rounded-3 h-100 bg-white border-start border-4 border-info">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted small text-uppercase fw-semibold">HDMI</span>
+                            <h3 class="fw-bold mb-0 text-dark mt-1">{{ disponibles.hdmi.disponible if disponibles and disponibles.hdmi else 0 }}</h3>
+                            <small class="text-muted">Total: {{ disponibles.hdmi.total if disponibles and disponibles.hdmi else 0 }}</small>
+                        </div>
+                        <div class="bg-info bg-opacity-10 text-info p-3 rounded-circle">
+                            <i class="bi bi-usb-c fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm rounded-3 h-100 bg-white border-start border-4 border-success">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted small text-uppercase fw-semibold">Controles</span>
+                            <h3 class="fw-bold mb-0 text-dark mt-1">{{ disponibles.controles.disponible if disponibles and disponibles.controles else 0 }}</h3>
+                            <small class="text-muted">Total: {{ disponibles.controles.total if disponibles and disponibles.controles else 0 }}</small>
+                        </div>
+                        <div class="bg-success bg-opacity-10 text-success p-3 rounded-circle">
+                            <i class="bi bi-remote fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Selección de Sede (solo para administradores) -->
+    {% if current_user and current_user.is_admin() %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Selección de Sede</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold" for="sede_prestamo">Sede de Préstamo:</label>
+                            <select class="form-select" id="sede_prestamo" name="sede_prestamo" required>
+                                <option value="">Seleccionar Sede...</option>
+                                {% for sede in sedes if sedes %}
+                                <option value="{{ sede.id }}" {% if current_user and current_user.sede and
+                                    current_user.sede.id==sede.id %}selected{% endif %}>
+                                    {{ sede.nombre }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="alert alert-info mb-0">
+                                <i class="bi bi-info-circle"></i> <strong>Información:</strong>
+                                <span id="info_sede">Seleccione una sede para ver los equipos disponibles</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Navegación por Sub-Pestañas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <ul class="nav nav-tabs" id="prestamosTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="nuevo-tab" data-bs-toggle="tab" data-bs-target="#nuevo" type="button" role="tab" aria-controls="nuevo" aria-selected="true">
+                        <i class="bi bi-plus-circle me-2"></i>Nuevo Préstamo
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="activos-tab" data-bs-toggle="tab" data-bs-target="#activos" type="button" role="tab" aria-controls="activos" aria-selected="false">
+                        <i class="bi bi-clock me-2"></i>Préstamos en el Día Actual
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="devueltos-tab" data-bs-toggle="tab" data-bs-target="#devueltos" type="button" role="tab" aria-controls="devueltos" aria-selected="false">
+                        <i class="bi bi-check-circle me-2"></i>Devueltos
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Contenido de las Sub-Pestañas -->
+    <div class="tab-content" id="prestamosTabsContent">
+        
+        <!-- Pestaña 1: Nuevo Préstamo -->
+        <div class="tab-pane fade show active" id="nuevo" role="tabpanel" aria-labelledby="nuevo-tab">
+            <!-- Notificaciones de Préstamos Vencidos -->
+            {% if prestamos_vencidos %}
+            <div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> ¡Atención! Préstamos Vencidos</h4>
+                <p>Los siguientes préstamos han superado su hora de devolución prevista y no han sido devueltos:</p>
+                <hr>
+                <ul class="mb-0">
+                    {% for prestamo in prestamos_vencidos %}
+                    <li>
+                        <strong>Profesor:</strong> {{ prestamo.nombre_profesor }} -
+                        <strong>Equipo:</strong> {{ prestamo.equipo_prestado }} -
+                        <strong>Devolución prevista:</strong> {{ prestamo.hora_fin }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- Formulario de Préstamo -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Nuevo Préstamo</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="formPrestamo">
+                                <div class="row g-3">
+                                    <!-- Selección de Profesor -->
+                                    <div class="col-md-6 position-relative">
+                                        <label class="form-label" for="busqueda_profesor">Profesor (Busca por Cédula o
+                                            Nombre):</label>
+                                        <input type="text" class="form-control" id="busqueda_profesor"
+                                            placeholder="Escribe cédula o nombre..." autocomplete="off" required>
+                                        <input type="hidden" id="cedula_profesor" name="cedula">
+                                        <div id="sugerenciasProfesores" class="list-group position-absolute w-100 shadow-sm"
+                                            style="display:none; max-height: 180px; overflow-y: auto; z-index: 1050; top: 100%;">
+                                        </div>
+                                    </div>
+
+                                    <!-- Información del Profesor Seleccionado -->
+                                    <div id="infoProfesor" class="col-12 mt-2"
+                                        style="display: none; background-color: #f8f9fa; border-left: 4px solid #2d6a9f; padding: 10px; border-radius: 5px;">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <h6 class="mb-0 text-primary"><i class="bi bi-person-check-fill me-1"></i>Datos
+                                                del Profesor</h6>
+                                            <button type="button"
+                                                class="btn btn-sm btn-link text-danger p-0 text-decoration-none"
+                                                onclick="limpiarProfesorSeleccionado()">Cambiar</button>
+                                        </div>
+                                        <p class="mb-0 small"><strong>Nombre:</strong> <span id="profesorNombre"></span></p>
+                                        <p class="mb-0 small"><strong>Cédula:</strong> <span id="profesorCedulaText"></span>
+                                        </p>
+                                        <p class="mb-0 small"><strong>Correo:</strong> <span id="profesorCorreo"></span></p>
+                                        <p class="mb-0 small"><strong>Programa:</strong> <span id="profesorPrograma"></span>
+                                        </p>
+                                        <p class="mb-0 small"><strong>Salón Asignado:</strong> <span id="profesorSalon">No
+                                                asignado</span></p>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold" for="hora_inicio">Hora Inicio:</label>
+                                        <input type="text" class="form-control" id="hora_inicio" name="hora_inicio" required
+                                            inputmode="numeric" placeholder="HH:MM (00:00-23:59)"
+                                            pattern="^([01]\d|2[0-3]):[0-5]\d$">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold" for="hora_fin">Hora Fin:</label>
+                                        <input type="text" class="form-control" id="hora_fin" name="hora_fin" required
+                                            inputmode="numeric" placeholder="HH:MM (00:00-23:59)"
+                                            pattern="^([01]\d|2[0-3]):[0-5]\d$">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold" for="ubicacion">Ubicación (opcional):</label>
+                                        <input type="text" class="form-control" id="ubicacion" name="ubicacion"
+                                            maxlength="100" placeholder="Ej: Laboratorio 1">
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold" for="observaciones">Observaciones
+                                            (opcional):</label>
+                                        <textarea class="form-control" id="observaciones" name="observaciones" rows="2"
+                                            maxlength="500" placeholder="Notas adicionales..."></textarea>
+                                    </div>
+
+                                    <!-- Búsqueda de Equipos desde Inventario -->
+                                    <div class="col-12" id="seccion_equipos" style="display: none;">
+                                        <div class="card border-0 shadow-sm">
+                                            <div class="card-header bg-primary text-white">
+                                                <h6 class="mb-0"><i class="bi bi-search"></i> Buscar Equipos desde Inventario</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row g-3">
+                                                    <!-- Filtros de Búsqueda -->
+                                                    <div class="col-md-4">
+                                                        <label class="form-label fw-bold">Tipo de Equipo:</label>
+                                                        <select class="form-select" id="filtro_tipo_equipo" name="filtro_tipo_equipo">
+                                                            <option value="">Todos los equipos...</option>
+                                                            <option value="PORTATIL">Portátil</option>
+                                                            <option value="CARGADOR">Cargador Portátil</option>
+                                                            <option value="HDMI">Cable HDMI</option>
+                                                            <option value="CONTROL">Control Remoto</option>
+                                                            <option value="TECLADO">Teclado</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <label class="form-label fw-bold">Marca (para controles):</label>
+                                                        <select class="form-select" id="filtro_marca_control" name="filtro_marca_control">
+                                                            <option value="">Todas las marcas...</option>
+                                                            <option value="SAMSUNG">Samsung</option>
+                                                            <option value="PANASONIC">Panasonic</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <label class="form-label fw-bold">Salón (para controles):</label>
+                                                        <input type="text" class="form-control" id="filtro_salon" name="filtro_salon" list="lista-salones-disponibles" placeholder="Escribe el salón (Ej: 101)">
+                                                        <datalist id="lista-salones-disponibles">
+                                                            <option value="101">Salón 101</option>
+                                                            <option value="102">Salón 102</option>
+                                                            <option value="103">Salón 103</option>
+                                                            <option value="104">Salón 104</option>
+                                                            <option value="105">Salón 105</option>
+                                                            <option value="201">Salón 201</option>
+                                                            <option value="202">Salón 202</option>
+                                                            <option value="203">Salón 203</option>
+                                                            <option value="204">Salón 204</option>
+                                                            <option value="205">Salón 205</option>
+                                                        </datalist>
+                                                    </div>
+
+                                                    <!-- Búsqueda por Número de Inventario -->
+                                                    <div class="col-12">
+                                                        <label class="form-label fw-bold">Buscar por Número de Inventario:</label>
+                                                        <div class="input-group">
+                                                            <input type="text" class="form-control" id="numero_inventario_busqueda" placeholder="Escanear código o escribir número de inventario..." list="lista-inventario-disponible">
+                                                            <button class="btn btn-primary" type="button" id="btnBuscarInventario">
+                                                                <i class="bi bi-search"></i> Buscar
+                                                            </button>
+                                                            <button class="btn btn-success" type="button" id="btnAgregarDirecto">
+                                                                <i class="bi bi-plus-lg"></i> Agregar Directo
+                                                            </button>
+                                                        </div>
+                                                        <datalist id="lista-inventario-disponible"></datalist>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Resultados de Búsqueda -->
+                                                <div class="row mt-3">
+                                                    <div class="col-12">
+                                                        <div id="resultadosBusqueda" class="table-responsive" style="display: none;">
+                                                            <table class="table table-sm table-bordered">
+                                                                <thead class="table-light">
+                                                                    <tr>
+                                                                        <th>Inventario</th>
+                                                                        <th>Equipo</th>
+                                                                        <th>Marca</th>
+                                                                        <th>Estado</th>
+                                                                        <th>Acción</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody id="resultadosBusquedaBody">
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Lista de Equipos Seleccionados -->
+                                    <div class="col-12" id="seccion_equipos_seleccionados" style="display: none;">
+                                        <div class="card border-0 shadow-sm">
+                                            <div class="card-header bg-primary text-white">
+                                                <h6 class="mb-0"><i class="bi bi-list-check"></i> Equipos Seleccionados para Préstamo</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="table-responsive">
+                                                    <table class="table table-sm table-bordered">
+                                                        <thead class="table-light">
+                                                            <tr>
+                                                                <th>Inventario</th>
+                                                                <th>Equipo</th>
+                                                                <th>Marca</th>
+                                                                <th>Acción</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="equiposSeleccionadosBody">
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <i class="bi bi-check-circle"></i> Registrar Préstamo
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pestaña 2: Préstamos en el Día Actual -->
+    <div class="tab-pane fade" id="activos" role="tabpanel" aria-labelledby="activos-tab">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-clock"></i> Préstamos en el Día Actual</h5>
+                <div class="d-flex gap-2">
+                    <input type="text" class="form-control form-control-sm" id="buscarActivos" placeholder="Buscar..." style="width: 200px;">
+                    <button class="btn btn-light btn-sm" onclick="location.reload()">
+                        <i class="bi bi-arrow-clockwise"></i> Actualizar
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover datatable" id="prestamosDiaTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Profesor</th>
+                                <th>Equipo</th>
+                                <th>Fecha</th>
+                                <th>Horario</th>
+                                <th>Ubicación</th>
+                                <th>Jornada</th>
+                                <th>Estado</th>
+                                <th>Observaciones</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prestamo in prestamos_dia %}
+                            <tr class="{% if prestamo.estado == 'Vencido' %}table-danger{% endif %}">
+                                <td>{{ prestamo.nombre_profesor }}</td>
+                                <td>{{ prestamo.equipo_prestado }}</td>
+                                <td>{{ prestamo.fecha }}</td>
+                                <td>{{ prestamo.hora_inicio }} - {{ prestamo.hora_fin }}</td>
+                                <td>{{ prestamo.ubicacion }}</td>
+                                <td>{{ prestamo.jornada }}</td>
+                                <td>
+                                    <span class="badge {% if prestamo.estado == 'Activo' %}bg-warning-subtle text-warning border border-warning-subtle text-dark{% elif prestamo.estado == 'Devuelto' %}bg-success-subtle text-success border border-success-subtle{% else %}bg-danger-subtle text-danger border border-danger-subtle{% endif %}">
+                                        {{ prestamo.estado }}
+                                    </span>
+                                </td>
+                                <td>{{ prestamo.observaciones or '-' }}</td>
+                                <td>
+                                    <button class="btn btn-success btn-sm" onclick="devolverPrestamo({{ prestamo.id_prestamo }})">
+                                        <i class="bi bi-check-circle"></i> Devolver
+                                    </button>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="9" class="text-center text-muted">No hay préstamos activos en el día de hoy</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pestaña 3: Devueltos -->
+    <div class="tab-pane fade" id="devueltos" role="tabpanel" aria-labelledby="devueltos-tab">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-check-circle"></i> Equipos Devueltos</h5>
+                <div class="d-flex gap-2">
+                    <input type="date" class="form-control form-control-sm" id="fechaDevolucion" style="width: 150px;">
+                    <button class="btn btn-light btn-sm" onclick="filtrarDevoluciones()">
+                        <i class="bi bi-filter"></i> Filtrar
+                    </button>
+                    <button class="btn btn-outline-light btn-sm" onclick="limpiarFiltroDevoluciones()">
+                        <i class="bi bi-x-circle"></i> Limpiar
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover datatable" id="prestamosDevueltosTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Profesor</th>
+                                <th>Equipo</th>
+                                <th>N° Inventario</th>
+                                <th>Fecha Préstamo</th>
+                                <th>Hora Inicio</th>
+                                <th>Hora Fin</th>
+                                <th>Fecha Devolución</th>
+                                <th>Ubicación</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prestamo in prestamos_devueltos if prestamos_devueltos %}
+                            <tr>
+                                <td>{{ prestamo.id_grupo }}</td>
+                                <td>{{ prestamo.nombre_profesor or '--' }}</td>
+                                <td>{{ prestamo.equipos|length }} equipos</td>
+                                <td>--</td>
+                                <td>{{ prestamo.fecha_prestamo.strftime('%d-%m-%Y') if prestamo.fecha_prestamo else '--' }}</td>
+                                <td>{{ prestamo.hora_inicio.strftime('%H:%M') if prestamo.hora_inicio else '--' }}</td>
+                                <td>{{ prestamo.hora_fin.strftime('%H:%M') if prestamo.hora_fin else '--' }}</td>
+                                <td>--</td>
+                                <td>{{ prestamo.ubicacion or '--' }}</td>
+                                <td><span class="estado-devuelto">Devuelto</span></td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="10" class="text-center text-muted">No hay equipos devueltos registrados</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Función para devolver préstamo
+function devolverPrestamo(prestamoId) {
+    if (confirm('¿Está seguro de que desea devolver este equipo?')) {
+        fetch(`/prestamos/devolver/${prestamoId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.content
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (window.notificationSystem) {
+                    window.notificationSystem.notify({
+                        title: '✅ Equipo Devuelto',
+                        message: 'El equipo ha sido devuelto exitosamente',
+                        type: 'success',
+                        icon: 'bi-check-circle',
+                        sound: 'success'
+                    });
+                }
+                location.reload();
+            } else {
+                if (window.notificationSystem) {
+                    window.notificationSystem.notify({
+                        title: '❌ Error',
+                        message: data.message || 'Error al devolver el equipo',
+                        type: 'danger',
+                        icon: 'bi-x-circle',
+                        sound: 'urgent'
+                    });
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al devolver el equipo');
+        });
+    }
+}
+
+// Función para filtrar devoluciones por fecha
+function filtrarDevoluciones() {
+    const fecha = document.getElementById('fechaDevolucion').value;
+    if (fecha) {
+        window.location.href = `/prestamos/devueltos?fecha=${fecha}`;
+    }
+}
+
+// Función para limpiar filtro de devoluciones
+function limpiarFiltroDevoluciones() {
+    document.getElementById('fechaDevolucion').value = '';
+    window.location.href = '/prestamos/devueltos';
+}
+
+// Variables globales para equipos
+let equiposSeleccionados = [];
+let inventarioDisponible = [];
+
+// Función para buscar equipos en inventario
+function buscarEquipos() {
+    const tipo = document.getElementById('filtro_tipo_equipo').value;
+    const marca = document.getElementById('filtro_marca_control').value;
+    const salon = document.getElementById('filtro_salon').value;
+    const numero = document.getElementById('numero_inventario_busqueda').value;
+    
+    const params = new URLSearchParams();
+    if (tipo) params.append('tipo', tipo);
+    if (marca) params.append('marca', marca);
+    if (salon) params.append('salon', salon);
+    if (numero) params.append('numero', numero);
+    
+    fetch(`/prestamos/buscar-equipos?${params}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.equipos.length > 0) {
+                mostrarResultadosBusqueda(data.equipos);
+            } else {
+                document.getElementById('resultadosBusqueda').style.display = 'none';
+                alert('No se encontraron equipos con los filtros especificados');
+            }
+        })
+        .catch(error => {
+            console.error('Error al buscar equipos:', error);
+            alert('Error al buscar equipos');
+        });
+}
+
+// Función para mostrar resultados de búsqueda
+function mostrarResultadosBusqueda(equipos) {
+    const tbody = document.getElementById('resultadosBusquedaBody');
+    tbody.innerHTML = '';
+    
+    equipos.forEach(equipo => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${equipo.numero_inventario}</td>
+            <td>${equipo.item}</td>
+            <td>${equipo.marca || '--'}</td>
+            <td><span class="badge bg-success">${equipo.estado}</span></td>
+            <td>
+                <button class="btn btn-sm btn-primary" onclick="agregarEquipo('${equipo.numero_inventario}', '${equipo.item}', '${equipo.marca || ''}')">
+                    <i class="bi bi-plus"></i> Agregar
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+    
+    document.getElementById('resultadosBusqueda').style.display = 'block';
+}
+
+// Función para agregar equipo a la lista
+function agregarEquipo(numero, item, marca) {
+    if (equiposSeleccionados.find(e => e.numero === numero)) {
+        alert('Este equipo ya está seleccionado');
+        return;
+    }
+    
+    equiposSeleccionados.push({ numero, item, marca });
+    actualizarListaEquiposSeleccionados();
+}
+
+// Función para actualizar la lista de equipos seleccionados
+function actualizarListaEquiposSeleccionados() {
+    const tbody = document.getElementById('equiposSeleccionadosBody');
+    tbody.innerHTML = '';
+    
+    equiposSeleccionados.forEach((equipo, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${equipo.numero}</td>
+            <td>${equipo.item}</td>
+            <td>${equipo.marca || '--'}</td>
+            <td>
+                <button class="btn btn-sm btn-danger" onclick="eliminarEquipo(${index})">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+    
+    document.getElementById('seccion_equipos_seleccionados').style.display = equiposSeleccionados.length > 0 ? 'block' : 'none';
+}
+
+// Función para eliminar equipo de la lista
+function eliminarEquipo(index) {
+    equiposSeleccionados.splice(index, 1);
+    actualizarListaEquiposSeleccionados();
+}
+
+// Event listeners para la búsqueda de equipos
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('btnBuscarInventario').addEventListener('click', buscarEquipos);
+    
+    document.getElementById('btnAgregarDirecto').addEventListener('click', function() {
+        const numero = document.getElementById('numero_inventario_busqueda').value;
+        if (numero) {
+            fetch(`/prestamos/buscar-equipos?numero=${numero}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.equipos.length > 0) {
+                        const equipo = data.equipos[0];
+                        agregarEquipo(equipo.numero_inventario, equipo.item, equipo.marca || '');
+                        document.getElementById('numero_inventario_busqueda').value = '';
+                    } else {
+                        alert('No se encontró el equipo con ese número de inventario');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al buscar equipo');
+                });
+        }
+    });
+    
+    // Mostrar sección de equipos cuando se selecciona un profesor
+    document.getElementById('busqueda_profesor').addEventListener('input', function() {
+        const cedula = document.getElementById('cedula_profesor').value;
+        if (cedula) {
+            document.getElementById('seccion_equipos').style.display = 'block';
+        }
+    });
+});
+
+// Inicializar DataTables cuando se cambie de pestaña
+document.addEventListener('DOMContentLoaded', function() {
+    const activosTab = document.getElementById('activos-tab');
+    const devueltosTab = document.getElementById('devueltos-tab');
+    
+    if (activosTab) {
+        activosTab.addEventListener('shown.bs.tab', function() {
+            const table = document.getElementById('prestamosDiaTable');
+            if (table && typeof $ !== 'undefined' && $.fn.DataTable) {
+                if ($.fn.DataTable.isDataTable(table)) {
+                    $(table).DataTable().columns.adjust().draw();
+                } else {
+                    $(table).DataTable({
+                        language: {
+                            url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es.json'
+                        },
+                        pageLength: 25,
+                        order: [[4, 'asc']] // Ordenar por hora inicio
+                    });
+                }
+            }
+        });
+    }
+    
+    if (devueltosTab) {
+        devueltosTab.addEventListener('shown.bs.tab', function() {
+            const table = document.getElementById('prestamosDevueltosTable');
+            if (table && typeof $ !== 'undefined' && $.fn.DataTable) {
+                if ($.fn.DataTable.isDataTable(table)) {
+                    $(table).DataTable().columns.adjust().draw();
+                } else {
+                    $(table).DataTable({
+                        language: {
+                            url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es.json'
+                        },
+                        pageLength: 25,
+                        order: [[8, 'desc']] // Ordenar por fecha devolución descendente
+                    });
+                }
+            }
+        });
+    }
+});
+
+</script>
+
+{% include 'components/footer.html' %}

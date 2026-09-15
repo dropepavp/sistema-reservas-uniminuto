@@ -1,0 +1,44 @@
+{% include 'components/header.html' %}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Registro de Nuevo Usuario</h4>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    <form method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="mb-3">
+                            <label for="usuario" class="form-label">Usuario / Documento</label>
+                            <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Ej. usuario123 o correo@dominio" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="nombre_completo" class="form-label">Nombre Completo</label>
+                            <input type="text" class="form-control" id="nombre_completo" name="nombre_completo" placeholder="Tu nombre completo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="correo" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="correo" name="correo" placeholder="correo@ejemplo.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="contraseña" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="contraseña" name="contraseña" placeholder="Crea una contraseña" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Registrarse</button>
+                    </form>
+                    <p class="mt-3 text-center">¿Ya tienes cuenta? <a href="{{ url_for('auth.login') }}">Inicia Sesión</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% include 'components/footer.html' %}

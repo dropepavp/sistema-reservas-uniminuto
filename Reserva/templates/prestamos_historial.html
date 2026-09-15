@@ -1,0 +1,341 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<div class="container-fluid mt-4 px-4">
+    <div class="row">
+        <div class="col-12 d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0"><i class="bi bi-clock-history"></i> Historial de Préstamos</h2>
+            <div>
+                <a href="{{ url_for('prestamos.prestamos_equipos') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver a Préstamos
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de Búsqueda y Filtros -->
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-search"></i> Búsqueda y Filtros Avanzados
+            </h5>
+        </div>
+        <div class="card-body">
+            <form id="filtrosHistorial" method="GET">
+                <div class="row g-3">
+                    <!-- Búsqueda por texto -->
+                    <div class="col-md-4">
+                        <label class="form-label">Buscar por:</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="busqueda"
+                                placeholder="Nombre profesor, equipo, ubicación..."
+                                value="{{ request.args.get('busqueda', '') }}" id="inputBusqueda">
+                            <button class="btn btn-outline-secondary" type="button" id="btnLimpiarBusqueda">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filtro por estado -->
+                    <div class="col-md-2">
+                        <label class="form-label">Estado:</label>
+                        <select class="form-select" name="estado">
+                            <option value="">Todos</option>
+                            <option value="Devuelto" {{ 'selected' if request.args.get('estado')=='Devuelto' else '' }}>
+                                Devuelto</option>
+                            <option value="Prestado" {{ 'selected' if request.args.get('estado')=='Prestado' else '' }}>
+                                Prestado</option>
+                        </select>
+                    </div>
+
+                    <!-- Filtro por jornada -->
+                    <div class="col-md-2">
+                        <label class="form-label">Jornada:</label>
+                        <select class="form-select" name="jornada">
+                            <option value="">Todas</option>
+                            <option value="MAÑANA" {{ 'selected' if request.args.get('jornada')=='MAÑANA' else '' }}>
+                                Mañana</option>
+                            <option value="TARDE" {{ 'selected' if request.args.get('jornada')=='TARDE' else '' }}>Tarde
+                            </option>
+                            <option value="NOCHE" {{ 'selected' if request.args.get('jornada')=='NOCHE' else '' }}>Noche
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Filtro por fecha desde -->
+                    <div class="col-md-2">
+                        <label class="form-label">Fecha desde:</label>
+                        <input type="date" class="form-control" name="fecha_desde"
+                            value="{{ request.args.get('fecha_desde', '') }}">
+                    </div>
+
+                    <!-- Filtro por fecha hasta -->
+                    <div class="col-md-2">
+                        <label class="form-label">Fecha hasta:</label>
+                        <input type="date" class="form-control" name="fecha_hasta"
+                            value="{{ request.args.get('fecha_hasta', '') }}">
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="bi bi-search"></i> Buscar
+                        </button>
+                        <a href="{{ url_for('prestamos.prestamos_historial') }}" class="btn btn-outline-secondary me-2">
+                            <i class="bi bi-arrow-clockwise"></i> Limpiar Filtros
+                        </a>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown">
+                                <i class="bi bi-download"></i> Exportar
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="exportarHistorial('excel')">
+                                        <i class="bi bi-file-earmark-excel"></i> Excel
+                                    </a></li>
+                                <li><a class="dropdown-item" href="#" onclick="exportarHistorial('csv')">
+                                        <i class="bi bi-file-earmark-text"></i> CSV
+                                    </a></li>
+                                <li><a class="dropdown-item" href="#" onclick="exportarHistorial('pdf')">
+                                        <i class="bi bi-file-earmark-pdf"></i> PDF
+                                    </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Estadísticas rápidas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-left-primary">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h5 class="card-title text-primary">Total Registros</h5>
+                            <h2 class="mb-0">{{ historial|length }}</h2>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-list-check display-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-left-success">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h5 class="card-title text-success">Devueltos</h5>
+                            <h2 class="mb-0">{{ historial|selectattr('estado', 'equalto', 'Devuelto')|list|length }}
+                            </h2>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-check-circle display-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-left-info">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h5 class="card-title text-info">Profesores Únicos</h5>
+                            <h2 class="mb-0">{{ historial|map(attribute='cedula_profesor')|unique|list|length }}</h2>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-people display-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-left-danger">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h5 class="card-title text-danger">Aún Prestados</h5>
+                            <h2 class="mb-0">{{ historial|selectattr('estado', 'equalto', 'Prestado')|list|length }}
+                            </h2>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-exclamation-triangle display-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5>Préstamos Devueltos</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped table-hover datatable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Profesor</th>
+                                <th>Equipo</th>
+                                <th>Nº Inventario</th>
+                                <th>Fecha Préstamo</th>
+                                <th>Hora Inicio</th>
+                                <th>Hora Fin Prevista</th>
+                                <th>Jornada</th>
+                                <th>H. Académicas</th>
+                                <th>Fecha Devolución</th>
+                                <th>Hora Devolución</th>
+                                <th>Aux. Entrega</th>
+                                <th>Aux. Recibe</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prestamo in historial %}
+                            <tr>
+                                <td>{{ prestamo.id_prestamo }}</td>
+                                <td>{{ prestamo.nombre_profesor or '--' }}</td>
+                                <td>{{ prestamo.equipo_prestado or '--' }}</td>
+                                <td>{{ prestamo.numero_inventario_equipo or '--' }}</td>
+                                <td>{{ prestamo.fecha_prestamo.strftime('%d-%m-%Y') if prestamo.fecha_prestamo else '--'
+                                    }}</td>
+                                <td>{{ prestamo.hora_inicio or '--' }}</td>
+                                <td>{{ prestamo.hora_fin or '--' }}</td>
+                                <td>{{ prestamo.jornada or '--' }}</td>
+                                <td>{{ "%.2f"|format(prestamo.horas_academicas|float) if prestamo.horas_academicas else
+                                    '0.00' }}</td>
+                                <td>{{ prestamo.fecha_devolucion.strftime('%d-%m-%Y') if prestamo.fecha_devolucion else
+                                    '--' }}</td>
+                                <td>{{ prestamo.hora_devolucion_real or '--' }}</td>
+                                <td>{{ prestamo.auxiliar_entrega or '--' }}</td>
+                                <td>{{ prestamo.auxiliar_recibe or '--' }}</td>
+                                <td>
+                                    <span class="badge bg-success">
+                                        {{ prestamo.estado }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="13" class="text-center text-muted">No hay préstamos en el historial.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Configurar DataTable si está disponible
+        if (typeof $.fn.DataTable !== 'undefined' && document.querySelector('.datatable')) {
+            $('.datatable').DataTable({
+                pageLength: 25,
+                order: [[0, 'desc']], // Ordenar por ID descendente
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
+                },
+                responsive: true,
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'csv', 'excel', 'pdf', 'print'
+                ]
+            });
+        }
+
+        // Limpiar búsqueda
+        const btnLimpiar = document.getElementById('btnLimpiarBusqueda');
+        if (btnLimpiar) {
+            btnLimpiar.addEventListener('click', function () {
+                document.getElementById('inputBusqueda').value = '';
+            });
+        }
+
+        // Autocompletar búsqueda
+        const inputBusqueda = document.getElementById('inputBusqueda');
+        if (inputBusqueda) {
+            inputBusqueda.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('filtrosHistorial').submit();
+                }
+            });
+        }
+
+        // Highlight de términos de búsqueda
+        const terminoBusqueda = new URLSearchParams(window.location.search).get('busqueda');
+        if (terminoBusqueda && terminoBusqueda.trim()) {
+            highlightSearchTerm(terminoBusqueda.trim());
+        }
+    });
+
+    // Función para resaltar términos de búsqueda
+    function highlightSearchTerm(term) {
+        const cells = document.querySelectorAll('table tbody td');
+        const regex = new RegExp(`(${term})`, 'gi');
+
+        cells.forEach(cell => {
+            if (cell.textContent.toLowerCase().includes(term.toLowerCase())) {
+                cell.innerHTML = cell.innerHTML.replace(regex, '<mark>$1</mark>');
+            }
+        });
+    }
+
+    // Función para exportar historial
+    function exportarHistorial(formato) {
+        const params = new URLSearchParams(window.location.search);
+        const url = `/prestamos/historial/exportar?${params.toString()}`;
+        window.open(url, '_blank');
+    }
+
+    // Función para ver detalles del préstamo (si se implementa)
+    function verDetalle(idPrestamo) {
+        // Esta función se puede implementar posteriormente
+        alert(`Ver detalles del préstamo ID: ${idPrestamo}`);
+    }
+
+    // Función para mostrar/ocultar filtros avanzados
+    function toggleFiltrosAvanzados() {
+        const filtros = document.getElementById('filtrosAvanzados');
+        if (filtros) {
+            filtros.classList.toggle('d-none');
+        }
+    }
+
+    // Auto-submit del formulario cuando cambian los selects
+    document.addEventListener('change', function (e) {
+        if (e.target.matches('select[name="estado"], select[name="jornada"]')) {
+            // Auto-submit cuando cambian los filtros de select
+            setTimeout(() => {
+                document.getElementById('filtrosHistorial').submit();
+            }, 100);
+        }
+    });
+
+    // Mostrar tooltip con información adicional
+    function initTooltips() {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    }
+
+    // Inicializar tooltips cuando la página esté lista
+    document.addEventListener('DOMContentLoaded', initTooltips);
+</script>
+
+{% include 'components/footer.html' %}
