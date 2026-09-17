@@ -250,7 +250,7 @@ def create_app(config_name=None):
             return render_template('index.html', stats=None, top_equipo=None, top_profesor=None)
 
     # ── Inicialización de DB y admin por defecto ───────────────────────────────
-    if not app.config.get('TESTING') and not os.environ.get('FLASK_SKIP_INIT_DB'):
+    if not app.config.get('TESTING') and not os.environ.get('FLASK_SKIP_INIT_DB') and not os.environ.get('VERCEL'):
         try:
             with app.app_context():
                 init_db(app)

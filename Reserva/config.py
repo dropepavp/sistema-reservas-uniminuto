@@ -12,6 +12,7 @@ def _build_safe_db_uri(raw_url: str) -> str:
             return 'sqlite:////tmp/sistema_reserva.db'
         return 'sqlite:///sistema_reserva.db'
 
+    raw_url = raw_url.strip().strip('"').strip("'")
     if raw_url.startswith('postgres://'):
         raw_url = raw_url.replace('postgres://', 'postgresql://', 1)
 
