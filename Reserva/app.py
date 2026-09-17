@@ -51,7 +51,11 @@ def create_app(config_name=None):
     migrate.init_app(app, db)
     csrf.init_app(app)
     limiter.init_app(app)
-    socketio.init_app(app)
+    if not os.environ.get('VERCEL'):
+        try:
+            socketio.init_app(app, cors_allowed_origins="*", async_mode="threading")
+        except Exception:
+            pass
     app.config['SWAGGER'] = {**SWAGGER_CONFIG, 'template': SWAGGER_TEMPLATE}
     swagger.init_app(app)
 

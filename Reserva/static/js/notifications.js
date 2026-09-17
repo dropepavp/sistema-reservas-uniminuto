@@ -16,12 +16,22 @@ class NotificationSystem {
     }
 
     init() {
-        // Inicializar Socket.IO
-        if (typeof io !== 'undefined') {
-            this.socket = io();
-            this.setupSocketListeners();
+        // Inicializar Socket.IO solo en desarrollo local (no en Vercel Serverless)
+        const isServerless = window.location.hostname.includes('vercel.app') || window.location.hostname.includes('.now.sh');
+        if (typeof io !== 'undefined' && !isServerless) {
+            try {
+                this.socket = io({
+                    reconnectionAttempts: 3,
+                    timeout: 5000,
+                    transports: ['websocket', 'polling']
+                });
+                this.setupSocketListeners();
+            } catch (e) {
+                console.warn('Socket.io no disponible:', e);
+            }
         } else {
-            console.warn('Socket.io no pudo ser cargado. Las notificaciones en tiempo real no estarán disponibles.');
+            // En Vercel Serverless las notificaciones funcionan en modo local/toast
+            this.socket = null;
         }
 
         // Crear elementos UI para notificaciones
