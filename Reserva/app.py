@@ -246,23 +246,26 @@ def create_app(config_name=None):
 
     # ── Inicialización de DB y admin por defecto ───────────────────────────────
     if not app.config.get('TESTING') and not os.environ.get('FLASK_SKIP_INIT_DB'):
-        with app.app_context():
-            init_db(app)
-            admin_doc = AdminConfig.DEFAULT_ADMIN_USER
-            if not Auxiliar.query.filter_by(documento=admin_doc).first():
-                success, message = registrar_auxiliar(
-                    AdminConfig.DEFAULT_ADMIN_USER,
-                    'Administrador del Sistema',
-                    AdminConfig.DEFAULT_ADMIN_EMAIL,
-                    AdminConfig.DEFAULT_ADMIN_PASSWORD,
-                    rol='admin'
-                )
-                if success:
-                    app.logger.warning(
-                        "Usuario administrador creado. Cambie las credenciales por defecto inmediatamente."
+        try:
+            with app.app_context():
+                init_db(app)
+                admin_doc = AdminConfig.DEFAULT_ADMIN_USER
+                if not Auxiliar.query.filter_by(documento=admin_doc).first():
+                    success, message = registrar_auxiliar(
+                        AdminConfig.DEFAULT_ADMIN_USER,
+                        'Administrador del Sistema',
+                        AdminConfig.DEFAULT_ADMIN_EMAIL,
+                        AdminConfig.DEFAULT_ADMIN_PASSWORD,
+                        rol='admin'
                     )
-                else:
-                    app.logger.error("Error al crear administrador: %s", message)
+                    if success:
+                        app.logger.warning(
+                            "Usuario administrador creado. Cambie las credenciales por defecto inmediatamente."
+                        )
+                    else:
+                        app.logger.error("Error al crear administrador: %s", message)
+        except Exception as e:
+            app.logger.error("Aviso al inicializar base de datos en el arranque: %s", str(e))
 
     return app
 

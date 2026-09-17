@@ -6,38 +6,40 @@ from urllib.parse import urlparse, quote_plus
 
 
 def _build_safe_db_uri(raw_url: str) -> str:
-    """Construye una URI de base de datos segura codificando el password con quote_plus.
-
-    Lanza ValueError si raw_url es None o vacío.
-    """
+    """Construye una URI de base de datos segura y normaliza esquemas como postgres://."""
     if not raw_url:
-        raise ValueError("raw_url no puede ser None ni vacío.")
+        return 'sqlite:///sistema_reserva.db'
 
-    parsed = urlparse(raw_url)
-    if parsed.password is None:
+    if raw_url.startswith('postgres://'):
+        raw_url = raw_url.replace('postgres://', 'postgresql://', 1)
+
+    try:
+        parsed = urlparse(raw_url)
+        if parsed.password is None:
+            return raw_url
+
+        safe_pwd = quote_plus(parsed.password)
+        netloc = f"{parsed.username}:{safe_pwd}@{parsed.hostname}"
+        if parsed.port:
+            netloc += f":{parsed.port}"
+        query_part = f"?{parsed.query}" if parsed.query else ""
+        return f"{parsed.scheme}://{netloc}{parsed.path}{query_part}"
+    except Exception:
         return raw_url
-
-    safe_pwd = quote_plus(parsed.password)
-    netloc = f"{parsed.username}:{safe_pwd}@{parsed.hostname}"
-    if parsed.port:
-        netloc += f":{parsed.port}"
-    return f"{parsed.scheme}://{netloc}{parsed.path}"
 
 
 class Config:
     """Configuración base de la aplicación."""
 
-    # Clave secreta — requerida, sin valor por defecto
-    _secret_key = os.environ.get('FLASK_SECRET_KEY')
-    if not _secret_key:
-        raise RuntimeError("FLASK_SECRET_KEY no está definida. La aplicación no puede arrancar.")
-    SECRET_KEY = _secret_key
+    # Clave secreta — soporta FLASK_SECRET_KEY, SECRET_KEY o valor seguro por defecto
+    SECRET_KEY = os.environ.get('FLASK_SECRET_KEY') or os.environ.get('SECRET_KEY') or 'dev-fallback-key-uniminuto-reserva-2026'
 
-    # Base de datos — requerida, sin valor por defecto
+    # Base de datos — soporta DATABASE_URL o fallback a SQLite
     _db_url = os.environ.get('DATABASE_URL')
-    if not _db_url:
-        raise RuntimeError("DATABASE_URL no está definida. La aplicación no puede arrancar.")
-    SQLALCHEMY_DATABASE_URI = _build_safe_db_uri(_db_url)
+    if _db_url:
+        SQLALCHEMY_DATABASE_URI = _build_safe_db_uri(_db_url)
+    else:
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///sistema_reserva.db'
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

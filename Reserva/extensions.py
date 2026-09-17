@@ -21,17 +21,25 @@ from urllib.parse import urlparse, unquote
 
 def _make_engine(raw_url: str):
     """Crea un engine de SQLAlchemy usando connect_args para evitar
-    problemas de encoding con caracteres especiales en la contraseña."""
+    problemas de encoding con caracteres especiales en la contraseña y soportar SSL."""
+    if raw_url.startswith('postgres://'):
+        raw_url = raw_url.replace('postgres://', 'postgresql://', 1)
+
     parsed = urlparse(raw_url)
     password = unquote(parsed.password or '')
+    db_name = parsed.path.lstrip('/') or 'sistema_reserva'
     connect_args = {
         'host': parsed.hostname or 'localhost',
         'port': parsed.port or 5432,
         'user': parsed.username or 'postgres',
         'password': password,
-        'database': parsed.path.lstrip('/') or 'sistema_reserva',
+        'database': db_name,
         'client_encoding': 'utf8',
     }
+    # Para bases de datos en la nube (Neon, Supabase, etc.), habilitar SSL
+    if parsed.hostname and parsed.hostname not in ('localhost', '127.0.0.1'):
+        connect_args['sslmode'] = 'require'
+
     return create_engine(
         'postgresql+psycopg2://',
         connect_args=connect_args,
