@@ -11,3 +11,4 @@ from app import create_app
 
 # Instancia WSGI expuesta para el runtime serverless de Vercel
 app = create_app()
+handler = app
