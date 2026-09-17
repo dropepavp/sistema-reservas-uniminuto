@@ -55,6 +55,9 @@ class Config:
     # Configuración de desarrollo
     DEBUG = os.environ.get('FLASK_ENV') == 'development'
 
+    # Entorno Vercel
+    VERCEL = bool(os.environ.get('VERCEL'))
+
     # Flags de seguridad en cookies de sesión
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
