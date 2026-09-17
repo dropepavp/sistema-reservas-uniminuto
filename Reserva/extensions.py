@@ -15,6 +15,7 @@ from flask_socketio import SocketIO
 from flask_migrate import Migrate
 from flasgger import Swagger
 from sqlalchemy import create_engine
+from sqlalchemy.orm import DeclarativeBase
 from urllib.parse import urlparse, unquote
 
 
@@ -39,6 +40,11 @@ def _make_engine(raw_url: str):
     )
 
 
+class Base(DeclarativeBase):
+    """Base declarativa con soporte tipado para SQLAlchemy 2.0 y Pyright/Pylance."""
+    pass
+
+
 class _SmartSQLAlchemy(SQLAlchemy):
     """SQLAlchemy que usa connect_args cuando DATABASE_URL está disponible."""
 
@@ -58,7 +64,8 @@ class _SmartSQLAlchemy(SQLAlchemy):
                 app.logger.error("Error al conectar a PostgreSQL: %s", e)
 
 
-db = _SmartSQLAlchemy()
+db = _SmartSQLAlchemy(model_class=Base)
+Base.query = db.session.query_property()
 csrf = CSRFProtect()
 limiter = Limiter(key_func=get_remote_address, default_limits=["200 per minute"])
 socketio = SocketIO()

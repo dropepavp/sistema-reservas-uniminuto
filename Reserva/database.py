@@ -3,9 +3,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import Optional
 from datetime import date as date_type, time as time_type
 import json
-from extensions import db
+from extensions import db, Base
 
-class Auxiliar(db.Model):
+class Auxiliar(Base):
     __tablename__ = 'auxiliares'
     documento: Mapped[str] = mapped_column(String, primary_key=True)
     nombre_completo: Mapped[str] = mapped_column(String, nullable=False)
@@ -20,7 +20,7 @@ class Auxiliar(db.Model):
         back_populates="auxiliar", cascade="all, delete-orphan"
     )
 
-class AuxiliarSede(db.Model):
+class AuxiliarSede(Base):
     __tablename__ = 'auxiliar_sedes'
     usuario_documento: Mapped[str] = mapped_column(
         ForeignKey('auxiliares.documento', ondelete='CASCADE'), primary_key=True
@@ -31,7 +31,7 @@ class AuxiliarSede(db.Model):
     auxiliar: Mapped["Auxiliar"] = relationship(back_populates="sedes_asignadas")
     sede: Mapped["Sede"] = relationship()
 
-class ProgramaAcademico(db.Model):
+class ProgramaAcademico(Base):
     """Catálogo maestro de Programas Académicos UNIMINUTO."""
     __tablename__ = 'programas_academicos'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -48,7 +48,7 @@ class ProgramaAcademico(db.Model):
     clases: Mapped[list["ClaseSalaComputo"]] = relationship(back_populates="programa_rel")
 
 
-class Estudiante(db.Model):
+class Estudiante(Base):
     """Base de datos de estudiantes de UNIMINUTO."""
     __tablename__ = 'estudiantes'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -75,7 +75,7 @@ class Estudiante(db.Model):
     observaciones: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
 
-class Profesor(db.Model):
+class Profesor(Base):
     __tablename__ = 'profesores'
     cedula: Mapped[int] = mapped_column(Integer, primary_key=True)
     nombre_completo: Mapped[str] = mapped_column(String, nullable=False)
@@ -88,7 +88,7 @@ class Profesor(db.Model):
     reservas: Mapped[list["Reserva"]] = relationship(back_populates="profesor")
     prestamos: Mapped[list["PrestamoEquipo"]] = relationship(back_populates="profesor")
 
-class Sede(db.Model):
+class Sede(Base):
     __tablename__ = 'sedes'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     nombre: Mapped[str] = mapped_column(String, unique=True, nullable=False)
@@ -96,7 +96,7 @@ class Sede(db.Model):
     bodegas: Mapped[list["Bodega"]] = relationship(back_populates="sede", cascade="all, delete-orphan")
     reservas: Mapped[list["Reserva"]] = relationship(back_populates="sede")
 
-class Bodega(db.Model):
+class Bodega(Base):
     __tablename__ = 'bodegas'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     nombre: Mapped[str] = mapped_column(String, nullable=False)
@@ -105,7 +105,7 @@ class Bodega(db.Model):
     sede: Mapped["Sede"] = relationship(back_populates="bodegas")
     items: Mapped[list["Inventario"]] = relationship(back_populates="bodega")
 
-class Ubicacion(db.Model):
+class Ubicacion(Base):
     __tablename__ = 'ubicaciones'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     nombre: Mapped[str] = mapped_column(String, nullable=False) # e.g. "Bloque A", "Piso 5", "Sede Única"
@@ -114,7 +114,7 @@ class Ubicacion(db.Model):
     sede: Mapped["Sede"] = relationship(backref="ubicaciones")
     recursos: Mapped[list["Recurso"]] = relationship(back_populates="ubicacion", cascade="all, delete-orphan")
 
-class Recurso(db.Model):
+class Recurso(Base):
     __tablename__ = 'recursos'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     nombre: Mapped[str] = mapped_column(String, nullable=False, index=True) # e.g. "A501"
@@ -125,12 +125,12 @@ class Recurso(db.Model):
     
     ubicacion: Mapped["Ubicacion"] = relationship(back_populates="recursos")
 
-class CategoriaInventario(db.Model):
+class CategoriaInventario(Base):
     __tablename__ = 'categorias_inventario'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     nombre: Mapped[str] = mapped_column(String, unique=True, nullable=False)
 
-class Inventario(db.Model):
+class Inventario(Base):
     __tablename__ = 'inventario'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     categoria: Mapped[str] = mapped_column(String, index=True)
@@ -180,7 +180,7 @@ class Inventario(db.Model):
             return (self.cantidad_disponible or 0) > 0
         return self.estado == 'Disponible'
 
-class PrestamoEquipo(db.Model):
+class PrestamoEquipo(Base):
     __tablename__ = 'prestamos_equipos'
     id_prestamo: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     id_grupo_prestamo: Mapped[int] = mapped_column(Integer, nullable=True, index=True)
@@ -225,7 +225,7 @@ class PrestamoEquipo(db.Model):
         Index('ix_prestamo_equipo_estado', 'equipo_prestado', 'estado'),
     )
 
-class Reserva(db.Model):
+class Reserva(Base):
     __tablename__ = 'reservas'
     id_reserva: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     
@@ -261,7 +261,7 @@ class Reserva(db.Model):
         Index('ix_reserva_tipo_fecha', 'recurso_tipo', 'fecha'),
     )
 
-class ClaseSalaComputo(db.Model):
+class ClaseSalaComputo(Base):
     __tablename__ = 'clases_salas_computo'
     id_clase: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     
@@ -295,7 +295,7 @@ class ClaseSalaComputo(db.Model):
     observaciones: Mapped[str] = mapped_column(Text, nullable=True)
 
 
-class UserPermission(db.Model):
+class UserPermission(Base):
     __tablename__ = 'permisos_usuarios'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     usuario_documento: Mapped[str] = mapped_column(ForeignKey('auxiliares.documento'), index=True)
@@ -308,7 +308,7 @@ class UserPermission(db.Model):
     usuario: Mapped["Auxiliar"] = relationship(backref="permisos")
 
 
-class AuditLog(db.Model):
+class AuditLog(Base):
     __tablename__ = 'auditorias'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     modulo: Mapped[str] = mapped_column(String, index=True)  # prestamos, reservas, inventario, profesores, usuarios
@@ -323,7 +323,7 @@ class AuditLog(db.Model):
     datos_antes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)   # JSON serializado
     datos_despues: Mapped[Optional[str]] = mapped_column(Text, nullable=True) # JSON serializado
 
-class Festivo(db.Model):
+class Festivo(Base):
     __tablename__ = 'festivos'
     fecha: Mapped[date_type] = mapped_column(Date, primary_key=True)
     descripcion: Mapped[str] = mapped_column(String)
@@ -487,7 +487,7 @@ def init_db(app):
 # MÓDULO COLABORADORES
 # ─────────────────────────────────────────────────────────────────────────────
 
-class Colaborador(db.Model):
+class Colaborador(Base):
     """Colaborador / auxiliar operativo con horario semanal y tareas."""
     __tablename__ = 'colaboradores'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -526,7 +526,7 @@ class Colaborador(db.Model):
 
 
 
-class HorarioColaborador(db.Model):
+class HorarioColaborador(Base):
     """Horario diario de un colaborador para un período específico."""
     __tablename__ = 'horarios_colaboradores'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -543,7 +543,7 @@ class HorarioColaborador(db.Model):
     colaborador: Mapped["Colaborador"] = relationship(back_populates="horarios")
 
 
-class TareaColaborador(db.Model):
+class TareaColaborador(Base):
     """Tarea asignada a un colaborador."""
     __tablename__ = 'tareas_colaboradores'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -558,7 +558,7 @@ class TareaColaborador(db.Model):
     colaborador: Mapped["Colaborador"] = relationship(back_populates="tareas")
 
 
-class PermisoColaborador(db.Model):
+class PermisoColaborador(Base):
     """Permisos de acceso de un colaborador a módulos del sistema."""
     __tablename__ = 'permisos_colaboradores'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -576,7 +576,7 @@ class PermisoColaborador(db.Model):
 # MODELOS PARA SALAS DE CÓMPUTO, PUESTOS, SOFTWARE Y NOVEDADES TÉCNICAS
 # =========================================================================
 
-class PuestoComputo(db.Model):
+class PuestoComputo(Base):
     """Puesto o equipo de cómputo individual dentro de una sala o laboratorio."""
     __tablename__ = 'puestos_computo'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -591,7 +591,7 @@ class PuestoComputo(db.Model):
     novedades: Mapped[list["NovedadTecnicaSala"]] = relationship(back_populates="puesto", cascade="all, delete-orphan")
 
 
-class SoftwareSala(db.Model):
+class SoftwareSala(Base):
     """Catálogo de programas y aplicaciones instaladas en las salas."""
     __tablename__ = 'software_salas'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -606,7 +606,7 @@ class SoftwareSala(db.Model):
     asignaciones: Mapped[list["SoftwareAsignadoSala"]] = relationship(back_populates="software", cascade="all, delete-orphan")
 
 
-class SoftwareAsignadoSala(db.Model):
+class SoftwareAsignadoSala(Base):
     """Relación entre software y sala/recurso de cómputo."""
     __tablename__ = 'software_asignado_salas'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -618,7 +618,7 @@ class SoftwareAsignadoSala(db.Model):
     recurso: Mapped["Recurso"] = relationship(backref="software_asignado")
 
 
-class NovedadTecnicaSala(db.Model):
+class NovedadTecnicaSala(Base):
     """Registro de novedades, fallas técnicas o mantenimientos en salas de cómputo."""
     __tablename__ = 'novedades_tecnicas_salas'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -647,7 +647,7 @@ class NovedadTecnicaSala(db.Model):
 # MODELO PARA MANTENIMIENTO Y HOJA DE VIDA DE EQUIPOS DE INVENTARIO
 # =========================================================================
 
-class MantenimientoInventario(db.Model):
+class MantenimientoInventario(Base):
     """Historial de mantenimientos preventivos y correctivos de equipos."""
     __tablename__ = 'mantenimientos_inventario'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -672,7 +672,7 @@ class MantenimientoInventario(db.Model):
 # MODELO PARA PRÁCTICA LIBRE ESTUDIANTIL EN SALAS / LABORATORIOS
 # =========================================================================
 
-class PracticaLibre(db.Model):
+class PracticaLibre(Base):
     """Registro y control de acceso de estudiantes para práctica libre en salas de cómputo."""
     __tablename__ = 'practicas_libres'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
