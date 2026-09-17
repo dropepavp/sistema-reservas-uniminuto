@@ -53,26 +53,7 @@ class Base(DeclarativeBase):
     pass
 
 
-class _SmartSQLAlchemy(SQLAlchemy):
-    """SQLAlchemy que usa connect_args cuando DATABASE_URL está disponible."""
-
-    def init_app(self, app, **kwargs):
-        super().init_app(app, **kwargs)
-        import os
-        raw_url = os.environ.get('DATABASE_URL')
-        if not app.config.get('TESTING') and raw_url and 'sqlite' not in raw_url:
-            try:
-                eng = _make_engine(raw_url)
-                with app.app_context():
-                    if hasattr(self, 'engines'):
-                        self.engines[None] = eng
-                    self.session.bind = eng
-                app.logger.info("Conexion PostgreSQL establecida via connect_args.")
-            except Exception as e:
-                app.logger.error("Error al conectar a PostgreSQL: %s", e)
-
-
-db = _SmartSQLAlchemy(model_class=Base)
+db = SQLAlchemy(model_class=Base)
 Base.query = db.session.query_property()
 csrf = CSRFProtect()
 limiter = Limiter(key_func=get_remote_address, default_limits=["200 per minute"], storage_uri="memory://")
