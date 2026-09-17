@@ -8,6 +8,8 @@ from urllib.parse import urlparse, quote_plus
 def _build_safe_db_uri(raw_url: str) -> str:
     """Construye una URI de base de datos segura y normaliza esquemas como postgres://."""
     if not raw_url:
+        if os.environ.get('VERCEL') or os.path.exists('/tmp'):
+            return 'sqlite:////tmp/sistema_reserva.db'
         return 'sqlite:///sistema_reserva.db'
 
     if raw_url.startswith('postgres://'):
@@ -34,12 +36,15 @@ class Config:
     # Clave secreta — soporta FLASK_SECRET_KEY, SECRET_KEY o valor seguro por defecto
     SECRET_KEY = os.environ.get('FLASK_SECRET_KEY') or os.environ.get('SECRET_KEY') or 'dev-fallback-key-uniminuto-reserva-2026'
 
-    # Base de datos — soporta DATABASE_URL o fallback a SQLite
+    # Base de datos — soporta DATABASE_URL o fallback a SQLite en /tmp
     _db_url = os.environ.get('DATABASE_URL')
     if _db_url:
         SQLALCHEMY_DATABASE_URI = _build_safe_db_uri(_db_url)
     else:
-        SQLALCHEMY_DATABASE_URI = 'sqlite:///sistema_reserva.db'
+        if os.environ.get('VERCEL') or os.path.exists('/tmp'):
+            SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/sistema_reserva.db'
+        else:
+            SQLALCHEMY_DATABASE_URI = 'sqlite:///sistema_reserva.db'
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

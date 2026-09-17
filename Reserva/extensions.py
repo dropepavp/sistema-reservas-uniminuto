@@ -75,7 +75,7 @@ class _SmartSQLAlchemy(SQLAlchemy):
 db = _SmartSQLAlchemy(model_class=Base)
 Base.query = db.session.query_property()
 csrf = CSRFProtect()
-limiter = Limiter(key_func=get_remote_address, default_limits=["200 per minute"])
+limiter = Limiter(key_func=get_remote_address, default_limits=["200 per minute"], storage_uri="memory://")
 socketio = SocketIO()
 migrate = Migrate()
 swagger = Swagger()
