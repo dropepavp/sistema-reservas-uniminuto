@@ -43,3 +43,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
 
 # Comando de inicio del contenedor (Cumplimiento Criterio 2)
 CMD ["python", "run.py"]
+
