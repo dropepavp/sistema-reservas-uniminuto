@@ -4,7 +4,6 @@
 #   1. web: Aplicación Flask (Contenedor 1)
 #   2. db:  Base de Datos PostgreSQL 15 (Contenedor 2)
 # ==============================================================================
-version: '3.8'
 
 services:
   # ----------------------------------------------------------------------------
@@ -76,3 +75,4 @@ networks:
 volumes:
   db_data:
     name: reserva_db_data
+
