@@ -6,7 +6,7 @@ from flask import Blueprint, render_template, request, redirect, flash, jsonify,
 import io
 import pandas as pd
 from datetime import datetime, date
-from database import db, Inventario, PrestamoEquipo, Sede, Bodega, CategoriaInventario, UserPermission, registrar_auditoria, MantenimientoInventario, AuditLog
+from database import db, Inventario, PrestamoEquipo, Sede, Bodega, CategoriaInventario, UserPermission, registrar_auditoria, MantenimientoInventario, AuditLog, InventarioCustodia
 from extensions import socketio
 from services.notification_service import NotificationService
 from config import SystemConstants
@@ -14,7 +14,9 @@ from validators import DataValidator
 from sqlalchemy import func, desc, asc
 from auth import login_required, permiso_requerido, sede_requerida
 from services.inventario_service import InventarioService
+from services.acta_custodia_service import ActaCustodiaService
 from utils.export_helpers import exportar_df_excel, exportar_df_csv
+from blueprints.mantenimiento import _procesar_y_guardar_imagen
 import re
 
 inventario_bp = Blueprint('inventario', __name__, url_prefix='/inventario')
@@ -72,12 +74,107 @@ def inventario_main():
         sedes = Sede.query.all()
         bodegas = Bodega.query.filter_by(sede_id=int(sede_actual_id)).all() if sede_actual_id else []
 
+        sede_usuario = Sede.query.get(int(user_sede_id)) if user_sede_id and str(user_sede_id).isdigit() else None
+        bodegas_usuario = Bodega.query.filter_by(sede_id=int(user_sede_id)).all() if user_sede_id and str(user_sede_id).isdigit() else []
+
+        tab_activa = request.args.get('tab', 'inventario')
+        custodias_list = InventarioService.obtener_custodias_filtradas(
+            request.args, user_rol=user_rol, user_sede_id=user_sede_id
+        )
+        custodias_stats = InventarioService.calcular_estadisticas_custodia(custodias_list)
+
+        # Opciones para filtros de la tabla de Custodia
+        custodia_edificios = [r[0] for r in db.session.query(InventarioCustodia.edificio).filter(InventarioCustodia.edificio.isnot(None)).distinct().all() if r[0]]
+        custodia_centros = [r[0] for r in db.session.query(InventarioCustodia.centro_costo).filter(InventarioCustodia.centro_costo.isnot(None)).distinct().all() if r[0]]
+        custodia_estados = [r[0] for r in db.session.query(InventarioCustodia.estado).filter(InventarioCustodia.estado.isnot(None)).distinct().all() if r[0]]
+
+        # === CATEGORÍAS FILTRADAS EXCLUSIVAMENTE POR LA SEDE EN SESIÓN ===
+        user_sede_id_int = int(user_sede_id) if user_sede_id and str(user_sede_id).isdigit() else None
+        
+        # Bodegas pertenecientes a la sede en sesión
+        bodegas_sede_activa = Bodega.query.filter_by(sede_id=user_sede_id_int).all() if user_sede_id_int else []
+        bodega_ids_sede_activa = [b.id for b in bodegas_sede_activa]
+        
+        # Activos pertenecientes ÚNICAMENTE a la sede de la sesión
+        if bodega_ids_sede_activa:
+            items_sede_activa = Inventario.query.filter(Inventario.bodega_id.in_(bodega_ids_sede_activa)).order_by(Inventario.categoria, Inventario.item).all()
+        else:
+            items_sede_activa = []
+        
+        ICONOS_CATEGORIAS = {
+            'Equipos Portátiles': ('bi-laptop', 'success'),
+            'Proyectores (Video Beam)': ('bi-projector', 'primary'),
+            'Adaptadores de corriente': ('bi-plug', 'warning'),
+            'Periféricos (Teclados, Mouse)': ('bi-keyboard', 'info'),
+            'Audio/Video (HDMI, Parlantes)': ('bi-speaker', 'secondary'),
+            'Todo en Uno': ('bi-pc-display', 'primary'),
+            'Pantallas Digitales Interactivas': ('bi-tv', 'danger'),
+            'Controles TV': ('bi-remote', 'dark'),
+            'Equipos de Medición y Laboratorio': ('bi-speedometer2', 'info'),
+            'Material Deportivo y Lote': ('bi-trophy', 'warning'),
+            'Otros / General': ('bi-box-seam', 'secondary'),
+        }
+
+        from collections import defaultdict
+        cat_map = defaultdict(lambda: {
+            'nombre': '',
+            'total': 0,
+            'disponibles': 0,
+            'prestados': 0,
+            'mantenimiento': 0,
+            'baja': 0,
+            'icono': 'bi-box-seam',
+            'color': 'secondary',
+            'items': []
+        })
+
+        for it in items_sede_activa:
+            c_nom = (it.categoria or 'Otros / General').strip()
+            entry = cat_map[c_nom]
+            entry['nombre'] = c_nom
+            entry['total'] += 1
+            if it.estado == 'Disponible':
+                entry['disponibles'] += 1
+            elif it.estado == 'En Préstamo':
+                entry['prestados'] += 1
+            elif it.estado in ('En Mantenimiento', 'En Reparación'):
+                entry['mantenimiento'] += 1
+            elif it.estado == 'De Baja':
+                entry['baja'] += 1
+            
+            ic_info = ICONOS_CATEGORIAS.get(c_nom, ('bi-box-seam', 'secondary'))
+            entry['icono'] = ic_info[0]
+            entry['color'] = ic_info[1]
+            entry['items'].append(it)
+
+        categorias_sede = sorted(cat_map.values(), key=lambda x: x['total'], reverse=True)
+
+        stats_sede_activa = {
+            'total': len(items_sede_activa),
+            'disponibles': sum(c['disponibles'] for c in categorias_sede),
+            'prestados': sum(c['prestados'] for c in categorias_sede),
+            'mantenimiento': sum(c['mantenimiento'] for c in categorias_sede),
+            'baja': sum(c['baja'] for c in categorias_sede)
+        }
+
         return render_template('inventario.html', 
                              inventario=inventario_list,
+                             custodias=custodias_list,
+                             custodias_stats=custodias_stats,
+                             custodia_edificios=custodia_edificios,
+                             custodia_centros=custodia_centros,
+                             custodia_estados=custodia_estados,
+                             tab_activa=tab_activa,
+                             categorias_sede=categorias_sede,
+                             items_sede_activa=items_sede_activa,
+                             stats_sede_activa=stats_sede_activa,
                              categorias=categorias,
                              estados=estados,
                              sedes=sedes,
                              bodegas=bodegas,
+                             sede_usuario=sede_usuario,
+                             bodegas_usuario=bodegas_usuario,
+                             user_sede_id=user_sede_id,
                              stats=stats,
                              disponibles_count=calc_stats['disponibles_count'],
                              prestados_count=calc_stats['prestados_count'],
@@ -87,7 +184,11 @@ def inventario_main():
                                  'estado': estado_filtro,
                                  'busqueda': busqueda,
                                  'sede': sede_actual_id,
-                                 'bodega': bodega_filtro
+                                 'bodega': bodega_filtro,
+                                 'edificio': request.args.get('edificio', ''),
+                                 'centro_costo': request.args.get('centro_costo', ''),
+                                 'cedula_custodio': request.args.get('cedula_custodio', ''),
+                                 'tipo_inventario': request.args.get('tipo_inventario', '')
                              })
 
     except Exception as e:
@@ -111,6 +212,12 @@ def inventario_main():
                                  'stock_items': [],
                                  'stock_por_tipo': {}
                              },
+                             custodias=[],
+                             custodias_stats={'total': 0, 'activos_fijos': 0, 'bodega_lote': 0, 'por_estado': {}, 'por_edificio': {}, 'por_centro_costo': {}},
+                             custodia_edificios=[],
+                             custodia_centros=[],
+                             custodia_estados=[],
+                             tab_activa='inventario',
                              disponibles_count=0,
                              prestados_count=0,
                              reparacion_count=0,
@@ -152,13 +259,61 @@ def corregir_estados():
         flash('Ocurrió un error al corregir los estados del inventario.', 'danger')
     return redirect(url_for('inventario.inventario_main'))
 
+
+def _propagar_foto_modelo_interno(origen, session_user=None, session_user_name=None):
+    """
+    Replica la foto del equipo origen a todos los equipos que tengan el mismo modelo o nombre de ítem.
+    Retorna el número de equipos actualizados.
+    """
+    if not origen or not origen.foto_url:
+        return 0
+
+    modelo = (origen.marca_modelo or '').strip()
+    nombre_item = (origen.item or '').strip()
+
+    filtros = []
+    if modelo and modelo.lower() not in ('nan', 'none', '--', 'no presenta', ''):
+        filtros.append(func.lower(Inventario.marca_modelo) == modelo.lower())
+    if nombre_item and nombre_item.lower() not in ('nan', 'none', '--', ''):
+        filtros.append(func.lower(Inventario.item) == nombre_item.lower())
+
+    if not filtros:
+        return 0
+
+    criterio = db.or_(*filtros)
+    otros_equipos = Inventario.query.filter(Inventario.id != origen.id, criterio).all()
+
+    actualizados = 0
+    for target in otros_equipos:
+        if target.foto_url != origen.foto_url:
+            datos_antes = {'foto_url': target.foto_url}
+            target.foto_url = origen.foto_url
+            actualizados += 1
+            if session_user:
+                registrar_auditoria(
+                    modulo='inventario',
+                    entidad_tipo='Inventario',
+                    entidad_id=target.id,
+                    accion='REPLICAR_FOTO_MODELO',
+                    usuario_documento=session_user,
+                    usuario_nombre=session_user_name or '',
+                    descripcion=f'Foto replicada desde equipo #{origen.id} ({modelo or nombre_item})',
+                    datos_antes=datos_antes,
+                    datos_despues={'foto_url': target.foto_url}
+                )
+
+    if actualizados > 0:
+        db.session.commit()
+
+    return actualizados
+
 @inventario_bp.route('/agregar', methods=['POST'])
 @login_required
 @permiso_requerido('inventario', 'crear')
 def agregar_item():
-    """Agrega un nuevo item al inventario."""
+    """Agrega un nuevo item al inventario con ficha técnica y foto única estilo Hoja de Vida."""
     try:
-        datos = request.json
+        datos = request.get_json(silent=True) or request.form.to_dict()
         
         def es_accesorio_cable_control(nombre: str) -> bool:
             if not nombre:
@@ -201,7 +356,7 @@ def agregar_item():
         accesorio = es_accesorio_cable_control(item_nombre)
         
         # Gestión por cantidad (forzamos para accesorios tipo control/cable)
-        es_por_cantidad = bool(datos.get('es_por_cantidad', False)) or accesorio
+        es_por_cantidad = bool(datos.get('es_por_cantidad') in (True, 'true', '1')) or accesorio
         
         # Número de inventario: opcional para accesorios; si viene vacío y es accesorio, generamos un ID estable
         num_inv = (datos.get('numero_inventario') or '').strip()
@@ -225,7 +380,57 @@ def agregar_item():
             except (ValueError, TypeError):
                 return jsonify({'success': False, 'message': 'La cantidad total debe ser un número válido'}), 400
             
-        # Crear item
+        # Sede: NO se le pide al usuario; se toma directamente de la sesión activa
+        sede_id = session.get('sede_id') or (current_user.sede_id if hasattr(current_user, 'sede_id') else None)
+        bodega_id = datos.get('bodega_id')
+        if not bodega_id or str(bodega_id).strip() in ('', 'None', 'undefined'):
+            if sede_id and str(sede_id).strip() not in ('', 'None', 'undefined'):
+                try:
+                    sede_id_int = int(sede_id)
+                    bodega_existente = Bodega.query.filter_by(sede_id=sede_id_int).first()
+                    if not bodega_existente:
+                        sede_obj = Sede.query.get(sede_id_int)
+                        nombre_sede = sede_obj.nombre if sede_obj else f"Sede {sede_id_int}"
+                        bodega_existente = Bodega(nombre=f'Bodega Principal {nombre_sede}', sede_id=sede_id_int)
+                        db.session.add(bodega_existente)
+                        db.session.flush()
+                    bodega_id = bodega_existente.id
+                except Exception as e:
+                    current_app.logger.warning(f"Error resolviendo bodega para sede {sede_id}: {e}")
+                    bodega_id = None
+            else:
+                bodega_id = None
+        else:
+            try:
+                bodega_id = int(bodega_id)
+            except (ValueError, TypeError):
+                bodega_id = None
+
+        # Procesamiento de foto única del elemento (como en Hoja de Vida)
+        foto_url = None
+        if 'foto' in request.files and request.files['foto'].filename:
+            foto_url = _procesar_y_guardar_imagen(request.files['foto'], subcarpeta='equipos')
+        elif datos.get('foto_url'):
+            foto_url = str(datos.get('foto_url')).strip() or None
+
+        # Procesamiento de fechas de adquisición y garantía (Hoja de Vida)
+        f_adq = datos.get('fecha_adquisicion')
+        fecha_adq = None
+        if f_adq and str(f_adq).strip():
+            try:
+                fecha_adq = datetime.strptime(str(f_adq).strip(), '%Y-%m-%d').date()
+            except ValueError:
+                pass
+
+        f_gar = datos.get('garantia_vencimiento')
+        fecha_gar = None
+        if f_gar and str(f_gar).strip():
+            try:
+                fecha_gar = datetime.strptime(str(f_gar).strip(), '%Y-%m-%d').date()
+            except ValueError:
+                pass
+
+        # Crear item con ficha técnica completa y única foto
         nuevo_item = Inventario(
             categoria=datos.get('categoria'),
             item=datos.get('item'),
@@ -236,16 +441,30 @@ def agregar_item():
             ubicacion_permanente=datos.get('ubicacion_permanente'),
             estado=datos.get('estado', 'Disponible'),
             observaciones=datos.get('observaciones'),
-            bodega_id=datos.get('bodega_id'),
+            bodega_id=bodega_id,
             es_por_cantidad=es_por_cantidad,
             cantidad_total=cantidad_total,
-            cantidad_disponible=cantidad_disponible
+            cantidad_disponible=cantidad_disponible,
+            # Ficha técnica / Hoja de Vida
+            foto_url=foto_url,
+            hostname=(datos.get('hostname') or '').strip() or None,
+            procesador=(datos.get('procesador') or '').strip() or None,
+            ram_gb=(datos.get('ram_gb') or '').strip() or None,
+            almacenamiento=(datos.get('almacenamiento') or '').strip() or None,
+            sistema_operativo=(datos.get('sistema_operativo') or '').strip() or None,
+            especificaciones_tecnicas=(datos.get('especificaciones_tecnicas') or '').strip() or None,
+            proveedor=(datos.get('proveedor') or '').strip() or None,
+            fecha_adquisicion=fecha_adq,
+            garantia_vencimiento=fecha_gar
         )
         
         db.session.add(nuevo_item)
         db.session.commit()
 
         # Emitir notificación usando el servicio centralizado
+                # Propagar foto al modelo si se solicitó
+        if datos.get('propagar_foto_modelo') in (True, 'true', '1') and nuevo_item.foto_url:
+            _propagar_foto_modelo_interno(nuevo_item, session.get('usuario', ''), session.get('nombre_completo', ''))
         NotificationService.notify_inventario_cambiado(
             accion='crear',
             item_id=nuevo_item.id,
@@ -260,19 +479,22 @@ def agregar_item():
             accion='CREAR',
             usuario_documento=session.get('usuario', ''),
             usuario_nombre=session.get('nombre_completo', ''),
-            descripcion=f'Creación de item de inventario "{nuevo_item.item}"',
+            descripcion=f'Creación de item de inventario "{nuevo_item.item}" con ficha técnica',
             datos_antes=None,
             datos_despues={
                 'categoria': nuevo_item.categoria,
                 'item': nuevo_item.item,
                 'numero_inventario': nuevo_item.numero_inventario,
                 'estado': nuevo_item.estado,
+                'foto_url': nuevo_item.foto_url
             }
         )
 
         return jsonify({
             'success': True,
-            'message': f'Item "{nuevo_item.item}" agregado exitosamente'
+            'message': f'Item "{nuevo_item.item}" agregado exitosamente',
+            'id': nuevo_item.id,
+            'foto_url': nuevo_item.foto_url
         })
         
     except Exception as e:
@@ -345,11 +567,11 @@ def bulk_delete():
         current_app.logger.error(f"Error en bulk_delete inventario: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
 
-@inventario_bp.route('/editar/<int:id>', methods=['PUT', 'GET'])
+@inventario_bp.route('/editar/<int:id>', methods=['PUT', 'POST', 'GET'])
 @login_required
 @permiso_requerido('inventario', 'editar')
 def editar_item(id):
-    """Obtiene o actualiza un item del inventario."""
+    """Obtiene o actualiza un item del inventario con su ficha técnica y foto única."""
     item = Inventario.query.get_or_404(id)
     
     if request.method == 'GET':
@@ -359,22 +581,36 @@ def editar_item(id):
                 'id': item.id,
                 'categoria': item.categoria,
                 'item': item.item,
-                'marca_modelo': item.marca_modelo,
-                'serial': item.serial,
-                'activo_fijo': item.activo_fijo,
-                'numero_inventario': item.numero_inventario,
-                'ubicacion_permanente': item.ubicacion_permanente,
+                'marca_modelo': item.marca_modelo or '',
+                'serial': item.serial or '',
+                'activo_fijo': item.activo_fijo or '',
+                'numero_inventario': item.numero_inventario or '',
+                'ubicacion_permanente': item.ubicacion_permanente or '',
                 'estado': item.estado,
-                'observaciones': item.observaciones,
+                'observaciones': item.observaciones or '',
                 'bodega_id': item.bodega_id,
+                'bodega_nombre': item.bodega.nombre if item.bodega else '',
+                'sede_id': item.bodega.sede_id if (item.bodega and item.bodega.sede_id) else None,
+                'sede_nombre': item.bodega.sede.nombre if (item.bodega and item.bodega.sede) else '',
                 'es_por_cantidad': item.es_por_cantidad,
                 'cantidad_total': item.cantidad_total,
-                'cantidad_disponible': item.cantidad_disponible
+                'cantidad_disponible': item.cantidad_disponible,
+                # Hoja de Vida / Ficha técnica
+                'foto_url': item.foto_url or '',
+                'hostname': item.hostname or '',
+                'procesador': item.procesador or '',
+                'ram_gb': item.ram_gb or '',
+                'almacenamiento': item.almacenamiento or '',
+                'sistema_operativo': item.sistema_operativo or '',
+                'especificaciones_tecnicas': item.especificaciones_tecnicas or '',
+                'proveedor': item.proveedor or '',
+                'fecha_adquisicion': item.fecha_adquisicion.strftime('%Y-%m-%d') if item.fecha_adquisicion else '',
+                'garantia_vencimiento': item.garantia_vencimiento.strftime('%Y-%m-%d') if item.garantia_vencimiento else ''
             }
         })
         
     try:
-        datos = request.json
+        datos = request.get_json(silent=True) or request.form.to_dict()
         
         # Validar categoría
         cate_db = CategoriaInventario.query.filter_by(nombre=datos.get('categoria')).first()
@@ -397,26 +633,88 @@ def editar_item(id):
             'estado': item.estado,
             'cantidad_total': item.cantidad_total,
             'cantidad_disponible': item.cantidad_disponible,
+            'foto_url': item.foto_url
         }
 
-        item.categoria = datos.get('categoria')
-        item.item = datos.get('item')
-        item.marca_modelo = datos.get('marca_modelo')
-        item.serial = datos.get('serial')
+        if datos.get('categoria'):
+            item.categoria = datos.get('categoria')
+        if datos.get('item'):
+            item.item = datos.get('item')
+        if 'marca_modelo' in datos:
+            item.marca_modelo = datos.get('marca_modelo')
+        if 'serial' in datos:
+            item.serial = datos.get('serial')
         # Si el item es un accesorio (control/cable) permitimos dejar activo_fijo vacío
-        nombre_item = (datos.get('item') or '')
+        nombre_item = (datos.get('item') or item.item or '')
         accesorio = 'control' in nombre_item.lower() or 'cable' in nombre_item.lower()
-        item.activo_fijo = (datos.get('activo_fijo') or '').strip() if not accesorio else None
+        if 'activo_fijo' in datos:
+            item.activo_fijo = (datos.get('activo_fijo') or '').strip() if not accesorio else None
         # Mantener un número de inventario válido; si usuario lo vacía y es accesorio, no lo anulamos para no romper préstamos
         if num_inv:
             item.numero_inventario = num_inv
-        item.ubicacion_permanente = datos.get('ubicacion_permanente')
-        item.estado = datos.get('estado')
-        item.observaciones = datos.get('observaciones')
-        item.bodega_id = datos.get('bodega_id')
+        if 'ubicacion_permanente' in datos:
+            item.ubicacion_permanente = datos.get('ubicacion_permanente')
+        if datos.get('estado'):
+            item.estado = datos.get('estado')
+        elif not item.estado:
+            item.estado = 'Disponible'
+        if 'observaciones' in datos:
+            item.observaciones = datos.get('observaciones')
+        
+        # Bodega: si se especifica y cambia, actualizarla dentro de la sede
+        bodega_val = datos.get('bodega_id')
+        if bodega_val and str(bodega_val).strip() not in ('', 'None', 'undefined'):
+            try:
+                item.bodega_id = int(bodega_val)
+            except (ValueError, TypeError):
+                pass
+
+        # Procesar foto única del elemento (subida o eliminación)
+        if 'foto' in request.files and request.files['foto'].filename:
+            foto_subida = _procesar_y_guardar_imagen(request.files['foto'], subcarpeta='equipos')
+            if foto_subida:
+                item.foto_url = foto_subida
+        elif datos.get('eliminar_foto') in ('true', True, '1'):
+            item.foto_url = None
+
+        # Ficha técnica / Hoja de Vida
+        if 'hostname' in datos:
+            item.hostname = (datos.get('hostname') or '').strip() or None
+        if 'procesador' in datos:
+            item.procesador = (datos.get('procesador') or '').strip() or None
+        if 'ram_gb' in datos:
+            item.ram_gb = (datos.get('ram_gb') or '').strip() or None
+        if 'almacenamiento' in datos:
+            item.almacenamiento = (datos.get('almacenamiento') or '').strip() or None
+        if 'sistema_operativo' in datos:
+            item.sistema_operativo = (datos.get('sistema_operativo') or '').strip() or None
+        if 'especificaciones_tecnicas' in datos:
+            item.especificaciones_tecnicas = (datos.get('especificaciones_tecnicas') or '').strip() or None
+        if 'proveedor' in datos:
+            item.proveedor = (datos.get('proveedor') or '').strip() or None
+
+        if 'fecha_adquisicion' in datos:
+            f_adq = datos.get('fecha_adquisicion')
+            if f_adq and str(f_adq).strip():
+                try:
+                    item.fecha_adquisicion = datetime.strptime(str(f_adq).strip(), '%Y-%m-%d').date()
+                except ValueError:
+                    pass
+            else:
+                item.fecha_adquisicion = None
+
+        if 'garantia_vencimiento' in datos:
+            f_gar = datos.get('garantia_vencimiento')
+            if f_gar and str(f_gar).strip():
+                try:
+                    item.garantia_vencimiento = datetime.strptime(str(f_gar).strip(), '%Y-%m-%d').date()
+                except ValueError:
+                    pass
+            else:
+                item.garantia_vencimiento = None
 
         # Gestión por cantidad
-        es_por_cantidad = bool(datos.get('es_por_cantidad', False))
+        es_por_cantidad = bool(datos.get('es_por_cantidad') in (True, 'true', '1'))
         item.es_por_cantidad = es_por_cantidad
         if es_por_cantidad:
             try:
@@ -439,6 +737,9 @@ def editar_item(id):
         db.session.commit()
 
         # Emitir notificación de edición de inventario
+                # Propagar foto al modelo si se solicitó
+        if datos.get('propagar_foto_modelo') in (True, 'true', '1') and item.foto_url:
+            _propagar_foto_modelo_interno(item, session.get('usuario', ''), session.get('nombre_completo', ''))
         NotificationService.notify_inventario_cambiado(
             accion='editar',
             item_id=item.id,
@@ -456,7 +757,38 @@ def editar_item(id):
             'estado': item.estado,
             'cantidad_total': item.cantidad_total,
             'cantidad_disponible': item.cantidad_disponible,
+            'foto_url': item.foto_url
         }
+
+        
+        # Propagar todos los cambios (ficha técnica, garantía, foto) a todos los equipos del mismo modelo si se solicitó
+        extra_modelo_count = 0
+        if datos.get('propagar_todo_modelo') in (True, 'true', '1'):
+            modelo = (item.marca_modelo or '').strip()
+            nombre_item = (item.item or '').strip()
+            filtros_mod = []
+            if modelo and modelo.lower() not in ('nan', 'none', '--', 'no presenta', ''):
+                filtros_mod.append(func.lower(Inventario.marca_modelo) == modelo.lower())
+            if nombre_item and nombre_item.lower() not in ('nan', 'none', '--', ''):
+                filtros_mod.append(func.lower(Inventario.item) == nombre_item.lower())
+
+            if filtros_mod:
+                criterio_mod = db.or_(*filtros_mod)
+                otros_del_modelo = Inventario.query.filter(Inventario.id != item.id, criterio_mod).all()
+                for target in otros_del_modelo:
+                    target.procesador = item.procesador
+                    target.ram_gb = item.ram_gb
+                    target.almacenamiento = item.almacenamiento
+                    target.sistema_operativo = item.sistema_operativo
+                    target.especificaciones_tecnicas = item.especificaciones_tecnicas
+                    target.proveedor = item.proveedor
+                    target.fecha_adquisicion = item.fecha_adquisicion
+                    target.garantia_vencimiento = item.garantia_vencimiento
+                    if item.foto_url:
+                        target.foto_url = item.foto_url
+                    extra_modelo_count += 1
+                if extra_modelo_count > 0:
+                    db.session.commit()
 
         registrar_auditoria(
             modulo='inventario',
@@ -470,8 +802,11 @@ def editar_item(id):
             datos_despues=datos_despues
         )
 
-        return jsonify({'success': True, 'message': 'Item actualizado correctamente'})
-        
+        return jsonify({
+            'success': True,
+            'message': 'Item actualizado correctamente',
+            'foto_url': item.foto_url
+        })
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 500
@@ -903,6 +1238,217 @@ def exportar_inventario(formato):
         return redirect(url_for('inventario.inventario_main'))
 
 
+@inventario_bp.route('/custodia')
+@login_required
+@permiso_requerido('inventario', 'ver')
+@sede_requerida
+def inventario_custodia_view():
+    """Acceso directo a la pestaña de custodia y centros de costo."""
+    args = dict(request.args)
+    args['tab'] = 'custodia'
+    return redirect(url_for('inventario.inventario_main', **args))
+
+
+@inventario_bp.route('/exportar-custodia/<formato>')
+@login_required
+@permiso_requerido('inventario', 'ver')
+def exportar_custodia(formato):
+    """Exporta la tabla de custodia y centros de costo con las 8 columnas requeridas más detalles."""
+    try:
+        user_rol = session.get('rol')
+        user_sede_id = session.get('sede_id')
+        custodias = InventarioService.obtener_custodias_filtradas(
+            request.args, user_rol=user_rol, user_sede_id=user_sede_id
+        )
+        if not custodias:
+            flash('No hay registros de custodia para exportar.', 'info')
+            return redirect(url_for('inventario.inventario_main', tab='custodia'))
+
+        data = []
+        for c in custodias:
+            data.append({
+                'ESTADO': c.estado,
+                'NOMBRE DEL CENTRO DE COSTO': c.nombre_centro_costo or '',
+                'CENTRO DE COSTO': c.centro_costo or '',
+                'CARGO RESPONSABLE (CUSTODIA)': c.cargo_custodio or '',
+                'RESPONSABLE (CUSTODIA)': c.responsable_custodia or '',
+                'CEDULA': c.cedula_custodio or '',
+                'EDIFICIO': c.edificio or '',
+                'UBICACIÓN': c.ubicacion or '',
+                'TIPO INVENTARIO': c.tipo_inventario,
+                'PLACA': c.placa or '',
+                'SERIE': c.serie or '',
+                'DESCRIPCIÓN': c.descripcion,
+                'MARCA': c.marca or '',
+                'CANTIDAD': c.cantidad,
+                'PROGRAMA / ÁREA': c.programa_area or '',
+                'OBSERVACIONES': c.observaciones or ''
+            })
+        df = pd.DataFrame(data)
+        if formato.lower() == 'excel':
+            return exportar_df_excel(df, sheet_name='Custodia_Centros_Costo', prefix='custodia_perdomo')
+        elif formato.lower() == 'csv':
+            return exportar_df_csv(df, prefix='custodia_perdomo')
+        else:
+            flash('Formato no válido. Use excel o csv.', 'warning')
+            return redirect(url_for('inventario.inventario_main', tab='custodia'))
+    except Exception as e:
+        current_app.logger.error(f"Error exportando custodia: {e}", exc_info=True)
+        flash(f"Error al exportar custodia: {str(e)}", "danger")
+        return redirect(url_for('inventario.inventario_main', tab='custodia'))
+
+
+@inventario_bp.route('/api/custodia/<int:custodia_id>')
+@login_required
+def api_detalle_custodia(custodia_id):
+    """Retorna información completa de un activo en custodia en formato JSON."""
+    try:
+        c = InventarioCustodia.query.get_or_404(custodia_id)
+        return jsonify({
+            'success': True,
+            'data': {
+                'id': c.id,
+                'estado': c.estado,
+                'nombre_centro_costo': c.nombre_centro_costo or 'Sin especificar',
+                'centro_costo': c.centro_costo or 'N/A',
+                'cargo_custodio': c.cargo_custodio or 'N/A',
+                'responsable_custodia': c.responsable_custodia or 'Sin custodio asignado',
+                'cedula_custodio': c.cedula_custodio or 'N/A',
+                'edificio': c.edificio or 'PERDOMO',
+                'ubicacion': c.ubicacion or 'Sin ubicación',
+                'tipo_inventario': c.tipo_inventario,
+                'placa': c.placa or 'Sin placa',
+                'serie': c.serie or 'N/A',
+                'descripcion': c.descripcion,
+                'marca': c.marca or 'N/A',
+                'cantidad': c.cantidad,
+                'cantidad_anterior': c.cantidad_anterior or 'N/A',
+                'programa_area': c.programa_area or 'N/A',
+                'funcionario_inventario': c.funcionario_inventario or 'N/A',
+                'fecha_inventario': c.fecha_inventario or 'N/A',
+                'anio_llegada': c.anio_llegada or 'N/A',
+                'es_investigacion': c.es_investigacion or 'No',
+                'observaciones': c.observaciones or 'Sin observaciones adicionales'
+            }
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 404
+
+
+@inventario_bp.route('/acta-custodia/pdf', methods=['GET', 'POST'])
+@login_required
+@permiso_requerido('inventario', 'ver')
+def descargar_acta_custodia_pdf():
+    """Genera y descarga el Acta Oficial de Custodia en PDF para los registros filtrados o seleccionados."""
+    try:
+        user_rol = session.get('rol')
+        user_sede_id = session.get('sede_id')
+
+        # Soporte para selección múltiple de ítems mediante ?ids=1,2,3 o JSON/form
+        ids_param = request.args.get('ids')
+        if not ids_param and request.is_json:
+            ids_param = request.json.get('ids')
+        elif not ids_param and request.form.get('ids'):
+            ids_param = request.form.get('ids')
+
+        es_seleccion_multiple = False
+        if ids_param:
+            if isinstance(ids_param, str):
+                id_list = [int(x.strip()) for x in ids_param.split(',') if x.strip().isdigit()]
+            elif isinstance(ids_param, list):
+                id_list = [int(x) for x in ids_param if str(x).isdigit()]
+            else:
+                id_list = []
+
+            if id_list:
+                es_seleccion_multiple = True
+                query = InventarioCustodia.query.filter(InventarioCustodia.id.in_(id_list))
+                if user_rol not in ('admin', 'superadmin') and user_sede_id:
+                    query = query.filter(InventarioCustodia.sede_id == user_sede_id)
+                custodias = query.order_by(InventarioCustodia.id.asc()).all()
+            else:
+                custodias = []
+        else:
+            custodias = InventarioService.obtener_custodias_filtradas(
+                request.args, user_rol=user_rol, user_sede_id=user_sede_id
+            )
+
+        if not custodias:
+            flash('No se encontraron registros de custodia para generar el acta.', 'warning')
+            return redirect(url_for('inventario.inventario_main', tab='custodia'))
+
+        organizar_por = request.args.get('organizar_por', 'categoria')
+        organizar_por_categoria = (organizar_por.lower() != 'ninguno')
+
+        sede_nombre = "PERDOMO"
+        if user_sede_id:
+            s_obj = db.session.get(Sede, user_sede_id)
+            if s_obj:
+                sede_nombre = s_obj.nombre
+        elif custodias and custodias[0].sede:
+            sede_nombre = custodias[0].sede.nombre
+
+        usuario_emisor = session.get('nombre_completo', session.get('usuario', 'Auxiliar de Inventario'))
+        
+        consecutivo = None
+        if es_seleccion_multiple:
+            consecutivo = f"ACTA-SEL-{len(custodias)}B-{datetime.now().strftime('%Y%m%d%H%M')}"
+
+        pdf_buffer = ActaCustodiaService.generar_acta_pdf(
+            custodias=custodias,
+            consecutivo=consecutivo,
+            usuario_emisor=usuario_emisor,
+            sede_nombre=sede_nombre,
+            organizar_por_categoria=organizar_por_categoria
+        )
+
+        tipo_sufijo = f"seleccion_{len(custodias)}bienes" if es_seleccion_multiple else sede_nombre.lower()
+        nombre_archivo = f"acta_custodia_{tipo_sufijo}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+        return send_file(
+            pdf_buffer,
+            mimetype='application/pdf',
+            as_attachment=False,
+            download_name=nombre_archivo
+        )
+    except Exception as e:
+        current_app.logger.error(f"Error generando acta de custodia PDF: {e}", exc_info=True)
+        flash(f"Error al generar el acta de custodia en PDF: {str(e)}", "danger")
+        return redirect(url_for('inventario.inventario_main', tab='custodia'))
+
+
+@inventario_bp.route('/acta-custodia/<int:custodia_id>/pdf')
+@login_required
+@permiso_requerido('inventario', 'ver')
+def descargar_acta_individual_pdf(custodia_id):
+    """Genera y descarga el Acta Oficial de Custodia en PDF para un activo específico."""
+    try:
+        c = InventarioCustodia.query.get_or_404(custodia_id)
+        sede_nombre = c.sede.nombre if c.sede else "PERDOMO"
+        usuario_emisor = session.get('nombre_completo', session.get('usuario', 'Auxiliar de Inventario'))
+        consecutivo = f"ACTA-IND-{c.placa or c.id}-{datetime.now().strftime('%Y%m%d')}"
+
+        pdf_buffer = ActaCustodiaService.generar_acta_pdf(
+            custodias=[c],
+            consecutivo=consecutivo,
+            usuario_emisor=usuario_emisor,
+            sede_nombre=sede_nombre
+        )
+
+        placa_clean = re.sub(r'[^a-zA-Z0-9_-]', '_', c.placa or f"id_{c.id}")
+        nombre_archivo = f"acta_custodia_{placa_clean}_{datetime.now().strftime('%Y%m%d')}.pdf"
+        return send_file(
+            pdf_buffer,
+            mimetype='application/pdf',
+            as_attachment=False,
+            download_name=nombre_archivo
+        )
+    except Exception as e:
+        current_app.logger.error(f"Error generando acta individual PDF: {e}", exc_info=True)
+        flash(f"Error al generar el acta individual en PDF: {str(e)}", "danger")
+        return redirect(url_for('inventario.inventario_main', tab='custodia'))
+
+
+
 @inventario_bp.route('/bulk_update', methods=['POST'])
 @login_required
 @permiso_requerido('inventario', 'editar')
@@ -954,6 +1500,182 @@ def bulk_update():
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(f"Error en bulk_update inventario: {e}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+
+@inventario_bp.route('/propagar_foto_modelo', methods=['POST'])
+@login_required
+@permiso_requerido('inventario', 'editar')
+def propagar_foto_modelo():
+    """Replica la foto de un item a todos los demás items que comparten el mismo modelo o nombre."""
+    try:
+        datos = request.get_json(silent=True) or request.form.to_dict()
+        item_id = datos.get('item_id')
+        if not item_id:
+            return jsonify({'success': False, 'message': 'ID de item no proporcionado.'}), 400
+
+        item = Inventario.query.get(int(item_id))
+        if not item:
+            return jsonify({'success': False, 'message': 'Equipo no encontrado.'}), 404
+
+        if not item.foto_url:
+            return jsonify({'success': False, 'message': 'Este equipo no cuenta con una foto asignada para replicar.'}), 400
+
+        actualizados = _propagar_foto_modelo_interno(
+            item, 
+            session_user=session.get('usuario', ''),
+            session_user_name=session.get('nombre_completo', '')
+        )
+
+        modelo_txt = item.marca_modelo or item.item
+        return jsonify({
+            'success': True,
+            'message': f'Foto replicada exitosamente a {actualizados} equipos del modelo "{modelo_txt}".',
+            'count': actualizados
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error en propagar_foto_modelo: {e}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@inventario_bp.route('/bulk_edit_modelo', methods=['POST'])
+@login_required
+@permiso_requerido('inventario', 'editar')
+def bulk_edit_modelo():
+    """Edita campos comunes (ubicación, estado, ficha técnica, observaciones, foto) para múltiples items del mismo modelo."""
+    try:
+        if request.is_json:
+            datos = request.json
+        else:
+            datos = request.form.to_dict()
+
+        raw_ids = datos.get('item_ids', '')
+        if isinstance(raw_ids, str):
+            item_ids = [int(i.strip()) for i in raw_ids.split(',') if i.strip().isdigit()]
+        elif isinstance(raw_ids, list):
+            item_ids = [int(i) for i in raw_ids if str(i).isdigit()]
+        else:
+            item_ids = []
+
+        if not item_ids:
+            return jsonify({'success': False, 'message': 'No se seleccionaron equipos para edición masiva.'}), 400
+
+        items = Inventario.query.filter(Inventario.id.in_(item_ids)).all()
+        if not items:
+            return jsonify({'success': False, 'message': 'No se encontraron los equipos seleccionados.'}), 404
+
+        foto_subida = None
+        if 'foto' in request.files and request.files['foto'].filename:
+            foto_subida = _procesar_y_guardar_imagen(request.files['foto'], subcarpeta='equipos')
+        elif datos.get('foto_url'):
+            foto_subida = str(datos.get('foto_url')).strip() or None
+
+        actualizados = 0
+        usuario_doc = session.get('usuario', '')
+        usuario_nom = session.get('nombre_completo', '')
+
+        for item in items:
+            datos_antes = {
+                'categoria': item.categoria,
+                'item': item.item,
+                'marca_modelo': item.marca_modelo,
+                'ubicacion_permanente': item.ubicacion_permanente,
+                'estado': item.estado,
+                'bodega_id': item.bodega_id,
+                'procesador': item.procesador,
+                'ram_gb': item.ram_gb,
+                'almacenamiento': item.almacenamiento,
+                'sistema_operativo': item.sistema_operativo,
+                'especificaciones_tecnicas': item.especificaciones_tecnicas,
+                'foto_url': item.foto_url
+            }
+
+            if 'categoria' in datos and datos['categoria'].strip():
+                item.categoria = datos['categoria'].strip()
+            if 'item' in datos and datos['item'].strip():
+                item.item = datos['item'].strip()
+            if 'marca_modelo' in datos and datos['marca_modelo'].strip():
+                item.marca_modelo = datos['marca_modelo'].strip()
+            if 'ubicacion_permanente' in datos and datos['ubicacion_permanente'].strip():
+                item.ubicacion_permanente = datos['ubicacion_permanente'].strip()
+            if 'estado' in datos and datos['estado'].strip():
+                item.estado = datos['estado'].strip()
+            if 'bodega_id' in datos and str(datos['bodega_id']).strip().isdigit():
+                item.bodega_id = int(datos['bodega_id'])
+            if 'observaciones' in datos and datos['observaciones'].strip():
+                item.observaciones = datos['observaciones'].strip()
+
+            if 'procesador' in datos and datos['procesador'].strip():
+                item.procesador = datos['procesador'].strip()
+            if 'ram_gb' in datos and datos['ram_gb'].strip():
+                item.ram_gb = datos['ram_gb'].strip()
+            if 'almacenamiento' in datos and datos['almacenamiento'].strip():
+                item.almacenamiento = datos['almacenamiento'].strip()
+            if 'sistema_operativo' in datos and datos['sistema_operativo'].strip():
+                item.sistema_operativo = datos['sistema_operativo'].strip()
+            if 'especificaciones_tecnicas' in datos and datos['especificaciones_tecnicas'].strip():
+                item.especificaciones_tecnicas = datos['especificaciones_tecnicas'].strip()
+
+            if 'proveedor' in datos and datos['proveedor'].strip():
+                item.proveedor = datos['proveedor'].strip()
+            if 'fecha_adquisicion' in datos and datos['fecha_adquisicion'].strip():
+                try:
+                    item.fecha_adquisicion = datetime.strptime(datos['fecha_adquisicion'].strip(), '%Y-%m-%d').date()
+                except ValueError:
+                    pass
+            if 'garantia_vencimiento' in datos and datos['garantia_vencimiento'].strip():
+                try:
+                    item.garantia_vencimiento = datetime.strptime(datos['garantia_vencimiento'].strip(), '%Y-%m-%d').date()
+                except ValueError:
+                    pass
+
+            if foto_subida:
+                item.foto_url = foto_subida
+
+            actualizados += 1
+
+            registrar_auditoria(
+                modulo='inventario',
+                entidad_tipo='Inventario',
+                entidad_id=item.id,
+                accion='EDITAR_MASIVO_MODELO',
+                usuario_documento=usuario_doc,
+                usuario_nombre=usuario_nom,
+                descripcion=f'Edición masiva de modelo para equipo "{item.item}" (#{item.numero_inventario})',
+                datos_antes=datos_antes,
+                datos_despues={
+                    'categoria': item.categoria,
+                    'item': item.item,
+                    'marca_modelo': item.marca_modelo,
+                    'estado': item.estado,
+                    'foto_url': item.foto_url
+                }
+            )
+
+        db.session.commit()
+
+        propagar_todos = datos.get('propagar_todos_modelo') in (True, 'true', '1')
+        extra_propagados = 0
+        if propagar_todos and foto_subida and items:
+            extra_propagados = _propagar_foto_modelo_interno(items[0], usuario_doc, usuario_nom)
+
+        msg = f'Se actualizaron con éxito {actualizados} equipos seleccionados.'
+        if extra_propagados > 0:
+            msg += f' Además, la foto se replicó a {extra_propagados} equipos adicionales del mismo modelo.'
+
+        return jsonify({
+            'success': True,
+            'message': msg,
+            'count': actualizados,
+            'extra_count': extra_propagados
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error en bulk_edit_modelo: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
@@ -1354,6 +2076,10 @@ def importar_excel():
             if marca_mod.lower() == 'nan':
                 marca_mod = None
 
+            hostname = str(row.get('hostname', '')).strip()
+            if hostname.lower() == 'nan' or not hostname:
+                hostname = None
+
             ubicacion = str(row.get('ubicacion_permanente', '')).strip()
             if ubicacion.lower() == 'nan':
                 ubicacion = None
@@ -1374,6 +2100,7 @@ def importar_excel():
                 item_existente.activo_fijo = activo_fijo
                 item_existente.bodega_id = bodega_id
                 item_existente.ubicacion_permanente = ubicacion
+                if hostname: item_existente.hostname = hostname
                 if es_por_cantidad:
                     item_existente.es_por_cantidad = True
                     item_existente.cantidad_total = cant_total
@@ -1390,6 +2117,7 @@ def importar_excel():
                     activo_fijo=activo_fijo,
                     numero_inventario=num_inv,
                     bodega_id=bodega_id,
+                    hostname=hostname,
                     ubicacion_permanente=ubicacion,
                     estado='Disponible',
                     es_por_cantidad=es_por_cantidad,

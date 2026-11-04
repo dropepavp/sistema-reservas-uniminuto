@@ -1,0 +1,938 @@
+tipo_inventario,placa,serie,descripcion,marca,estado,cantidad,cantidad_anterior,edificio,ubicacion,centro_costo,nombre_centro_costo,responsable_custodia,cedula_custodio,cargo_custodio,programa_area,funcionario_inventario,fecha_inventario,anio_llegada,es_investigacion,observaciones
+ACTIVO_FIJO,RESP200011538,,CONSOLA DE SONIDO,BEHRINGER,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,"Placa actual SAPAF58000100-0 -  MANTENIMIENTO CORRECTIVO, Arreglo de fadres, perillas, potenciometros y preamplificadores."
+ACTIVO_FIJO,RESP200026959,,GUITARRA ELÉCTRICA # 6,YAMAHA,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF15000704-0
+ACTIVO_FIJO,RESP200027070,,BAJO ELÉTRICO # 5,YAMAHA,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF15000935-0
+ACTIVO_FIJO,RUVD300003961,,GUITARRA ELECTROACÚSTICA,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Para mantenimiento En buen estado 2025
+ACTIVO_FIJO,RUVD300002789,,GUITARRA ELECTROACÚSTICA,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Para mantenimiento Placa actual SAPAF15000917-0 - cambio de cuerdas
+ACTIVO_FIJO,RESP200023916,,GUITARRA ACÚSTICA # 1,LA SANTANDEREANA,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF15000922-0 - cambio de cuerdas
+ACTIVO_FIJO,RESP200023920,,GUITARRA ACÚSTICA # 3,LA SANTANDEREANA,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF15000072-0 - cambio de cuerdas
+ACTIVO_FIJO,RESP200023915,,GUITARRA ACÚSTICA # 8,LA SANTANDEREANA,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF15000918-0
+ACTIVO_FIJO,RESP200023917,,GUITARRA ACÚSTICA # 10,LA SANTANDEREANA,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF15000924-0
+ACTIVO_FIJO,RESP200023921,,GUITARRA ACÚSTICA # 7,LA SANTANDEREANA,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF15000919-0
+ACTIVO_FIJO,RESP200023919,,GUITARRA ACÚSTICA # 5,LA SANTANDEREANA,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF15000925-0 - cambio de cuerdas
+ACTIVO_FIJO,RESP200011100,,BAJO ELÉTRICO # 6,YAMAHA,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF72000001-0
+ACTIVO_FIJO,RESP200023923,,GUITARRA ACÚSTICA # 2,LA SANTANDEREANA,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF15000921-0
+ACTIVO_FIJO,RESP200023924,,GUITARRA ACÚSTICA # 6,LA SANTANDEREANA,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,
+ACTIVO_FIJO,RESP200011069,,GUITARRA ACÚSTICA # 11,STINGRY,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,
+ACTIVO_FIJO,RESP200023918,,GUITARRA ACÚSTICA # 4,LA SANTANDEREANA,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Sin placa
+ACTIVO_FIJO,RUVD300002795,,MICRÓFONO SM58,SHURE,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,
+ACTIVO_FIJO,RUVD300002798,,MICRÓFONO SM58,SHURE,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,
+ACTIVO_FIJO,RESP200011081,V-2007-49-3109-U,AMPLIFICADOR DE BAJO,MARSHALL,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,"Placa actual SAPAF72000002-0 - Le hace falta las perillas de los controladores de volumen, equalización, ganancia"
+ACTIVO_FIJO,RESP200026954,V-2012-42-5946-F,AMPLIFICADOR PARA GUITARRA,MARSHALL,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF18004484-0
+ACTIVO_FIJO,RESP200026934,,AMPLIFICADOR PARA GUITARRA #10,MARSHALL,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF15001149-0
+ACTIVO_FIJO,RESP200026935,,AMPLIFICADOR PARA GUITARRA #9,MARSHALL,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF15001150-0
+ACTIVO_FIJO,RUVD300002783,YEWO02082,TECLADO DIGITAL PSR-E253,YAMAHA,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,
+ACTIVO_FIJO,RUVD300002852,YBXI01609,TECLADO DIGITAL PSR-E253,YAMAHA,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,
+ACTIVO_FIJO,RUVD300002784,YEWO01901,TECLADO DIGITAL PSR-E253,YAMAHA,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,
+ACTIVO_FIJO,RUVD300002782,YBXH02981,TECLADO DIGITAL PSR-E353,YAMAHA,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,
+ACTIVO_FIJO,SIN PLACA,,BASE PARA TECLADO,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,BASE PARA TECLADO,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,BASE PARA TECLADO,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,BASE PARA TECLADO,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,RUVD300003323,MP3-IIA1702130177,CABINA DE SONIDO,BETA 3,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,
+ACTIVO_FIJO,RESP200010997,,ALEGRE KIT COSTA ATLANTICA 4,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF15000084-0
+ACTIVO_FIJO,RESP200010977,,LLAMADOR KIT  COSTA ATLANTICA 4,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,
+ACTIVO_FIJO,RESP200010978,,TAMBORA KIT COSTA ATLANTICA 4,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF15000068-0 - Necesita afinacion externo
+ACTIVO_FIJO,RESP200026951,,BATERIA ROJA,MAPEX,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF15000679-0
+ACTIVO_FIJO,SIN PLACA,,MARRANA/RUNCHO,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,XILÓFONO MINI PLANO,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,XILÓFONO MINI PLANO,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,CAMPANAS DE MANO,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,CAMPANAS DE MANO,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,CAMPANAS DE MANO,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,GUACHARACA,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,GUACHARACA,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,GUASÁ,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,PAR DE MARACAS,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,MARACA,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,QUENA,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,CLAVES PAREJA,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,CLAVES PAREJA,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,CLAVES PAREJA,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,RESP200010970,,GAITAS #1,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2020,No,Placa actual SAPAF15000058-0
+ACTIVO_FIJO,SIN PLACA,,GAITAS #5,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2020,No,Sin placa Placa actual SAPAF15000064-0
+ACTIVO_FIJO,RESP200025431,,MINI COMPONENTE,PANASONIC,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2020,No,Placa actual SAPAF18004891-0
+ACTIVO_FIJO,SIN PLACA,,PALOS DE AGUA,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,
+ACTIVO_FIJO,RESP200024788,,ATRIL #16,HERCULES,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF9027966-0
+ACTIVO_FIJO,RESP200024796,,ATRIL #15,HERCULES,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF9027970-0
+ACTIVO_FIJO,RESP200024798,,ATRIL #18,HERCULES,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF9027968-0
+ACTIVO_FIJO,RESP200024800,,ATRIL #19,HERCULES,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa acual SAPAF9027967-0
+ACTIVO_FIJO,RESP200024780,,ATRIL #20,HERCULES,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF9027964-0
+ACTIVO_FIJO,RESP200024797,,ATRIL #17,HERCULES,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2019,No,Placa actual SAPAF9027952-0
+ACTIVO_FIJO,SIN PLACA,2.01806E+15,PARLANTE PRE AMPLIFICADOR,PRODJ,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,"Sin placa Perillas del volumen, equalizador en mal estado, mantenimiento correctivo"
+ACTIVO_FIJO,RUVD300006333,1.11802E+14,MICRÓFONO INHALÁMBRICO,PRODJ,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,
+ACTIVO_FIJO,RUVD300006334,1.11802E+14,MICRÓFONO INHALÁMBRICO,PRODJ,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,
+ACTIVO_FIJO,RUVD300003956,,MICRÓFONO SM58,SHURE,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,
+ACTIVO_FIJO,RUVD300003959,,MICRÓFONO SM57,SHURE,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,
+ACTIVO_FIJO,RUVD300003960,,MICRÓFONO SM57,SHURE,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,
+ACTIVO_FIJO,SIN PLACA,,MICRÓFONO SM58,SHURE,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,SILLA DE BATERIA,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,PEDAL PARA BATERIA #1,MAPEX,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,TRIPODE PARA CABINA LS20,,Configurado,1,,PERDOMO,1001,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MÚSICA,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,,NO ESTABA EN LA VALIDACIÓN,Ubicado en el CUARTO TÉCNICO 3 Piso 10.
+ACTIVO_FIJO,RUVD300000013,,MUEBLE DE MADERA PEQUEÑO,,Configurado,1,,PERDOMO,1004,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,PERDOMO ACTIVO FIJO,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,
+ACTIVO_FIJO,SIN PLACA,,CABALLETE,,Configurado,1,,PERDOMO,CUARTO TÉCNICO 3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,ARTES,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,CABALLETE,,Configurado,1,,PERDOMO,CUARTO TÉCNICO 3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,ARTES,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,CABALLETE,,Configurado,1,,PERDOMO,CUARTO TÉCNICO 3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,ARTES,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,CABALLETE,,Configurado,1,,PERDOMO,CUARTO TÉCNICO 3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,ARTES,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,CABALLETE,,Configurado,1,,PERDOMO,CUARTO TÉCNICO 3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,ARTES,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,CABALLETE,,Configurado,1,,PERDOMO,CUARTO TÉCNICO 3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,ARTES,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,CABALLETE,,Configurado,1,,PERDOMO,CUARTO TÉCNICO 3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,ARTES,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,CABALLETE,,Configurado,1,,PERDOMO,CUARTO TÉCNICO 3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,ARTES,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,CABALLETE,,Configurado,1,,PERDOMO,CUARTO TÉCNICO 3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,ARTES,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,CABALLETE,,Configurado,1,,PERDOMO,CUARTO TÉCNICO 3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,ARTES,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,CABALLETE,,Configurado,1,,PERDOMO,CUARTO TÉCNICO 3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,ARTES,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,CABALLETE,,Configurado,1,,PERDOMO,CUARTO TÉCNICO 3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,ARTES,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,CABALLETE,,Configurado,1,,PERDOMO,CUARTO TÉCNICO 3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,ARTES,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,SIN PLACA,,CABALLETE,,Configurado,1,,PERDOMO,CUARTO TÉCNICO 3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,ARTES,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,Sin placa
+ACTIVO_FIJO,RUVD300006328,,BARRAS PARALELAS BALLET,,Configurado,1,,PERDOMO,CUARTO TÉCNICO 3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,ARTES,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,
+ACTIVO_FIJO,RUVD300006329,,BARRAS PARALELAS BALLET,,Configurado,1,,PERDOMO,CUARTO TÉCNICO 3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,ARTES,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,
+ACTIVO_FIJO,RUVD300006330,,BARRAS PARALELAS BALLET,,Configurado,1,,PERDOMO,CUARTO TÉCNICO 3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,ARTES,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,
+ACTIVO_FIJO,RUVD300006373,,MESA PLEGABLE,,Configurado,1,,PERDOMO,CUARTO TÉCNICO 4,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,PERDOMO ACTIVO FIJO,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,
+ACTIVO_FIJO,RUVD300006370,,MESA PLEGABLE,,Configurado,1,,PERDOMO,CUARTO TÉCNICO 4,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,PERDOMO ACTIVO FIJO,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,
+ACTIVO_FIJO,RUVD300006335,,MESA PLEGABLE,,Configurado,1,,PERDOMO,CUARTO TÉCNICO 4,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,PERDOMO ACTIVO FIJO,Andrés Rojas-Leonardo Rangel- Natalia Rodriguez-Erika Moreno,11/12/2024,2025,No,
+ACTIVO_FIJO,RBSS449000308,,ALCOHOLIMETRO DIGITAL,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSS449000317,,AUDIOMETRO DE DETECCION,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSB441000100,,AUDIOMETRO DE DETECCION,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSR449000755,,CALIBRADOR ACUSTICO,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSS449000310,,CALIBRADOR NIVEL SONIDO,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSS449000312,,CALIBRADOR NIVEL SONIDO,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSS449000311,,CALIBRADOR NIVEL SONIDO,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSS449000303,,DETECTOR DE GASES,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSS449000304,,DETECTOR DE RADIACION,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSB441000092,,DETECTOR DE RADIACION,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSS449000305,,DETECTOR DE RADIACION,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSB441000093,,DETECTOR DE RADIACION,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSB441000090,,DETECTOR MULTI GAS,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSB441000101,,ESPIROMETRO,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSB441000102,,ESPIROMETRO,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSS449000306,,ESPIROMETRO,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSS449000307,,ESPIROMETRO,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSR449000754,,LUXOMETRO,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RUVDSC3000667,,MEDIDOR DE CAMPO MAGNETICO,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,luxometro
+ACTIVO_FIJO,RBSS449000301,,MEDIDOR DE CAMPO MAGNETICO,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSS449000300,,MEDIDOR DE CAMPO MAGNETICO,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RUVDSC3000666,,MEDIDOR DE CAMPO MAGNETICO,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,luxometro
+ACTIVO_FIJO,RBSS449000302,,MEDIDOR DE ESTRÉS,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSS449000315,,MEDIDOR ILUMINANCIA DIGITAL,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSS449000316,,MEDIDOR ILUMINANCIA DIGITAL,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSB441000082,,MEDIDOR ILUMINANCIA DIGITAL,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSB441000084,,MEDIDOR ILUMINANCIA DIGITAL,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSB441000085,,MEDIDOR ILUMINANCIA DIGITAL,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSB441000083,,MEDIDOR ILUMINANCIA DIGITAL,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RUVDSC3000680,SC151609,PROBADOR DE VISION PORTATIL,DEPISTEO,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSB441000104,SC151605,PROBADOR DE VISION PORTATIL,DEPISTEO,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSB441000103,SC151608,PROBADOR DE VISION PORTATIL,DEPISTEO,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,23001403,SC151606,PROBADOR DE VISION PORTATIL,DEPISTEO,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,23000703,SC151607,PROBADOR DE VISION PORTATIL,DEPISTEO,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSB441000086,,REGISTRADOR DE DATOS DE TEMPERATURA Y HUMEDAD,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSB441000087,,REGISTRADOR DE DATOS DE TEMPERATURA Y HUMEDAD,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,23002341,,REGISTRADOR DE DATOS DE TEMPERATURA Y HUMEDAD,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSB441000089,,REGISTRADOR DE DATOS DE TEMPERATURA Y HUMEDAD,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSS449000314,,REGISTRADOR DE DATOS DE TEMPERATURA Y HUMEDAD,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSS449000313,,REGISTRADOR DE DATOS DE TEMPERATURA Y HUMEDAD,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSB441000080,,SONOMETRO,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSB441000079,,SONOMETRO,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSB441000078,,SONOMETRO,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSR449000286,,SONOMETRO,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSR449000287,,SONOMETRO,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSB441000099,,SONOMETRO,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,analizador de vibraciones
+ACTIVO_FIJO,RUVDSC3000668,,SONOMETRO,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,RBSB441000098,,SONOMETRO INTEGRADOR,,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,MEDICIÓN AMBIENTAL,Stiven Tequia-Jennifer Miranda-Erika Moreno,22/02/2024,2024,No,
+ACTIVO_FIJO,17028268,5CD2506CLN,PORTATIL  PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028241,5CD2506CK6,PORTATIL  PROBOOK 445 G10,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028265,5CD2506CHT,PORTATIL  PROBOOK 445 G11,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028271,5CD2506CLC,PORTATIL  PROBOOK 445 G12,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028447,5CD2506CKB,PORTATIL  PROBOOK 445 G13,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028274,5CD2506CBY,PORTATIL  PROBOOK 445 G14,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028362,5CD2506CF8,PORTATIL  PROBOOK 445 G15,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028456,5CD2506CHK,PORTATIL  PROBOOK 445 G16,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028359,5CD2506CH6,PORTATIL  PROBOOK 445 G17,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028450,5CD2506CKT,PORTATIL  PROBOOK 445 G18,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028325,5CD2506CHS,PORTATIL  PROBOOK 445 G19,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028444,5CD2506D0M,PORTATIL  PROBOOK 445 G20,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028272,5CD2506CKD,PORTATIL  PROBOOK 445 G21,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028342,5CD2506CBH,PORTATIL  PROBOOK 445 G22,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028358,5CD2506CM1,PORTATIL  PROBOOK 445 G23,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028361,5CD2506CJ1,PORTATIL  PROBOOK 445 G24,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028446,5CD2506CJT,PORTATIL  PROBOOK 445 G25,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028326,5CD2506CHC,PORTATIL  PROBOOK 445 G26,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028454,5CD2506CJY,PORTATIL  PROBOOK 445 G27,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028374,5CD2506CKR,PORTATIL  PROBOOK 445 G28,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028363,5CD2506CK3,PORTATIL  PROBOOK 445 G29,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028324,5CD2506CMJ,PORTATIL  PROBOOK 445 G30,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028452,5CD2506CJK,PORTATIL  PROBOOK 445 G31,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028372,5CD2506CHL,PORTATIL  PROBOOK 445 G32,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028451,5CD2506CJL,PORTATIL  PROBOOK 445 G33,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028277,5CD2506CGC,PORTATIL  PROBOOK 445 G34,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028442,5CD2506CJW,PORTATIL  PROBOOK 445 G35,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028243,5CD2506CK4,PORTATIL  PROBOOK 445 G36,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028341,5CD2506CL6,PORTATIL  PROBOOK 445 G37,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028460,5CD2506CBZ,PORTATIL  PROBOOK 445 G38,HP,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028821,YN220182I08180270,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,505,22002915,,,1014212535,,CRAII,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0067,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,704LS1,22002915,,,1014212535,,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271016,H264,ONE SCREEN,Configurado,1,,PERDOMO,704LS1,22002915,,,1014212535,,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,,MULTIOTOMA,NTONPOWER,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,4
+ACTIVO_FIJO,9080108,,NIÑERA 7,NO PRESENTA,Configurado,1,,PERDOMO,704LS1,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028409,5CD2506CF3,PORTATIL  PROBOOK 445 G38,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028403,5CD2506C98,PORTATIL  PROBOOK 445 G39,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028313,5CD2506D0D,PORTATIL  PROBOOK 445 G40,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028412,5CD2506CYL,PORTATIL  PROBOOK 445 G41,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028402,5CD2506CCF,PORTATIL  PROBOOK 445 G42,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028354,5CD2506C9C,PORTATIL  PROBOOK 445 G43,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028318,5CD2506CDT,PORTATIL  PROBOOK 445 G44,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028414,5CD2506D0B,PORTATIL  PROBOOK 445 G45,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028355,5CD2506C9F,PORTATIL  PROBOOK 445 G46,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028405,5CD2506CMK,PORTATIL  PROBOOK 445 G47,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028314,5CD2506CYZ,PORTATIL  PROBOOK 445 G48,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028307,5CD2506CFY,PORTATIL  PROBOOK 445 G49,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028353,5CD2506CFN,PORTATIL  PROBOOK 445 G50,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028319,5CD2506CF4,PORTATIL  PROBOOK 445 G51,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028315,5CD2506CZ4,PORTATIL  PROBOOK 445 G52,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028308,5CD2506CBG,PORTATIL  PROBOOK 445 G53,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028411,5CD2506CCS,PORTATIL  PROBOOK 445 G54,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028310,5CD2506C99,PORTATIL  PROBOOK 445 G55,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028406,5CD2506CF0,PORTATIL  PROBOOK 445 G56,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028410,5CD2506CDQ,PORTATIL  PROBOOK 445 G57,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028311,5CD2506CC5,PORTATIL  PROBOOK 445 G58,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028407,5CD2506CF5,PORTATIL  PROBOOK 445 G59,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028413,5CD2506CYM,PORTATIL  PROBOOK 445 G60,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028316,5CD2506CZ7,PORTATIL  PROBOOK 445 G61,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028312,5CD2506CBJ,PORTATIL  PROBOOK 445 G62,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028408,5CD2506CFG,PORTATIL  PROBOOK 445 G63,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028356,5CD2506CY9,PORTATIL  PROBOOK 445 G64,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028401,5CD2506CBN,PORTATIL  PROBOOK 445 G65,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028317,5CD2506CF2,PORTATIL  PROBOOK 445 G66,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028464,5CD2506CY6,PORTATIL  PROBOOK 445 G67,HP,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,,MULTITOMA,NTONPOWER,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,3
+ACTIVO_FIJO,9080114,,NIÑERA 5,NO PRESENTA,Configurado,1,,PERDOMO,803LS2,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028322,5CD2506CK2,PORTATIL  PROBOOK 445 G67,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028424,5CD2506CNJ,PORTATIL  PROBOOK 445 G68,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028427,5CD2506CZZ,PORTATIL  PROBOOK 445 G69,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028437,5CD2506CFL,PORTATIL  PROBOOK 445 G70,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028357,5CD2506CN0,PORTATIL  PROBOOK 445 G71,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028430,5CD2506D0F,PORTATIL  PROBOOK 445 G72,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028423,5CD2506CCL,PORTATIL  PROBOOK 445 G73,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028434,5CD2506CKY,PORTATIL  PROBOOK 445 G74,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028420,5CD2506CP0,PORTATIL  PROBOOK 445 G75,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028419,5CD2506D00,PORTATIL  PROBOOK 445 G76,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028320,5CD2506C9B,PORTATIL  PROBOOK 445 G77,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028417,5CD2506D06,PORTATIL  PROBOOK 445 G78,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028433,5CD2506CJ7,PORTATIL  PROBOOK 445 G79,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028436,5CD2506CHP,PORTATIL  PROBOOK 445 G80,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028323,5CD2506CJ6,PORTATIL  PROBOOK 445 G81,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028416,5CD2506CMM,PORTATIL  PROBOOK 445 G82,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028428,5CD2506CYY,PORTATIL  PROBOOK 445 G83,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028435,5CD2506CJX,PORTATIL  PROBOOK 445 G84,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028438,5CD2506C9T,PORTATIL  PROBOOK 445 G85,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028431,5CD2506D0H,PORTATIL  PROBOOK 445 G86,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028440,5CD2506C9Q,PORTATIL  PROBOOK 445 G87,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028426,5CD2506CCR,PORTATIL  PROBOOK 445 G88,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028421,5CD2506CZP,PORTATIL  PROBOOK 445 G89,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028425,5CD2506CPH,PORTATIL  PROBOOK 445 G90,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028439,5CD2506CLB,PORTATIL  PROBOOK 445 G91,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028418,5CD2506CDC,PORTATIL  PROBOOK 445 G92,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028254,5CD2506CJC,PORTATIL  PROBOOK 445 G93,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028432,5CD2506CF7,PORTATIL  PROBOOK 445 G94,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028429,5CD2506CBX,PORTATIL  PROBOOK 445 G95,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028321,5CD2506CKC,PORTATIL  PROBOOK 445 G96,HP,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,,MULTITOMA,NTONPOWER,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,4
+ACTIVO_FIJO,9080112,,NIÑERA 6,NO PRESENTA,Configurado,1,,PERDOMO,804LS3,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028510,2YD68Y3,OptiPlex All-in-One 7410,Dell,Configurado,1,,PERDOMO,Lideres de programa 601,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,PERDOMO ACTIVO FIJO,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028507,2WD68Y3,OptiPlex All-in-One 7410,Dell,Configurado,1,,PERDOMO,Lideres de programa 601,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,PERDOMO ACTIVO FIJO,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028508,4WD68Y3,OptiPlex All-in-One 7410,Dell,Configurado,1,,PERDOMO,Lideres de programa 601,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,PERDOMO ACTIVO FIJO,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028509,7VD68Y3,OptiPlex All-in-One 7410,Dell,Configurado,1,,PERDOMO,Lideres de programa 601,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,PERDOMO ACTIVO FIJO,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,RBSB-441-000002,MXL7271L05,HP ProOne 400 G2,Hewlett-Packard,Configurado,1,,PERDOMO,Lideres de programa 601,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,PERDOMO ACTIVO FIJO,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17020814,MJ03Z7HB,Lenovo M700z,Lenovo,Configurado,1,,PERDOMO,Lideres de programa 601,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,PERDOMO ACTIVO FIJO,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17017442,MJ016MNL,Lenovo M73z,Lenovo,Configurado,1,,PERDOMO,Lideres de programa 601,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,PERDOMO ACTIVO FIJO,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028505,5XD68Y3,OptiPlex All-in-One 7410,Dell,Configurado,1,,PERDOMO,Lideres de programa 602,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,PERDOMO ACTIVO FIJO,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028506,DXD68Y3,OptiPlex All-in-One 7410,Dell,Configurado,1,,PERDOMO,Lideres de programa 602,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,PERDOMO ACTIVO FIJO,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17002592,MJ00H8LW,Lenovo M73z,Lenovo,Configurado,1,,PERDOMO,Lideres de programa 602,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,PERDOMO ACTIVO FIJO,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17000851,MJ00B2AZ,Lenovo M73z,Lenovo,Configurado,1,,PERDOMO,Lideres de programa 602,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,PERDOMO ACTIVO FIJO,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028926,FVD68Y3,OptiPlex All-in-One,Dell,Configurado,1,,PERDOMO,Isla 6 piso,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,PERDOMO ACTIVO FIJO,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,,MULTITOMA,NTONPOWER,Configurado,1,,PERDOMO,602,22002916,Laboratorios Generales,,1014212536,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,17028808,YN220182I08180370,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,603,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0069,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,603,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271018,H264,ONE SCREEN,Configurado,1,,PERDOMO,603,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028830,YN210176I08090017,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,605,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R090,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,605,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271020,H264,ONE SCREEN,Configurado,1,,PERDOMO,605,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028793,YN220182I08180468,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,604,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0070,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,604,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271022,H264,ONE SCREEN,Configurado,1,,PERDOMO,604,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028807,YN220182I08180241,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,606,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0115,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,606,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271012,H264,ONE SCREEN,Configurado,1,,PERDOMO,606,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028806,YN220182I08180364,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,607,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0045,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,607,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271014,H264,ONE SCREEN,Configurado,1,,PERDOMO,607,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028805,YN220182I08180351,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,608,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0111,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,608,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271021,H264,ONE SCREEN,Configurado,1,,PERDOMO,608,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000186,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 6 AP 1,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000187,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 6 AP 2,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000188,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 6 AP 3,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000189,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 6 AP 4,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000190,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 6 AP 5,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000191,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 6 AP 6,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000192,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 6 AP 7,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000194,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 6 AP 8,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,5700193,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 6 AP 9,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000195,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 6 AP 10,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000196,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 6 AP 11,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000197,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 6 AP 12,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028927,JWD68Y3,OptiPlex All-in-One,Dell,Configurado,1,,PERDOMO,Isla 7 piso,22002915,,,1014212535,,PERDOMO ACTIVO FIJO,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028829,YN210076H09150067WH0,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,702,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0082,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,702,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271041,H264,ONE SCREEN,Configurado,1,,PERDOMO,702,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028804,YN220182I08180461,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,703,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0089,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,703,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271013,H264,ONE SCREEN,Configurado,1,,PERDOMO,703,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028803,YN220182I08180293,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,704,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0081,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,704,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271011,H264,ONE SCREEN,Configurado,1,,PERDOMO,704,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028811,YN220182I08180301,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,706,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0088,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,706,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271043,H264,ONE SCREEN,Configurado,1,,PERDOMO,706,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028810,YN220182I08180269,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,707,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0087,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,707,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271054,H264,ONE SCREEN,Configurado,1,,PERDOMO,707,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028809,YN220182I08180297,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,708,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0084,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,708,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271045,H264,ONE SCREEN,Configurado,1,,PERDOMO,708,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000198,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 7 AP 1,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000199,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 7 AP 2,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000200,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 7 AP 3,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000201,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 7 AP 4,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000202,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 7 AP 5,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000203,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 7 AP 6,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000204,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 7 AP 7,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000205,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 7 AP 8,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000206,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 7 AP 9,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000207,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 7 AP 10,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000208,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 7 AP 11,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000209,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 7 AP 12,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,,MULTITOMA,NTONPOWER,Configurado,1,,PERDOMO,801,22002915,,,1014212535,,CRAII,DAVID Y JAIDER,10/12/2025,,No,3
+ACTIVO_FIJO,,,MULTITOMA,NTONPOWER,Configurado,1,,PERDOMO,802,22002915,,,1014212535,,CRAII,DAVID Y JAIDER,10/12/2025,,No,2
+ACTIVO_FIJO,17028915,GWD68Y3,OptiPlex All-in-One 7410,Dell,Configurado,1,,PERDOMO,Coworking 802,22002915,,,1014212535,,PERDOMO ACTIVO FIJO,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028916,CVD68Y3,OptiPlex All-in-One 7410,Dell,Configurado,1,,PERDOMO,Coworking 802,22002915,,,1014212535,,PERDOMO ACTIVO FIJO,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028914,4ZD68Y3,OptiPlex All-in-One 7410,Dell,Configurado,1,,PERDOMO,Coworking 802,22002915,,,1014212535,,PERDOMO ACTIVO FIJO,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028950,9YD68Y3,OptiPlex All-in-One,Dell,Configurado,1,,PERDOMO,isla 8 PISO,22002915,,,1014212535,,PERDOMO ACTIVO FIJO,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028828,YN210076H09150037WHO,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,804,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0010,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,804,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271015,H264,ONE SCREEN,Configurado,1,,PERDOMO,804,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028815,YN220182I08180462,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,805,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0015,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,805,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271044,H264,ONE SCREEN,Configurado,1,,PERDOMO,805,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028827,YN210076H09150080WH0,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,803,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0005,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,803,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271056,H264,ONE SCREEN,Configurado,1,,PERDOMO,803,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028812,YN220182I08180302,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,806,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0003,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,806,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271053,H264,ONE SCREEN,Configurado,1,,PERDOMO,806,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028814,YN220182I08180440,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,807,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0004,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,807,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011270120,H264,ONE SCREEN,Configurado,1,,PERDOMO,807,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028813,YN220182I08180260,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,808,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0083,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,808,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271051,H264,ONE SCREEN,Configurado,1,,PERDOMO,808,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000210,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 8 AP 1,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000211,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 8 AP 2,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000212,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 8 AP 3,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000213,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 8 AP 4,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000214,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 8 AP 5,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000215,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 8 AP 6,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000216,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 8 AP 7,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000217,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 8 AP 8,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000218,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 8 AP 9,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000219,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 8 AP 10,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000220,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 8 AP 11,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,57000221,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 8 AP 12,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028928,2XD68Y3,OptiPlex All-in-One,Dell,Configurado,1,,PERDOMO,isla 9 PISO,22002915,,,1014212535,,PERDOMO ACTIVO FIJO,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028819,YN220182I08180254,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,904,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0008,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,904,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271061,H264,ONE SCREEN,Configurado,1,,PERDOMO,904,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028820,YN220182I08180291,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,903,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0006,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,903,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271038,H264,ONE SCREEN,Configurado,1,,PERDOMO,903,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028818,YN220182I08180261,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,906,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0002,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,906,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271042,H264,ONE SCREEN,Configurado,1,,PERDOMO,906,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028817,YN220182I08180506,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,907,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0007,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,907,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271050,H264,ONE SCREEN,Configurado,1,,PERDOMO,907,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028816,YN220182I08180454,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,908,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0009,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,908,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271030,H264,ONE SCREEN,Configurado,1,,PERDOMO,908,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028009,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 9 AP 1,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028008,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 9 AP 2,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028007,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 9 AP 3,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028006,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 9 AP 4,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028005,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 9 AP 5,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028004,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 9 AP 6,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028015,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 9 AP 7,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028014,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PIS0 9 AP 8,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028013,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 9 AP 9,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028012,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 9 AP 10,22002915,,,1014212535,,REDES,DAVID Y JAIDER,12/12/2025,,No,
+ACTIVO_FIJO,17028011,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 9 AP 11,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028010,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 9  AP 12,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028929,5ZD68Y3,OptiPlex All-in-One,Dell,Configurado,1,,PERDOMO,isla 10 PISO,22002915,,,1014212535,,PERDOMO ACTIVO FIJO,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028826,YN220182I08180501,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,10 01,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0122,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,10 01,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271058,H264,ONE SCREEN,Configurado,1,,PERDOMO,10 01,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028836,YN210175108090061,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,10 03,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0044,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,10 03,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271046,H264,ONE SCREEN,Configurado,1,,PERDOMO,10 03,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028825,YN210179H11060572,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,10 04,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0068,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,10 04,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271033,H264,ONE SCREEN,Configurado,1,,PERDOMO,10 04,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028824,YN220182I08180494,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,10 06,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0086,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,10 06,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271048,H264,ONE SCREEN,Configurado,1,,PERDOMO,10 06,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028822,YN220182I08180350,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,10 07,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0130,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,10 07,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271039,H264,ONE SCREEN,Configurado,1,,PERDOMO,10 07,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028823,YN220182I08180240,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,10 08,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,VA TODO INTEGRADO A LA PANTALLA
+ACTIVO_FIJO,,HSGK23N07Y06R0085,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,10 08,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271036,H264,ONE SCREEN,Configurado,1,,PERDOMO,10 08,22002915,,,1014212535,,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17027994,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 10 AP 4,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17027995,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 10 AP 3,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17027996,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 10 AP 2,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17027997,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 10 AP 1,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17027998,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 10 AP 12,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17027999,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 10 AP 11,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028000,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 10 AP 10,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028001,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 10 AP 09,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028002,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 10 AP 08,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028003,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 10 AP 07,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17029792,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 10 AP 06,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17027993,4.1023E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 10 AP 05,22002915,,,1014212535,,REDES,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028018,2.46022E+13,AP,EXTREME,Configurado,1,,PERDOMO,TERRAZA NORTE,22002915,,,1014212535,,REDER,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028021,2.46022E+13,AP,EXTREME,Configurado,1,,PERDOMO,TERRAZA NORTE,22002915,,,1014212535,,REDER,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028027,2.46022E+13,AP,EXTREME,Configurado,1,,PERDOMO,TERRAZA NORTE,22002915,,,1014212535,,REDER,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028026,2.46022E+13,AP,EXTREME,Configurado,1,,PERDOMO,TERRAZA SUR,22002915,,,1014212535,,REDER,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028030,2.46022E+13,AP,EXTREME,Configurado,1,,PERDOMO,TERRAZA SUR,22002915,,,1014212535,,REDER,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,TERRAZA SUR,22002915,,,1014212535,,REDER,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028404,5CD2506CVP,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212535,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028309,5CD2506CFT,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212536,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028422,5CD2506CJ4,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212537,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028415,5CD2506D0R,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212538,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028449,5CD2506CN2,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212539,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028360,5CD2506CJH,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212540,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028300,5CD2506CW8,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212541,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028303,5CD2506CBQ,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212542,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028250,5CD2506CM9,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212543,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028390,5CD2506CZ5,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212544,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028398,5CD2506CX4,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212545,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028387,5CD2506CBD,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212546,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028351,5CD2506CYV,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212547,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028296,5CD2506CGD,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212548,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028302,5CD2506C9G,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212549,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028340,5CD2506CHV,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212550,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028399,5CD2506CB0,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212551,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028306,5CD2506CDD,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212552,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028299,5CD2506C96,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212553,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028298,5CD2506CF1,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212554,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028392,5CD2506CBS,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212555,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028394,5CD2506CC2,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212556,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028397,5CD2506C9J,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212557,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,17028252,5CD2506CC8,PORTATIL PROBOOK 445 G9,HP,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,RBSB-441-000049,,VIDEO BEAM,EPSON,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,RBSB-441-000045,PD6CD02511000S,VIDEO BEAM,BENQ,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,N0 PRESENTA,MULTITOMAS,VESTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,N0 PRESENTA,MULTITOMAS,OSBLACK,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,N0 PRESENTA,MULTITOMAS,TITANIUM,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,N0 PRESENTA,GUAYAS NUMERICAS,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,51 OFICINA 8 PISO
+ACTIVO_FIJO,,N0 PRESENTA,CABLES DE PODER HEXAGONALES,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,5 OFICINA 8 PISO
+ACTIVO_FIJO,RBSB-441-000061,SYBBX9131508000046,GRABADORA,SIMPLY,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,RBSB-441-000063,N0 PRESENTA,GRABADORA,SONY,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,N0 PRESENTA,TORRE MULTITOMA USB,NTONPOWER,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,8 OFICINA 8 PISO
+ACTIVO_FIJO,,N0 PRESENTA,TORRE MULTITOMA USB Y TIPO C,VERTICAL INTELLIGENT SOCKET,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,1 OFICINA 8 PISO
+ACTIVO_FIJO,,2BL27832837,MICROFONO ALAMBRICO,SHURE,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,2CB23652521,MICROFONO ALAMBRICO,SHURE,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,18011325,25CN2225100986,CABINA AUDIO ACTIVA CON CABLE PODER HEXAGONAL,QSC,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,18011324,25CN2313200509,CABINA AUDIO ACTIVA CON CABLE PODER HEXAGONAL,QSC,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,N0 PRESENTA,CABLES HDMI DE 2 MTS,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,28 OFICINA 8 PISO
+ACTIVO_FIJO,,,CABLES PARA IMPRESORA,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,44 OFICINA 8 PISO
+ACTIVO_FIJO,,,EXTENSOR TOUCH,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,42 OFICINA 8 PISO
+ACTIVO_FIJO,,,CONTROLES TV,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,42 OFICINA 8 PISO
+ACTIVO_FIJO,,,LAPIZ INMANTADO TIPO TOUCH,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,84 OFICINA 8 PISO
+ACTIVO_FIJO,,,CABLES PATCH CORE 3 METROS,PANDUIT,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,2 OFICINA 8 PISO
+ACTIVO_FIJO,,2022120224,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,AULA MULTIPLE 204
+ACTIVO_FIJO,,2022120095,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,AULA MULTIPLE 205
+ACTIVO_FIJO,,2022120100,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,403
+ACTIVO_FIJO,,2022120115,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,404
+ACTIVO_FIJO,,2022120091,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,AULA STEAM PCIS 408
+ACTIVO_FIJO,,2022120102,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,501
+ACTIVO_FIJO,,2022120103,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,502
+ACTIVO_FIJO,,2022120104,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,503
+ACTIVO_FIJO,,2022120105,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,504
+ACTIVO_FIJO,,2022120118,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,506
+ACTIVO_FIJO,,2022120114,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,507
+ACTIVO_FIJO,,2022120099,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,508
+ACTIVO_FIJO,,2022120097,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,603
+ACTIVO_FIJO,,2022120096,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,604
+ACTIVO_FIJO,,2022120106,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,605
+ACTIVO_FIJO,,2022120107,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,606
+ACTIVO_FIJO,,2022120108,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,607
+ACTIVO_FIJO,,2022120109,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,608
+ACTIVO_FIJO,,2022120110,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,702
+ACTIVO_FIJO,,2022120101,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,703
+ACTIVO_FIJO,,2022120113,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,704
+ACTIVO_FIJO,,2022120112,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,706
+ACTIVO_FIJO,,2022120111,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,707
+ACTIVO_FIJO,,2022120119,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,708
+ACTIVO_FIJO,,2022120120,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,803
+ACTIVO_FIJO,,2022120098,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,804
+ACTIVO_FIJO,,2022120239,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,805
+ACTIVO_FIJO,,2022120220,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,806
+ACTIVO_FIJO,,2022120236,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,807
+ACTIVO_FIJO,,2022120116,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,808
+ACTIVO_FIJO,,2022120117,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,902
+ACTIVO_FIJO,,2022120269,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,903
+ACTIVO_FIJO,,2022120238,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,904
+ACTIVO_FIJO,,2022120223,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,906
+ACTIVO_FIJO,,2022120221,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,907
+ACTIVO_FIJO,,2022120214,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,908
+ACTIVO_FIJO,,2022120253,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,10 01
+ACTIVO_FIJO,,2022120232,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,10 02
+ACTIVO_FIJO,,2022120240,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,10 04
+ACTIVO_FIJO,,2022120254,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,10 06
+ACTIVO_FIJO,,2022120233,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,10 07
+ACTIVO_FIJO,,2022120213,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CAL,DAVID Y JAIDER,10/12/2025,,No,10 08
+ACTIVO_FIJO,17016066-0,,TRIPODE,NO TIENE,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,3
+ACTIVO_FIJO,,,MOLDEADOR DE LUZ,GODOX,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,2
+ACTIVO_FIJO,17016066-0,17001216,ESTROBOSCOPIO,GODOX,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,17016066-0,17000820,ESTROBOSCOPIO,GODOX,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,17016066-0,17000841,ESTROBOSCOPIO,GODOX,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,17016066-0,17000841,ESTROBOSCOPIO,GODOX,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,10431833,CARGADOR DE BATERIAS CAMARAS,JVC,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,6730148,CARGADOR DE BATERIAS CAMARAS,JVC,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,11730097,CARGADOR DE BATERIAS CAMARAS,JVC,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,13830026,CARGADOR DE BATERIAS CAMARAS,JVC,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,6830107,CARGADOR DE BATERIAS CAMARAS,JVC,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,11730115,CARGADOR DE BATERIAS CAMARAS,JVC,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,21313719,ADAPTADOR ENERGIA ELECTRICA,JVC,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,21312612,ADAPTADOR ENERGIA ELECTRICA,JVC,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,21312130,ADAPTADOR ENERGIA ELECTRICA,JVC,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,21312612,ADAPTADOR ENERGIA ELECTRICA,JVC,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,21312130,ADAPTADOR ENERGIA ELECTRICA,JVC,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,21312A18,ADAPTADOR ENERGIA ELECTRICA,JVC,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RESP-200-010240,2214813,GRABADORA,SONY,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RESP-200-027981,2369045,GRABADORA,SONY,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RESP-200-031155,1023848,GRABADORA,SONY,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RESP-200-030700,1031891,GRABADORA,SONY,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RESP-200-030699,1033338,GRABADORA,SONY,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RESP-200-031153,1023846,GRABADORA,SONY,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RESP-200-030503,1034705,GRABADORA,SONY,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RESP-200-002495,1804221,GRABADORA,SONY,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RESP-200-030653,CGB0EN415A2502,GRABADORA,RCA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RESP-200-002416,107M23811,CAMARA DE VIDEO,JVC,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RESP-200-002419,137M2978,CAMARA DE VIDEO,JVC,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RESP-200-002498,124V3533,CAMARA DE VIDEO,JVC,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RESP-200-002410,137M3130,CAMARA DE VIDEO,JVC,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RESP-200-002414,078M4488,CAMARA DE VIDEO,JVC,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,P3201081500686,DIADEMA,PC SMART,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,P3201081500714,DIADEMA,PC SMART,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,P3201081500120,DIADEMA,PC SMART,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,P3201081500883,DIADEMA,PC SMART,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,18005994,4071604288,CAMARA FOTOGRAFICA,CANON,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,18005127,4171600367,CAMARA FOTOGRAFICA,CANON,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,18001546,4171600368,CAMARA FOTOGRAFICA,CANON,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,18008391,4071604291,CAMARA FOTOGRAFICA,CANON,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RUVDSC-300-0704,6FAH004739,TABLETA GRAFICADORA,WACOM INTUOS,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RUVDSC-300-0687,5GAH011572,TABLETA GRAFICADORA,WACOM INTUOS PRO SMALL,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RUVDSC-300-0694,5DAH006829,TABLETA GRAFICADORA,WACOM INTUOS PRO SMALL,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RUVDSC-300-0691,5HAH010147,TABLETA GRAFICADORA,WACOM INTUOS PRO SMALL,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RUVDSC-300-0695,5DAH006830,TABLETA GRAFICADORA,WACOM INTUOS PRO SMALL,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RUVDSC-300-0701,5DAH006826,TABLETA GRAFICADORA,WACOM INTUOS PRO SMALL,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RUVDSC-300-0693,5GAH011573,TABLETA GRAFICADORA,WACOM INTUOS PRO SMALL,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RUVDSC-300-0685,5DAH006827,TABLETA GRAFICADORA,WACOM INTUOS PRO SMALL,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RUVDSC-300-0686,5GAH011571,TABLETA GRAFICADORA,WACOM INTUOS PRO SMALL,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RUVDSC-300-0692,5EAH001541,TABLETA GRAFICADORA,WACOM INTUOS PRO SMALL,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RUVDSC-300-0699,5HAH010146,TABLETA GRAFICADORA,WACOM INTUOS PRO SMALL,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RUVDSC-300-0703,5DAH006828,TABLETA GRAFICADORA,WACOM INTUOS PRO SMALL,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RUVDSC-300-0696,5EAH001545,TABLETA GRAFICADORA,WACOM INTUOS PRO SMALL,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RUVDSC-300-0700,5EAH001544,TABLETA GRAFICADORA,WACOM INTUOS PRO SMALL,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RUVDSC-300-0690,5GAH011575,TABLETA GRAFICADORA,WACOM INTUOS PRO SMALL,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RUVDSC-300-0698,5HAH010148,TABLETA GRAFICADORA,WACOM INTUOS PRO SMALL,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RUVDSC-300-0689,5GAH011574,TABLETA GRAFICADORA,WACOM INTUOS PRO SMALL,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RUVDSC-300-0702,5HAH010150,TABLETA GRAFICADORA,WACOM INTUOS PRO SMALL,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RUVDSC-300-0697,5HAH010149,TABLETA GRAFICADORA,WACOM INTUOS PRO SMALL,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,18001444,3906606,CAMARA DIGITAL,NIKON,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,18005329,3882730,CAMARA DIGITAL,NIKON,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,18005330,40027053,CAMARA  FOTOGRAFICA DIGITAL,NIKON,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,18001545,2335956,CAMARA DIGITAL,NIKON,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,18001544,12070084468,CAMARA DIGITAL,CANON,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RUVDSC-300-0715,SN802834000323,CAMARA DE VIDEO,CANON,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,18000494,5953C30ZA10051B,CAMARA FOTOGRAFICA,SAMSUNG,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,18000493,5953C30B108049L,CAMARA FOTOGRAFICA,SAMSUNG,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,75000971,8524931,CAMARA FOTOGRAFICA,SONY,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,18005331,90002131,b,NIKON,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,X0009HUZKF,LUZ LED,YONGNOUO,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,18006079,RFAJ50JL9RH,LENTES DE REALIDAD AUMENTADA,SAMSUNG,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RESP-200-030478,,TRIPODE,MAGNUS,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RESP-200-031975,,TRIPODE,MAGNUS,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RESP-200-030479,,TRIPODE,MAGNUS,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,RESP-200-030473,,TRIPODE,MAGNUS,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,,REFLECTOR FLEX,NO TIENEN,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,F COMUNICACIÓN,DAVID Y JAIDER,10/12/2025,,No,3
+ACTIVO_FIJO,,,EXTENECION DE ENERGIA ELECTRICA DE 6 METROS,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,,EXTENECION DE ENERGIA ELECTRICA DE 10 METROS,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002916,Laboratorios Generales,,1014212559,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,,CABLES PATCH CORE DE 3 METROS,PANDUIT,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,2
+ACTIVO_FIJO,,,CABLES PATCH CORE,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,,MOUSE,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,64
+ACTIVO_FIJO,,,KIT HERRAMIENTA,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002916,Laboratorios Generales,,1014212559,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,,SOPLADORA,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,,PILAS AAA,GP RECYKO,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002918,Laboratorios Generales,,1014212561,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,1 CAJA DE 10 PAQUETES
+ACTIVO_FIJO,,,PILAS 9V,GP RECYKO,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002918,Laboratorios Generales,,1014212561,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,"2 CAJAS DE 10 PAQUETES, 2 PAQUETES SUELTOS"
+ACTIVO_FIJO,,,PILA 8.4V,GP RECYKO,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002919,Laboratorios Generales,,1014212562,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,1
+ACTIVO_FIJO,,,PILAS AA,GP RECYKO,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002918,Laboratorios Generales,,1014212561,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,"1 CAJA DE 10 PAQUETES, 3 PAQUETES SUELTOS"
+ACTIVO_FIJO,,,CARGADOR DE PILAS,MAXDAY,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002919,Laboratorios Generales,,1014212562,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,2 CARGADORES DE PILAS PARA AA/AAA/9V
+ACTIVO_FIJO,,,GUILLOTINA,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002919,Laboratorios Generales,,1014212562,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,,DESTORNILLADOR ELECTRICO,BLACK + DECKER,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002915,Laboratorios Generales,,1014212558,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,,ASTAS DE BANDERAS,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002916,Laboratorios Generales,,1014212559,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,Cada una con su base 3
+ACTIVO_FIJO,,,CANDADOS DE MICROCHIP,DORLET,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,10
+ACTIVO_FIJO,9080111,,NIÑERA 1,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,carro portatil
+ACTIVO_FIJO,9080113,,NIÑERA 3,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,CRAII,DAVID Y JAIDER,10/12/2025,,No,carro portatil
+ACTIVO_FIJO,RUVD300005368,,Tensiometros,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,RUVD300005369,,Tensiometros,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,RUVD300005370,,Tensiometros,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,RUVD300005371,,Tensiometros,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,RUVD300005379,,Adipometro,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,RUVD300005380,,Adipometro,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,RUVD300005381,,Adipometro,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,RUVD300005382,,Adipometro,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,RUVD300005383,,Adipometro,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,RUVD300005384,,Adipometro,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,RUVD300003663,,Oximetro Digital,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,RUVD300003664,,Oximetro Digital,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,RUVD300003446,20170501450f,Bascula de Bioimpedancia,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,RUVD300003448,,Dinamometro de Mano,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,RUVD300003449,,Dinamometro de Mano,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,RESP200030175,35072517241,Medidor de Lactato,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,20183149,Glucometro,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,,Goniometro,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,,Goniometro,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,,Goniometro,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,,Goniometro,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,ED FISICA,DAVID Y JAIDER,10/12/2025,,No,
+ACTIVO_FIJO,,,Goniometro,NO PRESENTA,Configurado,1,,PERDOMO,OFICINA CRAII OCTAVO PISO,22002917,Laboratorios Generales,,1014212560,Coordinadora de laboratorios,,,,,No,
+ACTIVO_FIJO,17028794,YN220182I08180276,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,505,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,"VA TODO INTEGRADO A LA PANTALLA, NO SE ENCUENTRA EN EL LUGAR NO SE SABE SU UBICACIÓN AL MOMENTO DE HACER INVENTARIO EL 11/12/2025"
+ACTIVO_FIJO,,HSGK23N07Y06R0001,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,505,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271047,H264,ONE SCREEN,Configurado,1,,PERDOMO,505,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,17028831,YN210076H09150107WHO,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,501,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,HSGK23N07Y06R0146,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,501,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271017,H264,ONE SCREEN,Configurado,1,,PERDOMO,501,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,17028802,YN210179H11060571,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,503,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,HSGK23N07Y06R0123,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,503,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271019,H264,ONE SCREEN,Configurado,1,,PERDOMO,503,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,17028801,YN220182I08180318,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,504,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,HSGK23N07Y06R0043,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,504,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271024,H264,ONE SCREEN,Configurado,1,,PERDOMO,504,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,17028800,YN220182I08180299,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,506,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,HSGK23N07Y06R0121,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,506,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271010,H264,ONE SCREEN,Configurado,1,,PERDOMO,506,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,17028799,YN220182I08180330,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,507,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,YW220543I09210068,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,507,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271026,H264,ONE SCREEN,Configurado,1,,PERDOMO,507,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,17028798,YN220182I08180242,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,508,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,HSGK23N07Y06R0148,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,508,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271009,H264,ONE SCREEN,Configurado,1,,PERDOMO,508,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,,MULTITOMA,NTONPOWER,Configurado,1,,PERDOMO,502 CONWORKING,22002915,,,1014212535,,CRAII,PEDRO Y HUGO,11/12/2025,,No,3
+ACTIVO_FIJO,57000181,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 5 AP 1,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000182,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 5 AP 2,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000183,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 5 AP 3,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000184,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 5 AP 4,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000248,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 5 AP 12,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000246,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 5 AP 11,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000185,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 5 AP 5,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000166,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 5 AP 6,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000168,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 5 AP 7,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000229,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 5 AP 8,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000228,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 5 AP 9,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000247,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 5 AP 10,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,17027281,JA072238G-00255,SWITCH,EXTREME,Configurado,1,,PERDOMO,PISO 5 CUARTO COMUNICACIONES,,,,,,CAL,PEDRO Y HUGO,,,No,
+ACTIVO_FIJO,17027294,JA072238G-00235,SWITCH,EXTREME,Configurado,1,,PERDOMO,PISO 5 CUARTO COMUNICACIONES,,,,,,CAL,PEDRO Y HUGO,,,No,
+ACTIVO_FIJO,17027970,2245393852,UPS,APC,Configurado,1,,PERDOMO,PISO 5 CUARTO COMUNICACIONES,,,,,,REDES,PEDRO Y HUGO,,,No,
+ACTIVO_FIJO,17028925,3XD68Y3,OptiPlex All-in-One,DELL,Configurado,1,,PERDOMO,ISLA 5,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,17028833,YN210076H091500104WHO,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,403,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,HSGK23N07Y06R0124,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,403,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271029,H264,ONE SCREEN,Configurado,1,,PERDOMO,403,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,17028797,YN220182I08180363,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,404,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,HSGK23N07Y06R0113,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,404,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271034,H264,ONE SCREEN,Configurado,1,,PERDOMO,404,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,17028832,YN210076H09150121WHO,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,407,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,HSGK23N07Y06R0147,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,407,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271023,H264,ONE SCREEN,Configurado,1,,PERDOMO,407,,,,,,CAL,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000245,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 4 AP 05,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000174,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 4 AP 11,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000175,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 4 AP 10,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000176,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 4 AP 09,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000244,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 4 AP 04,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000243,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 4 AP 03,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000242,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 4 AP 02,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000241,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 4 AP 01,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000180,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 4 AP 12,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000177,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 4 AP 08,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000178,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 4 AP 07,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,57000179,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 4 AP 06,,,,,,REDES,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,17028504,6WD68Y3,OptiPlex All-in-One,DELL,Configurado,1,,PERDOMO,401,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,17028924,DWD68Y3,OptiPlex All-in-One,DELL,Configurado,1,,PERDOMO,Isla 4 piso,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,,,MULTITOMA,NTONPOWER,Configurado,1,,PERDOMO,402 CONWORKING,22002915,,,1014212535,,CRAII,PEDRO Y HUGO,11/12/2025,,No,2
+ACTIVO_FIJO,,X8B23402770,VIDEO BEAM,EPSON Power Lite E20,Configurado,1,,PERDOMO,PASTORAL,,,,,,PASTORAL,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,,2022120093,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,CRAII BIBLIOTECA,,,,,,CAL,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,,2022120094,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,CRAII BIBLIOTECA,,,,,,CAL,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,18011302,203MXQA82116,TELEVISOR ¨50¨,LG,Configurado,1,,PERDOMO,PISO 3,,,,,,CAL,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,18011301,203MXSK9B678,TELEVISOR ¨50¨,LG,Configurado,1,,PERDOMO,PISO 3,,,,,,CAL,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,17028837,YN210175I08090062,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CAL,PEDRO Y HUGO,10/12/2025,,No,
+ACTIVO_FIJO,,HSGK23N07Y06R0120,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CAL,PEDRO Y HUGO,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271027,H264,ONE SCREEN,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CAL,PEDRO Y HUGO,10/12/2025,,No,
+ACTIVO_FIJO,17028835,YN210175I08090052,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CAL,PEDRO Y HUGO,10/12/2025,,No,
+ACTIVO_FIJO,,HSGK23N07Y06R0116,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CAL,PEDRO Y HUGO,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271049,H264,ONE SCREEN,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CAL,PEDRO Y HUGO,10/12/2025,,No,
+ACTIVO_FIJO,15001633,YBCZ01287,TECLADO MUSICAL,YAMAHA,Configurado,1,,PERDOMO,PASTORAL,,,,,,PASTORAL,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,,,BASE PARA TECLADO MUSICAL,NO PRESENTA,Configurado,1,,PERDOMO,PASTORAL,,,,,,PASTORAL,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,57000238,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 3 AP 10,,,,,,REDES,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,57000152,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 3 AP 03,,,,,,REDES,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,57000153,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 3 AP 02,,,,,,REDES,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,57000154,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 3 AP 01,,,,,,REDES,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,57000237,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 3 AP 09,,,,,,REDES,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,57000236,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 3 AP 08,,,,,,REDES,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,57000234,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 3 AP 06,,,,,,REDES,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,57000151,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 3 AP 04,,,,,,REDES,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,,,AP,EXTREME,Configurado,1,,PERDOMO,PISO 3 AP 07,,,,,,REDES,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,57000150,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 3 AP 05,,,,,,REDES,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17027295,JA072238G-00103,SWITCH,EXTREME,Configurado,1,,PERDOMO,PISO 3 CUARTO COMUNICACIONES,,,,,,CAL,PEDRO Y HUGO,,,No,
+ACTIVO_FIJO,17027289,JA072238G-00001,SWITCH,EXTREME,Configurado,1,,PERDOMO,PISO 3 CUARTO COMUNICACIONES,,,,,,CAL,PEDRO Y HUGO,,,No,
+ACTIVO_FIJO,57000146,JA072238G-00334,SWITCH,EXTREME,Configurado,1,,PERDOMO,PISO 3 CUARTO COMUNICACIONES,,,,,,CAL,PEDRO Y HUGO,,,No,
+ACTIVO_FIJO,17027963,2241394902,UPS,APC,Configurado,1,,PERDOMO,PISO 3 CUARTO COMUNICACIONES,,,,,,REDES,PEDRO Y HUGO,,,No,
+ACTIVO_FIJO,17028352,5CD2506CB1,Portatil,Hewlett-Packard,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CRAII,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17028389,5CD2506CYX,Portatil,Hewlett-Packard,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CRAII,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17028305,5CD2506CFJ,Portatil,Hewlett-Packard,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CRAII,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17028395,5CD2506D0K,Portatil,Hewlett-Packard,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CRAII,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17028388,5CD2506CFZ,Portatil,Hewlett-Packard,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CRAII,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17028349,5CD2506CFV,Portatil,Hewlett-Packard,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CRAII,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17028400,5CD2506CCC,Portatil,Hewlett-Packard,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CRAII,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17028391,5CD2506CD5,Portatil,Hewlett-Packard,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CRAII,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17028295,5CD2506CFR,Portatil,Hewlett-Packard,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CRAII,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17028304,5CD2506D0P,Portatil,Hewlett-Packard,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CRAII,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17028396,5CD2506C9L,Portatil,Hewlett-Packard,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CRAII,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17028393,5CD2506CVY,Portatil,Hewlett-Packard,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CRAII,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17028301,5CD2506D08,Portatil,Hewlett-Packard,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CRAII,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17028350,5CD2506CCX,Portatil,Hewlett-Packard,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CRAII,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,9080109,,carro portatil,,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CRAII,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17028955,8WD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17028954,6YD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,RESP-200-025666,MJ03Z7KH,Todo en uno,Lenovo,Configurado,1,,PERDOMO,PASTORAL,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,RESP-200-022928,MJ02HPXL,Todo en uno,Lenovo,Configurado,1,,PERDOMO,PASTORAL,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17028950,9YD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,PASTORAL,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,,,MULTITOMA,NTONPOWER,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,22002915,,,,,CRAII,PEDRO Y HUGO,11/12/2025,,No,4
+ACTIVO_FIJO,,X8B23402770,VIDEO BEAM,EPSON Power Lite E20,Configurado,1,,PERDOMO,PASTORAL,,,,,,CAL,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,,2022120093,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,CRAII BIBLIOTECA,,,,,,,PEDRO Y HUGO,10/12/2025,,No,
+ACTIVO_FIJO,,2022120094,TECLADO INALAMBRICO,ONE SCREEN,Configurado,1,,PERDOMO,CRAII BIBLIOTECA,,,,,,,PEDRO Y HUGO,11/12/2025,,No,
+ACTIVO_FIJO,18011302,203MXQA82116,TELEVISOR ¨50¨,LG,Configurado,1,,PERDOMO,PISO 3,,,,,,CAL,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,18011301,203MXSK9B678,TELEVISOR ¨50¨,LG,Configurado,1,,PERDOMO,PISO 3,,,,,,,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,17028837,YN210175I08090062,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CAL,PEDRO Y HUGO,10/12/2025,,No,
+ACTIVO_FIJO,,HSGK23N07Y06R0120,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,C,PEDRO Y HUGO,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271027,H264,ONE SCREEN,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CAL,PEDRO Y HUGO,10/12/2025,,No,
+ACTIVO_FIJO,17028835,YN210175I08090052,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CAL,PEDRO Y HUGO,10/12/2025,,No,
+ACTIVO_FIJO,,HSGK23N07Y06R0116,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CAL,PEDRO Y HUGO,10/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271049,H264,ONE SCREEN,Configurado,1,,PERDOMO,BIBLIOTECA CRAII 3 PISO,,,,,,CAL,PEDRO Y HUGO,10/12/2025,,No,
+ACTIVO_FIJO,15001633,YBCZ01287,TECLADO MUSICAL,YAMAHA,Configurado,1,,PERDOMO,PASTORAL,,,,,,CAL,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,,,BASE PARA TECLADO MUSICAL,NO PRESENTA,Configurado,1,,PERDOMO,PASTORAL,,,,,,CAL,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,18011207,X8WW2Y00097,VIDEO BEAM,EPSON EB-750F,Configurado,1,,PERDOMO,AULA MULTIPLE 204,,,,,,CAL,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,18011208,X8WW2Y00232,VIDEO BEAM,EPSON EB-750F,Configurado,1,,PERDOMO,AULA MULTIPLE 205,,,,,,CAL,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,18011213,X8WW2Y00213,VIDEO BEAM,EPSON EB-750F,Configurado,1,,PERDOMO,PISO 2 CUARTO DE COMUNICAIONES,,,,,,CAL,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,,X8B23402614,VIDEO BEAM,EPSON Power Lite E20,Configurado,1,,PERDOMO,OFICINA PCIS,,,,,,CAL,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,,405400333900100000,PARLANTE,ELECTRO VOICE,Configurado,1,,PERDOMO,PASILLO PISO 2,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,,405400318000530000,PARLANTE,ELECTRO VOICE,Configurado,1,,PERDOMO,PASILLO PISO 2,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,,405400333900120000,PARLANTE,ELECTRO VOICE,Configurado,1,,PERDOMO,PASILLO PISO 2,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,,405400333900100000,PARLANTE,ELECTRO VOICE,Configurado,1,,PERDOMO,PASILLO PISO 2,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,,405400333900100000,PARLANTE,ELECTRO VOICE,Configurado,1,,PERDOMO,PASILLO PISO 2,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,,405400333900100000,PARLANTE,ELECTRO VOICE,Configurado,1,,PERDOMO,PASILLO PISO 2,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,,405400333900120000,PARLANTE,ELECTRO VOICE,Configurado,1,,PERDOMO,PASILLO PISO 2,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,18011304,203MXDM9B682,TELEVISOR ¨50¨,LG,Configurado,1,,PERDOMO,PISO 2,,,,,,CAL,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,18011303,203MXXQ9B690,TELEVISOR ¨50¨,LG,Configurado,1,,PERDOMO,PISO 2,,,,,,CAL,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028795,YN220182I08180446,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,203,,,,,,CAL,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,,HSGK23N07Y06R0117,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,203,,,,,,CAL,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271025,H264,ONE SCREEN,Configurado,1,,PERDOMO,203,,,,,,CAL,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028845,7.70993E+12,IMPRESORA 3D,FUCED FORM,Configurado,1,,PERDOMO,201,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,PCIS100001253,,CARRO NIÑERA,,Configurado,1,,PERDOMO,201,,,,,,CRAII,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,18003853,A902ABAY55-118446,VIDEO BEAM,CASIO,Configurado,1,,PERDOMO,201,,,,,,CAL,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,PCIS1000011699,PDA3E04135000,VIDEO BEAM,BENQ,Configurado,1,,PERDOMO,201,,,,,,CAL,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028492,47H6DX3,Todo en uno,Dell,Configurado,1,,PERDOMO,oficina pcis 2 piso,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028959,D6H6DX3,Todo en uno,Dell,Configurado,1,,PERDOMO,201,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028500,G7H6DX3,Todo en uno,Dell,Configurado,1,,PERDOMO,201,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028493,37H6DX3,Todo en uno,Dell,Configurado,1,,PERDOMO,oficina pcis 2 piso,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028956,J6H6DX3,Todo en uno,Dell,Configurado,1,,PERDOMO,oficina pcis 2 piso,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028495,67H6DX3,Todo en uno,Dell,Configurado,1,,PERDOMO,201,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028496,F6H6DX3,Todo en uno,Dell,Configurado,1,,PERDOMO,201,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028503,D7H6DX3,Todo en uno,Dell,Configurado,1,,PERDOMO,201,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028957,27H6DX3,Todo en uno,Dell,Configurado,1,,PERDOMO,oficina pcis 2 piso,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028953,77H6DX3,Todo en uno,Dell,Configurado,1,,PERDOMO,oficina pcis 2 piso,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028960,C7H6DX3,Todo en uno,Dell,Configurado,1,,PERDOMO,201,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028958,G6H6DX3,Todo en uno,Dell,Configurado,1,,PERDOMO,oficina pcis 2 piso,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028494,87H6DX3,Todo en uno,Dell,Configurado,1,,PERDOMO,oficina pcis 2 piso,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028501,H6H6DX3,Todo en uno,Dell,Configurado,1,,PERDOMO,201,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028499,17H6DX3,Todo en uno,Dell,Configurado,1,,PERDOMO,201,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028497,B7H6DX3,Todo en uno,Dell,Configurado,1,,PERDOMO,201,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028498,57H6DX3,Todo en uno,Dell,Configurado,1,,PERDOMO,201,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028961,F7H6DX3,Todo en uno,Dell,Configurado,1,,PERDOMO,201,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028502,97H6DX3,Todo en uno,Dell,Configurado,1,,PERDOMO,201,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,57000158,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,AUDITORIO 205 AP  09,,,,,,REDES,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,57000159,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,AUDITORIO 204 AP  08,,,,,,REDES,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 2 AP 10,,,,,,REDES,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,57000157,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 2 AP 07,,,,,,REDES,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,57000172,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 2 AP 05,,,,,,REDES,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,57000173,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 2 AP 04,,,,,,REDES,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,57000165,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 2 AP 03,,,,,,REDES,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,17028028,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 2 AP 02,,,,,,REDES,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,17028024,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 2 AP 01,,,,,,REDES,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,17028029,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 2 AP 06,,,,,,REDES,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,,AS1809294272,UPS,APC,Sin Configurar,1,,PERDOMO,PISO 2,,,,,,REDES,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,57000173,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 2 AP 04,,,,,,REDES,PEDRO Y HUGO,06/12/2025,,No,
+ACTIVO_FIJO,,,MULTITOMA,INTELLIGENT SOCKET,Configurado,1,,PERDOMO,CUARTO DE COMUNICACIONES PISO 2,,,,,,89,PEDRO Y HUGO,11/12/2025,,No,65
+ACTIVO_FIJO,,,MULTITOMA,NTONPOWER,Configurado,1,,PERDOMO,CUARTO DE COMUNICACIONES PISO 2,,,,,,CRAII,PEDRO Y HUGO,11/12/2025,,No,24
+ACTIVO_FIJO,,,MULTITOMA,NTONPOWER,Configurado,1,,PERDOMO,PISO 2 PARQUE CIENTIFICO,,,,,,CRAII,PEDRO Y HUGO,11/12/2025,,No,1
+ACTIVO_FIJO,18011279,115755633903352000,CABINA DE AUDIO,ELECTRO VOICE,Configurado,1,,PERDOMO,HALL 1 PISO,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,18011279,115755633903352000,CABINA DE AUDIO,ELECTRO VOICE,Configurado,1,,PERDOMO,HALL 1 PISO,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,18011279,115755633903352000,CABINA DE AUDIO,ELECTRO VOICE,Configurado,1,,PERDOMO,HALL 1 PISO,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,18011279,115755633903352000,CABINA DE AUDIO,ELECTRO VOICE,Configurado,1,,PERDOMO,HALL 1 PISO,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,18011279,115755633903352000,CABINA DE AUDIO,ELECTRO VOICE,Configurado,1,,PERDOMO,HALL 1 PISO,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,18011279,115755633903352000,CABINA DE AUDIO,ELECTRO VOICE,Configurado,1,,PERDOMO,HALL 1 PISO,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,18011279,115755633903352000,CABINA DE AUDIO,ELECTRO VOICE,Configurado,1,,PERDOMO,HALL 1 PISO,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,18011279,115755633903352000,CABINA DE AUDIO,ELECTRO VOICE,Configurado,1,,PERDOMO,HALL 1 PISO,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,18011279,115755633903352000,CABINA DE AUDIO,ELECTRO VOICE,Configurado,1,,PERDOMO,HALL 1 PISO,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,18011279,115755633903352000,CABINA DE AUDIO,ELECTRO VOICE,Configurado,1,,PERDOMO,HALL 1 PISO,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,18011279,405400327500300000,PARLANTE,ELECTRO VOICE,Configurado,1,,PERDOMO,CALLE DEL ESTUDIANTE,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,18011279,405400333900120000,PARLANTE,ELECTRO VOICE,Configurado,1,,PERDOMO,CALLE DEL ESTUDIANTE,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,18011279,405400333900100000,PARLANTE,ELECTRO VOICE,Configurado,1,,PERDOMO,CALLE DEL ESTUDIANTE,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,18011279,405400327500300000,PARLANTE,ELECTRO VOICE,Configurado,1,,PERDOMO,CALLE DEL ESTUDIANTE,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,,405400318000530000,PARLANTE,ELECTRO VOICE,Configurado,1,,PERDOMO,DAF,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,,405400333900100000,PARLANTE,ELECTRO VOICE,Configurado,1,,PERDOMO,DAF,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,,405400333900120000,PARLANTE,ELECTRO VOICE,Configurado,1,,PERDOMO,CASA MINUTO,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,,405400333900100000,PARLANTE,ELECTRO VOICE,Configurado,1,,PERDOMO,CASA MINUTO,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,18011306,207MXZJ1M517,TELEVISOR ¨50¨,LG,Configurado,1,,PERDOMO,PISO 1,,,,,,CAL,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,18011305,207MXWE1M529,TELEVISOR ¨50¨,LG,Configurado,1,,PERDOMO,PISO 1,,,,,,CAL,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,74001779,CNJ6D5P098,IMPRESORA,HP,Configurado,1,,PERDOMO,DAF,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,,3352PC52099,IMPRESORA,RICOH,Configurado,1,,PERDOMO,CASA UNIMINUTO,,,,,,CAL,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,18011215,0DMLHCLW200092J,PANTALLA GRANDE,SAMSUNG,Configurado,1,,PERDOMO,HALL 1 PISO,,,,,,CAL,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,18011215,0DMLHCLW200163A,SIN DESCRIPCION,SAMSUNG,Configurado,1,,PERDOMO,HALL 1 PISO,,,,,,CAL,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,18011215,0DMLHCLW200146D,SIN DESCRIPCION,SAMSUNG,Configurado,1,,PERDOMO,HALL 1 PISO,,,,,,CAL,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,18011215,0DMLHCLW200086A,SIN DESCRIPCION,SAMSUNG,Configurado,1,,PERDOMO,HALL 1 PISO,,,,,,CAL,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,18011215,0DMLHCLW200190M,SIN DESCRIPCION,SAMSUNG,Configurado,1,,PERDOMO,HALL 1 PISO,,,,,,CAL,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,17028834,YN210175I08090093,0NE SCREEN 6,ONE SCREEN,Configurado,1,,PERDOMO,CASA UNIMINUTO,,,,,,CAL,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,,HSGK23N07Y06R0119,HS H110-I5/7400 IPS,ONE SCREEN,Configurado,1,,PERDOMO,CASA UNIMINUTO,,,,,,CAL,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,,J1702CS2011271032,H264,ONE SCREEN,Configurado,1,,PERDOMO,CASA UNIMINUTO,,,,,,CAL,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,,AFDB6OA003026,MONITOR PC,AOC,Configurado,1,,PERDOMO,CASETA PARQUEADERO,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,,BB1531069,IMPRESORA,XEROX,Configurado,1,,PERDOMO,Casa minuto,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,1801279,45281337324133000,intercomunicador,BOSCH,Configurado,1,,PERDOMO,RECEPCION,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,,45281337324133000,intercomunicador,BOSCH,Configurado,1,,PERDOMO,DAF,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,,45281337324133000,intercomunicador,BOSCH,Sin Configurar,1,,PERDOMO,COMUNICACIONES PISO 1,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028930,7WD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,Recepcion,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,17028931,BWD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,Recepcion,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,17028938,8VD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,Casa minuto,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,17028940,FXD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,Casa minuto,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,17028937,JXD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,Casa minuto,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,17028932,9WD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,Casa minuto,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,17028939,8XD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,Casa minuto,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,17028936,20F68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,Casa minuto,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,,6XD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,Casa minuto,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,17028943,7XD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,DAF,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028944,9XD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,DAF,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028951,BVD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,DAF,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028918,3YD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,Casa minuto,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,17028945,1XD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,DAF,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028948,1ZD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,DAF,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028941,GVD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,DAF,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028946,4XD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,DAF,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028953,40F68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,DAF,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028947,HXD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,DAF,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028949,7YD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,DAF,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028942,1WD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,DAF,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028917,4YD68Y3,Todo en uno,Dell,Configurado,1,,PERDOMO,Enfermeria,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,317006025,5CD2345HPM,Portatil,Hewlett-Packard,Configurado,1,,PERDOMO,OFICINA DEL DIRECTOR,,,,,,CAL,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,57000230,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 1 AP 10,,,,,,REDES,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,57000231,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 1 AP 09,,,,,,REDES,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,57000232,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 1 AP 08,,,,,,REDES,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,57000233,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 1 AP 07,,,,,,REDES,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,57000224,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 1 AP 06,,,,,,REDES,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,57000226,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 1 AP 05,,,,,,REDES,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,57000225,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PISO 1 AP 04,,,,,,REDES,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028017,2.46022E+13,AP,,Configurado,1,,PERDOMO,HALL PISO 1,,,,,,REDES,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,57000227,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,DAF AP 03,,,,,,REDES,PEDRO Y HUGO,04/12/2025,,No,
+ACTIVO_FIJO,57000223,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,CASA MINUTO AP 01,,,,,,REDES,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,17028019,2.46022E+13,AP,,Configurado,1,,PERDOMO,PLAZOLETA PARQUE,,,,,,REDES,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,17028025,2.46022E+13,AP,,Configurado,1,,PERDOMO,PLAZOLETA PARQUE,,,,,,REDES,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,17027292,JA072238G-00144,SWITCH,EXTREME,Configurado,1,,PERDOMO,PISO 1,,,,,,CAL,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17027290,JA072238G-00156,SWITCH,EXTREME,Configurado,1,,PERDOMO,PISO 1,,,,,,CAL,PEDRO Y HUGO,05/12/2025,,No,
+ACTIVO_FIJO,17028023,2.46022E+13,AP,,Configurado,1,,PERDOMO,CALLE DEL ESTUDIANTE,,,,,,REDES,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,,2.46022E+13,AP,,Configurado,1,,PERDOMO,CANCHA  DE BALONCESTO,,,,,,REDES,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,17028028,2.46022E+13,AP,,Configurado,1,,PERDOMO,PARQUEADERO,,,,,,REDES,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,17028024,2.46022E+13,AP,,Configurado,1,,PERDOMO,PARQUEADERO,,,,,,REDES,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,17028022,2.46022E+13,AP,EXTREME,Configurado,1,,PERDOMO,ENTRADA PRINCIPAL,,,,,,REDES,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,57000162,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,PARQUEADERO,,,,,,REDES,PEDRO Y HUGO,03/12/2025,,No,
+ACTIVO_FIJO,17027287,JA072238G-00197,SWITCH,EXTREME,Configurado,1,,PERDOMO,PISO 1 CUARTO DE COMUNICACIONES,,,,,,REDES,PEDRO Y HUGO,,,No,
+ACTIVO_FIJO,,18383679705A,PORT OUTDOORMIDSPAN,MICROSEMI,Configurado,1,,PERDOMO,PISO 1 CUARTO DE COMUNICACIONES,,,,,,REDES,PEDRO Y HUGO,,,No,
+ACTIVO_FIJO,,18383865705A,PORT OUTDOORMIDSPAN,MICROSEMI,Configurado,1,,PERDOMO,PISO 1 CUARTO DE COMUNICACIONES,,,,,,REDES,PEDRO Y HUGO,,,No,
+ACTIVO_FIJO,,18383686705A,PORT OUTDOORMIDSPAN,MICROSEMI,Configurado,1,,PERDOMO,PISO 1 CUARTO DE COMUNICACIONES,,,,,,REDES,PEDRO Y HUGO,,,No,
+ACTIVO_FIJO,,18383847705A,PORT OUTDOORMIDSPAN,MICROSEMI,Configurado,1,,PERDOMO,PISO 1 CUARTO DE COMUNICACIONES,,,,,,REDES,PEDRO Y HUGO,,,No,
+ACTIVO_FIJO,,18383828705A,PORT OUTDOORMIDSPAN,MICROSEMI,Configurado,1,,PERDOMO,PISO 1 CUARTO DE COMUNICACIONES,,,,,,REDES,PEDRO Y HUGO,,,No,
+ACTIVO_FIJO,,18383847705A,PORT OUTDOORMIDSPAN,MICROSEMI,Configurado,1,,PERDOMO,PISO 1 CUARTO DE COMUNICACIONES,,,,,,REDES,PEDRO Y HUGO,,,No,
+ACTIVO_FIJO,,18383828705A,PORT OUTDOORMIDSPAN,MICROSEMI,Configurado,1,,PERDOMO,PISO 1 CUARTO DE COMUNICACIONES,,,,,,REDES,PEDRO Y HUGO,,,No,
+ACTIVO_FIJO,NO SE VE,A52241394461,UPS,APC,Configurado,1,,PERDOMO,PISO 1 CUARTO DE COMUNICACIONES,,,,,,REDES,PEDRO Y HUGO,,,No,
+ACTIVO_FIJO,,,MULTITOMA,NTONPOWER,Configurado,1,,PERDOMO,PISO 1  CASA MINUTO,,,,,,CRAII,PEDRO Y HUGO,11/12/2025,,No,5
+ACTIVO_FIJO,,,MULTITOMA,NTONPOWER,Configurado,1,,PERDOMO,PISO 1 DAF,,,,,,CRAII,PEDRO Y HUGO,11/12/2025,,No,8
+ACTIVO_FIJO,,,MULTITOMA,NTONPOWER,Configurado,1,,PERDOMO,HALL PISO 1,,,,,,CRAII,PEDRO Y HUGO,11/12/2025,,No,PRESTADO PESEBRE 1
+ACTIVO_FIJO,,,MULTITOMA,INTELLIGENT SOCKET,Configurado,1,,PERDOMO,OFICINA DIRECTOR,,,,,,CRAII,PEDRO Y HUGO,11/12/2025,,No,1
+ACTIVO_FIJO,57000249,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,SOTANO BICICLETERO,,,,,,RET,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,57000239,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,SOTANO MOTOS,,,,,,REDES,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,57000155,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,SOTANO MOTOS,,,,,,REDES,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,57000161,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,SOTANO AUTOMOVILES,,,,,,REDES,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,57000171,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,SOTANO SALIDA DE ELEVADORES,,,,,,REDES,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,57000162,4.1021E+12,AP,EXTREME,Configurado,1,,PERDOMO,SOTANO SOBRE EL CARCAMO,,,,,,REDES,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,18011308,207MXBP1M533,TELEVISOR ¨50¨,LG,Configurado,1,,PERDOMO,SOTANO,,,,,,CAL,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,18011307,203MXCR82115,TELEVISOR ¨50¨,LG,Configurado,1,,PERDOMO,SOTANO,,,,,,CAL,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17028933,10F68Y3,Todo en uno,DELL,Configurado,1,,PERDOMO,SOTANO OFICINA ING WILSON,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,10/12/2025,,No,
+ACTIVO_FIJO,,,MULTITOMA,NTONPOWER,Configurado,1,,PERDOMO,SOTANO OFICINA ING WILSON,,,,,,CRAII,PEDRO Y HUGO,10/12/2025,,No,1
+ACTIVO_FIJO,17028935,1YD68Y3,Todo en uno,Dell,Configurado,1,,CC PASEO VILLA DEL RIO,CC PASEO VILLA DEL RIO,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17028934,3WD68Y3,Todo en uno,Dell,Configurado,1,,CC PASEO VILLA DEL RIO,CC PASEO VILLA DEL RIO,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17028952,JVD68Y3,Todo en uno,Dell,Configurado,1,,CC PASEO VILLA DEL RIO,CC PASEO VILLA DEL RIO,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,17028929,5ZD68Y3,Todo en uno,Dell,Configurado,1,,CC PASEO VILLA DEL RIO,CC PASEO VILLA DEL RIO,,,,,,PERDOMO ACTIDO FIHO,PEDRO Y HUGO,09/12/2025,,No,
+ACTIVO_FIJO,,,MULTITOMA,NTONPOWER,Configurado,1,,CC PASEO VILLA DEL RIO,CC PASEO VILLA DEL RIO,,,,,,CRAII,PEDRO Y HUGO,09/12/2025,,No,4
+BODEGA_LOTE,,,BALONES DE FUTBOL # 5 GOLTY AMARILLO,GOLTY,FUNCIONAL,3,3,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,BALONES DE FUTBOL # 5 GOLTY BLANCO,GOLTY,FUNCIONAL,3,4,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,BALONES DE VOLEYBALL MOLTEN TACTO SUAVE,MOLTEN,FUNCIONAL,18,5,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,4 balones no tienen marca y 1 es de marca GOLBAL
+BODEGA_LOTE,,,BALONES DE VOLEYBALL MOLTEN TACTO RIGIDO,MOLTEN,FUNCIONAL,5,13,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,BALONES DE VOLEYBALL GOLTY TACTO RIGIDO,GOLTY,FUNCIONAL,7,10,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,BALONES DE BALONCESTO TALLA 6 MOLTEN NARANJAS,MELTEN,FUNCIONAL,22,17,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,BALONES DE BALONCESTO TALLA 7 MOLTEN NARANJAS,MOLTEN,FUNCIONAL,16,19,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,BALONES DE BALONCESTO TALLA 7 GOLTY NARANJAS,GOLTY,FUNCIONAL,10,19,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,CONOS CON HUECOS  TAMAÑO 32 CM,,FUNCIONAL,10,25,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,CONOS GRANDES  NARANJAS,,FUNCIONAL,21,21,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,"PLATILLOS  VERDE, AZUL Y NARANJAS",,FUNCIONAL,69,96,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,AROS PLANOS  VERDES Y NARANJAS,,FUNCIONAL,22,20,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,HULA HULA TUBULAR COLORES,,FUNCIONAL,22,20,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 2,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,PELOTAS PLASTICAS AMARRILLAS,,FUNCIONAL,13,20,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,PELOTAS PLASTICAS VERDES Y AZULES,,FUNCIONAL,10,20,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,PELOTAS DE TENIS HEAD PRO CMF VERDES,,FUNCIONAL,86,?,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,Se contaron la totalidad de pelotas
+BODEGA_LOTE,,,PELOTAS DE TENIS WILSON VERDES,WILSON,FUNCIONAL,86,74 ant 70 nuev,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,Se contaron la totalidad de pelotas
+BODEGA_LOTE,,,RAQUETAS DE TENIS EXCEL AZULES,,FUNCIONAL,12,144,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,Se contaron la totalidad de raquetas de tenis
+BODEGA_LOTE,,,RAQUETAS DE PADEL  MADERA,,FUNCIONAL,36,22,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,RAQUETAS TENIS DE MESA RUNIC MADERA,,FUNCIONAL,6,7,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,ESCALERAS DE COORDINACION  VERDE Y NARANJA,,FUNCIONAL,11,9,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,MALLA DE VOLEIBALL miyagi ROJA Y AZUL,,FUNCIONAL,4,3,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,"De estas mayas 3 son blanco y negro, la otra es rojo, violeta y blanco, no se identifica marca"
+BODEGA_LOTE,,,SOGAS MEDIANAS  GRISES,,FUNCIONAL,10,10,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,SOGA GRANDE  ROJA,,FUNCIONAL,1,1,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,LAZO DE SALTO  TELA MULTICOLOR,,FUNCIONAL,1,1,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,BOMBA  GW CON BASE,,FUNCIONAL,2,2,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,1 Bomba con base marca BIXE
+BODEGA_LOTE,,,CANDADOS YALE CON DESLIZAMIENTO,,FUNCIONAL,0,5,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,"TULAS  AZUL, ROJA Y GRIS",,FUNCIONAL,10,9,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,"Solo hay 1 tula gris, 7 azules, una negra y 1 roja"
+BODEGA_LOTE,,,PLATILLOS  MULTICOLOR,,FUNCIONAL,0,?,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,RAQUETAS DE TENIS ROX AZULES,,FUNCIONAL,12,?,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,Se contaron la totalidad de raquetas de tenis
+BODEGA_LOTE,,,CONOS PEQUEÑOS  NARANJAS,,FUNCIONAL,45,45,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,PERDOMO,PERDOMO,ELIZABETH,,ELIZABETH,LEFI,DAVID Y OMAR,19/10/2026,,No,
+BODEGA_LOTE,,,TRAMPOLIN TR-001 SPORTFITNES,,FUNCIONAL,2,,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,,,,,,LEFI,HUGO,10/12/2025,,No,2 TRAMPOLIN TR-001 SPORTFITNES
+BODEGA_LOTE,,,PELOTAS LETRAS #7 CON VALVULA DIAMETRO 15 CMS,,FUNCIONAL,25,,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,,,,,,LEFI,HUGO,10/12/2025,,No,25 PELOTAS LETRAS #7 CON VALVULA DIAMETRO 15 CMS
+BODEGA_LOTE,,,COLCHONETA INDIVIDUALES PEQUEÑAS,,FUNCIONAL,35,,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 2 PISO 1,,,,,,LEFI,HUGO,10/12/2025,,No,35 COLCHONETA INDIVIDUALES PEQUEÑAS
+BODEGA_LOTE,,,COLCHONETA SEGURIDAD SALTO RELLENO ESPUMASEMICOMPACTA FORRO LONA CARPA IMPERMEABLE CON MANIJAS OJETES RESPIRADORES CREMALLER,,FUNCIONAL,1,,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,,,,,,LEFI,HUGO,10/12/2025,,No,1 COLCHONETA SEGURIDAD SALTO RELLENO ESPUMASEMICOMPACTA FORRO LONA CARPA IMPERMEABLE CON MANIJAS OJETES RESPIRADORES CREMALLER
+BODEGA_LOTE,,,POSTES DE VOLEIBOL,,FUNCIONAL,2,,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 1 PISO 1,,,,,,LEFI,HUGO,10/12/2025,,No,2 POSTES DE VOLEIBOL
+BODEGA_LOTE,,,COLCHONETAS PLEGABLES,,FUNCIONAL,4,,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 2 PISO 1,,,,,,LEFI,HUGO,10/12/2025,,No,4 COLCHONETAS PLEGABLES
+BODEGA_LOTE,,,COLCHONETA INDIVIDUALES MEDIANAS,,FUNCIONAL,3,,C.E. CIUDAD BOLIVAR,CUARTO DE DEPOSITO 2 PISO 1,,,,,,LEFI,HUGO,10/12/2025,,No,3 COLCHONETA INDIVIDUALES MEDIANAS

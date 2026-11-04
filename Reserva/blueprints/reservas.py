@@ -55,7 +55,7 @@ def reservas_main():
 
         if not recursos:
             recursos = {
-                "Salón": SystemConstants.SALONES,
+                "Aula": getattr(SystemConstants, 'AULAS', SystemConstants.SALONES),
                 "Niñera": SystemConstants.NINERAS
             }
         
@@ -517,7 +517,7 @@ def nueva_reserva():
         
         if not recurso_db:
              # Fallback a constantes si no hay recursos en DB aún (para evitar bloqueo inmediato)
-             recursos_const = SystemConstants.SALONES if recurso_tipo == 'Salón' else SystemConstants.NINERAS
+             recursos_const = getattr(SystemConstants, 'AULAS', SystemConstants.SALONES) if recurso_tipo in ('Aula', 'Salón') else SystemConstants.NINERAS
              if recurso_nombre not in recursos_const:
                  return jsonify({'success': False, 'message': 'Recurso no encontrado en el sistema'}), 400
 

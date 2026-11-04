@@ -1,0 +1,965 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* ── Header con Gradiente Institucional ── */
+    .mantenimiento-header {
+        background: linear-gradient(135deg, #1e3a5f 0%, #2d6a9f 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: white;
+        box-shadow: 0 8px 24px rgba(30, 58, 95, 0.16);
+        position: relative;
+        overflow: hidden;
+    }
+    .mantenimiento-header::after {
+        content: '';
+        position: absolute;
+        top: -40px;
+        right: -40px;
+        width: 180px;
+        height: 180px;
+        background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 70%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    /* ── Tarjetas KPI ── */
+    .kpi-mant-card {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 1.25rem 1.5rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+    }
+    .kpi-mant-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    }
+    .kpi-icon-wrap {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        flex-shrink: 0;
+    }
+    .kpi-val {
+        font-size: 1.75rem;
+        font-weight: 800;
+        line-height: 1;
+        color: #0f172a;
+    }
+    .kpi-title {
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #64748b;
+        margin-bottom: 0.25rem;
+    }
+
+    /* ── Pestañas Estilizadas ── */
+    .nav-tabs-mantenimiento {
+        border-bottom: 2px solid #e2e8f0;
+        gap: 0.5rem;
+    }
+    .nav-tabs-mantenimiento .nav-link {
+        border: none;
+        color: #64748b;
+        font-weight: 600;
+        padding: 0.75rem 1.25rem;
+        border-radius: 10px 10px 0 0;
+        background: transparent;
+        transition: all 0.2s ease;
+    }
+    .nav-tabs-mantenimiento .nav-link.active {
+        color: #1e3a5f;
+        background: #ffffff;
+        border-bottom: 3px solid #2d6a9f;
+        font-weight: 700;
+    }
+    .nav-tabs-mantenimiento .nav-link:hover:not(.active) {
+        color: #1e293b;
+        background: rgba(241, 245, 249, 0.6);
+    }
+
+    /* ── Badges de Tipo de Intervención ── */
+    .badge-tipo-actualizacion {
+        background: #e0f2fe;
+        color: #0369a1;
+        border: 1px solid #bae6fd;
+    }
+    .badge-tipo-software {
+        background: #f3e8ff;
+        color: #7e22ce;
+        border: 1px solid #e9d5ff;
+    }
+    .badge-tipo-partes {
+        background: #fef3c7;
+        color: #b45309;
+        border: 1px solid #fde68a;
+    }
+    .badge-tipo-reparacion {
+        background: #ffe4e6;
+        color: #be123c;
+        border: 1px solid #fecdd3;
+    }
+    .badge-tipo-preventivo {
+        background: #dcfce7;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+    }
+    .badge-tipo-garantia {
+        background: #e2e8f0;
+        color: #334155;
+        border: 1px solid #cbd5e1;
+    }
+
+    /* ── Catálogo de Hojas de Vida (Cards) ── */
+    .hoja-vida-card {
+        background: #ffffff;
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.25s ease;
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .hoja-vida-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+        border-color: #cbd5e1;
+    }
+    .hoja-vida-thumb-container {
+        width: 100%;
+        height: 175px;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .hoja-vida-thumb-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    .hoja-vida-card:hover .hoja-vida-thumb-container img {
+        transform: scale(1.04);
+    }
+    .hoja-vida-no-photo {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+    }
+    .spec-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        background: #f1f5f9;
+        color: #334155;
+        border-radius: 6px;
+        padding: 0.25rem 0.55rem;
+        font-size: 0.72rem;
+        font-weight: 600;
+    }
+
+    /* ── Tabla de Mantenimientos ── */
+    .table-mantenimiento th {
+        background-color: #f8fafc !important;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #475569;
+        font-weight: 700;
+        padding: 0.85rem 1rem !important;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    .table-mantenimiento td {
+        padding: 0.85rem 1rem !important;
+        vertical-align: middle;
+        font-size: 0.88rem;
+        color: #1e293b;
+    }
+    .table-mantenimiento tbody tr:hover {
+        background-color: rgba(45, 106, 159, 0.04) !important;
+    }
+</style>
+
+<div class="container-fluid py-4 px-md-4">
+    <!-- Header Principal -->
+    <div class="mantenimiento-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <i class="bi bi-tools fs-3"></i>
+                <h1 class="h3 fw-bold mb-0">Mantenimiento & Hojas de Vida de Equipos</h1>
+            </div>
+            <p class="mb-0 text-white-50 small">
+                Registro y trazabilidad técnica: actualizaciones, instalaciones de software, sustitución de partes, arreglos y fichas con foto.
+            </p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-warning text-dark fw-bold px-3 py-2 shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalNuevoMantenimiento">
+                <i class="bi bi-plus-circle-fill"></i> Nueva Intervención
+            </button>
+            <a href="{{ url_for('mantenimiento.exportar_excel', sede=filtros.sede, tipo=filtros.tipo) }}" class="btn btn-outline-light px-3 py-2 d-flex align-items-center gap-2" title="Descargar Historial en Excel">
+                <i class="bi bi-file-earmark-excel"></i> Exportar
+            </a>
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="kpi-mant-card">
+                <div class="kpi-icon-wrap bg-primary bg-opacity-10 text-primary">
+                    <i class="bi bi-wrench-adjustable-circle"></i>
+                </div>
+                <div>
+                    <div class="kpi-title">Total Intervenciones</div>
+                    <div class="kpi-val">{{ total_mantenimientos }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-mant-card">
+                <div class="kpi-icon-wrap bg-success bg-opacity-10 text-success">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+                <div>
+                    <div class="kpi-title">Este Mes</div>
+                    <div class="kpi-val">{{ mantenimientos_mes }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-mant-card">
+                <div class="kpi-icon-wrap bg-warning bg-opacity-15 text-warning">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <div class="kpi-title">En Taller / Arreglo</div>
+                    <div class="kpi-val">{{ equipos_en_mantenimiento }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-mant-card">
+                <div class="kpi-icon-wrap bg-info bg-opacity-15 text-info">
+                    <i class="bi bi-cpu"></i>
+                </div>
+                <div>
+                    <div class="kpi-title">Software & Partes</div>
+                    <div class="kpi-val">{{ total_software + total_partes }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pestañas de Navegación -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-white pt-3 px-4 pb-0 border-0">
+            <ul class="nav nav-tabs nav-tabs-mantenimiento" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link {% if tab_activa == 'intervenciones' %}active{% endif %}" href="{{ url_for('mantenimiento.dashboard_mantenimiento', tab='intervenciones') }}">
+                        <i class="bi bi-clock-history me-1"></i> Historial de Mantenimientos e Intervenciones
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if tab_activa == 'hojas_vida' %}active{% endif %}" href="{{ url_for('mantenimiento.dashboard_mantenimiento', tab='hojas_vida') }}">
+                        <i class="bi bi-file-earmark-person me-1"></i> Directorio de Hojas de Vida (Equipos & Fotos)
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card-body p-4">
+            <!-- Barra de Filtros -->
+            <form method="GET" action="{{ url_for('mantenimiento.dashboard_mantenimiento') }}" class="row g-2 mb-4 p-3 bg-light rounded-3 border">
+                <input type="hidden" name="tab" value="{{ tab_activa }}">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted mb-1">Búsqueda rápida</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" class="form-control" name="busqueda" value="{{ filtros.busqueda }}" placeholder="N° Inventario, Serial, Ítem, Técnico...">
+                    </div>
+                </div>
+
+                {% if tab_activa == 'intervenciones' %}
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted mb-1">Tipo de Intervención</label>
+                    <select class="form-select form-select-sm" name="tipo">
+                        <option value="">Todos los tipos</option>
+                        {% for t in tipos_disponibles %}
+                        <option value="{{ t }}" {% if filtros.tipo == t %}selected{% endif %}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted mb-1">Desde</label>
+                    <input type="date" class="form-control form-control-sm" name="fecha_desde" value="{{ filtros.fecha_desde }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted mb-1">Hasta</label>
+                    <input type="date" class="form-control form-control-sm" name="fecha_hasta" value="{{ filtros.fecha_hasta }}">
+                </div>
+                {% else %}
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted mb-1">Categoría</label>
+                    <select class="form-select form-select-sm" name="categoria">
+                        <option value="">Todas las categorías</option>
+                        {% for c in categorias %}
+                        <option value="{{ c.nombre }}" {% if filtros.categoria == c.nombre %}selected{% endif %}>{{ c.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+
+                {% if session.rol in ('admin', 'superadmin') %}
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted mb-1">Sede</label>
+                    <select class="form-select form-select-sm" name="sede">
+                        <option value="">Todas las sedes</option>
+                        {% for s in sedes %}
+                        <option value="{{ s.id }}" {% if filtros.sede == s.id|string %}selected{% endif %}>{{ s.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+
+                <div class="col-md-{% if session.rol in ('admin', 'superadmin') %}2{% else %}2{% endif %} d-flex align-items-end gap-1">
+                    <button type="submit" class="btn btn-sm btn-primary w-100 fw-semibold">
+                        <i class="bi bi-funnel-fill me-1"></i> Filtrar
+                    </button>
+                    <a href="{{ url_for('mantenimiento.dashboard_mantenimiento', tab=tab_activa) }}" class="btn btn-sm btn-outline-secondary" title="Limpiar filtros">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                </div>
+            </form>
+
+            <!-- TAB 1: HISTORIAL DE INTERVENCIONES -->
+            {% if tab_activa == 'intervenciones' %}
+            {% if mantenimientos and mantenimientos|length > 0 %}
+            <div class="table-responsive rounded-3 border">
+                <table class="table table-hover table-mantenimiento mb-0 align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width: 110px;">Fecha</th>
+                            <th style="width: 170px;">Tipo</th>
+                            <th>Título & Detalles</th>
+                            <th>Equipo / Identificador</th>
+                            <th>Técnico</th>
+                            <th>Estado</th>
+                            <th style="width: 110px;" class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in mantenimientos %}
+                        {% set eq = m.equipo %}
+                        <tr>
+                            <td class="text-muted small">
+                                <i class="bi bi-calendar3 me-1"></i> {{ m.fecha_envio.strftime('%d/%m/%Y') if m.fecha_envio else '--' }}
+                            </td>
+                            <td>
+                                {% if 'Actualización' in m.tipo %}
+                                    <span class="badge badge-tipo-actualizacion"><i class="bi bi-arrow-up-circle-fill me-1"></i> Actualización</span>
+                                {% elif 'Software' in m.tipo %}
+                                    <span class="badge badge-tipo-software"><i class="bi bi-code-slash me-1"></i> Software</span>
+                                {% elif 'Partes' in m.tipo %}
+                                    <span class="badge badge-tipo-partes"><i class="bi bi-cpu me-1"></i> Partes/Repuesto</span>
+                                {% elif 'Arreglo' in m.tipo or 'Correctivo' in m.tipo %}
+                                    <span class="badge badge-tipo-reparacion"><i class="bi bi-tools me-1"></i> Arreglo/Reparación</span>
+                                {% elif 'Preventivo' in m.tipo %}
+                                    <span class="badge badge-tipo-preventivo"><i class="bi bi-shield-check me-1"></i> Preventivo</span>
+                                {% else %}
+                                    <span class="badge badge-tipo-garantia">{{ m.tipo }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark">{{ m.titulo or m.motivo }}</div>
+                                <div class="small text-muted text-truncate" style="max-width: 380px;">
+                                    {% if m.software_instalado %}
+                                        <span class="text-primary me-2"><i class="bi bi-check2"></i> SW: {{ m.software_instalado }}</span>
+                                    {% endif %}
+                                    {% if m.partes_cambiadas %}
+                                        <span class="text-warning-emphasis me-2"><i class="bi bi-motherboard"></i> Piezas: {{ m.partes_cambiadas }}</span>
+                                    {% endif %}
+                                    {{ m.trabajo_realizado or m.motivo }}
+                                </div>
+                            </td>
+                            <td>
+                                {% if eq %}
+                                <div class="d-flex align-items-center gap-2">
+                                    {% if eq.foto_url %}
+                                    <img src="{{ eq.foto_url }}" alt="Foto" class="rounded-2 border" style="width: 36px; height: 36px; object-fit: cover;">
+                                    {% else %}
+                                    <div class="rounded-2 bg-light border d-flex align-items-center justify-content-center text-muted" style="width: 36px; height: 36px; font-size: 0.8rem;">
+                                        <i class="bi bi-laptop"></i>
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <a href="{{ url_for('mantenimiento.hoja_vida', inventario_id=eq.id) }}" class="fw-bold text-decoration-none text-primary small d-block">
+                                            {{ eq.numero_inventario or 'S/N' }}
+                                        </a>
+                                        <span class="small text-muted">{{ eq.item }}</span>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <span class="badge bg-secondary">Sin Asignar</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="small fw-semibold text-secondary"><i class="bi bi-person-fill"></i> {{ m.auxiliar_responsable or m.proveedor_tecnico }}</span>
+                            </td>
+                            <td>
+                                {% if m.estado == 'Finalizado' %}
+                                <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check-circle-fill me-1"></i> Finalizado</span>
+                                {% elif m.estado == 'En Proceso' %}
+                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle"><i class="bi bi-hourglass-split me-1"></i> En Proceso</span>
+                                {% else %}
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle">{{ m.estado }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-outline-info" title="Ver Detalle" onclick="verDetalleIntervencion({{ m.id }})">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    {% if eq %}
+                                    <a href="{{ url_for('mantenimiento.hoja_vida', inventario_id=eq.id) }}" class="btn btn-outline-primary" title="Hoja de Vida">
+                                        <i class="bi bi-file-earmark-person"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if session.rol in ('admin', 'superadmin') %}
+                                    <button type="button" class="btn btn-outline-danger" title="Eliminar" onclick="confirmarEliminarIntervencion({{ m.id }})">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5 bg-light rounded-4">
+                <i class="bi bi-tools display-4 text-muted mb-3 d-block"></i>
+                <h5 class="fw-bold text-dark">No se encontraron registros de mantenimiento</h5>
+                <p class="text-muted small mb-3">Registra actualizaciones, instalaciones de software o cambios de repuestos para comenzar el historial.</p>
+                <button type="button" class="btn btn-primary btn-sm px-3" data-bs-toggle="modal" data-bs-target="#modalNuevoMantenimiento">
+                    <i class="bi bi-plus-circle me-1"></i> Registrar Primer Mantenimiento
+                </button>
+            </div>
+            {% endif %}
+            {% endif %}
+
+            <!-- TAB 2: CATÁLOGO DE HOJAS DE VIDA (EQUIPOS & FOTOS) -->
+            {% if tab_activa == 'hojas_vida' %}
+            {% if equipos_hojas_vida and equipos_hojas_vida|length > 0 %}
+            <div class="row g-3">
+                {% for eq in equipos_hojas_vida %}
+                <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+                    <div class="hoja-vida-card">
+                        <!-- Espacio de la Foto del Equipo -->
+                        <div class="hoja-vida-thumb-container">
+                            {% if eq.foto_url %}
+                            <img src="{{ eq.foto_url }}" alt="{{ eq.item }}">
+                            {% else %}
+                            <div class="hoja-vida-no-photo">
+                                <i class="bi bi-camera fs-1 mb-1"></i>
+                                <span style="font-size: 0.72rem; font-weight: 600;">Sin foto asignada</span>
+                            </div>
+                            {% endif %}
+                            <!-- Badge de Estado Superpuesto -->
+                            <div class="position-absolute top-0 end-0 m-2">
+                                {% if eq.estado == 'Disponible' %}
+                                <span class="badge bg-success shadow-sm">Disponible</span>
+                                {% elif eq.estado in ('En Mantenimiento', 'En Reparación') %}
+                                <span class="badge bg-warning text-dark shadow-sm">{{ eq.estado }}</span>
+                                {% elif eq.estado == 'En Préstamo' %}
+                                <span class="badge bg-primary shadow-sm">Prestado</span>
+                                {% else %}
+                                <span class="badge bg-secondary shadow-sm">{{ eq.estado }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Datos del Equipo -->
+                        <div class="p-3 flex-grow-1 d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="badge bg-light text-dark border fw-bold" style="font-size: 0.75rem;">
+                                        <i class="bi bi-upc me-1"></i>{{ eq.numero_inventario or 'S/N' }}
+                                    </span>
+                                    <span class="small text-muted" style="font-size: 0.72rem;">{{ eq.categoria }}</span>
+                                </div>
+                                <h6 class="fw-bold text-dark text-truncate mb-1" title="{{ eq.item }}">{{ eq.item }}</h6>
+                                <p class="small text-muted mb-2 text-truncate" title="{{ eq.marca_modelo }}">
+                                    {{ eq.marca_modelo or 'Marca no especificada' }}
+                                </p>
+
+                                <!-- Especificaciones Técnicas Resumidas -->
+                                <div class="d-flex flex-wrap gap-1 mb-3">
+                                    {% if eq.procesador %}
+                                    <span class="spec-pill" title="Procesador"><i class="bi bi-cpu"></i> {{ eq.procesador }}</span>
+                                    {% endif %}
+                                    {% if eq.ram_gb %}
+                                    <span class="spec-pill" title="Memoria RAM"><i class="bi bi-memory"></i> {{ eq.ram_gb }}</span>
+                                    {% endif %}
+                                    {% if eq.almacenamiento %}
+                                    <span class="spec-pill" title="Almacenamiento"><i class="bi bi-hdd"></i> {{ eq.almacenamiento }}</span>
+                                    {% endif %}
+                                    {% if eq.sistema_operativo %}
+                                    <span class="spec-pill" title="Sistema Operativo"><i class="bi bi-windows"></i> {{ eq.sistema_operativo }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Botones de Acción -->
+                            <div class="pt-2 border-top d-flex gap-2">
+                                <a href="{{ url_for('mantenimiento.hoja_vida', inventario_id=eq.id) }}" class="btn btn-sm btn-primary w-100 fw-semibold d-flex align-items-center justify-content-center gap-1">
+                                    <i class="bi bi-file-earmark-person"></i> Hoja de Vida
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-warning" title="Registrar Mantenimiento a este equipo" onclick="abrirMantenimientoParaEquipo({{ eq.id }}, '{{ eq.numero_inventario }}', '{{ eq.item|replace("'", "\\'") }}')">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5 bg-light rounded-4">
+                <i class="bi bi-laptop display-4 text-muted mb-3 d-block"></i>
+                <h5 class="fw-bold text-dark">No se encontraron equipos registrados</h5>
+                <p class="text-muted small">Verifica los filtros seleccionados o registra nuevos elementos en el módulo de Inventario.</p>
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL: REGISTRAR NUEVO MANTENIMIENTO / INTERVENCIÓN TÉCNICA -->
+<!-- ========================================================================= -->
+<div class="modal fade" id="modalNuevoMantenimiento" tabindex="-1" aria-labelledby="modalNuevoMantenimientoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <form class="modal-content border-0 shadow" action="{{ url_for('mantenimiento.registrar_mantenimiento') }}" method="POST" enctype="multipart/form-data" id="formNuevoMantenimiento">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <input type="hidden" name="inventario_id" id="mant_inventario_id" value=""/>
+
+            <div class="modal-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-tools fs-5 me-2"></i>
+                    <h5 class="modal-title fw-bold mb-0" id="modalNuevoMantenimientoLabel">Registrar Mantenimiento / Intervención</h5>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="submit" class="btn btn-warning text-dark fw-bold btn-sm shadow-sm d-flex align-items-center gap-1" id="btnGuardarMantenimientoTop">
+                        <i class="bi bi-floppy-fill"></i> Guardar
+                    </button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+            </div>
+
+            <div class="modal-body p-4">
+                    <!-- 1. Búsqueda y Selección del Equipo -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">1. Seleccionar Equipo de Cómputo / Elemento <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="buscadorEquipoMantenimiento" placeholder="Escriba N° de Inventario, Serial, Activo Fijo o Nombre..." autocomplete="off">
+                        </div>
+                        <div id="resultadosBusquedaEquipo" class="list-group position-relative shadow-sm mt-1" style="max-height: 200px; overflow-y: auto; display: none; z-index: 1050;"></div>
+
+                        <!-- Card de Equipo Seleccionado -->
+                        <div id="tarjetaEquipoSeleccionado" class="card bg-light border-primary mt-2" style="display: none;">
+                            <div class="card-body p-2 d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div id="thumbEquipoSeleccionado" class="rounded bg-white border d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; overflow: hidden;">
+                                        <i class="bi bi-laptop fs-5 text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <strong id="nombreEquipoSeleccionado" class="d-block text-dark small"></strong>
+                                        <span id="metaEquipoSeleccionado" class="small text-muted" style="font-size: 0.75rem;"></span>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-danger border-0" id="btnQuitarEquipoSeleccionado" title="Cambiar equipo">
+                                    <i class="bi bi-x-circle-fill fs-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Tipo de Intervención -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" for="selectTipoIntervencion">2. Tipo de Intervención <span class="text-danger">*</span></label>
+                            <select class="form-select" id="selectTipoIntervencion" name="tipo" required onchange="adaptarFormularioTipo(this.value)">
+                                <option value="Actualización de Equipo">Actualización de Equipo (Upgrade Hardware/SO)</option>
+                                <option value="Instalación de Software">Instalación / Licenciamiento de Software</option>
+                                <option value="Cambio de Partes / Repuestos">Cambio de Partes / Repuestos</option>
+                                <option value="Arreglo / Reparación">Arreglo / Reparación Correctiva</option>
+                                <option value="Mantenimiento Preventivo" selected>Mantenimiento Preventivo (Limpieza/Diagnóstico)</option>
+                                <option value="Garantía / Diagnóstico">Garantía / Diagnóstico Técnico</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Título / Resumen Breve</label>
+                            <input type="text" class="form-control" name="titulo" id="inputTituloMantenimiento" placeholder="Ej: Cambio a SSD 500GB + Instalación Office 365">
+                        </div>
+                    </div>
+
+                    <!-- 3. Campos Dinámicos según el tipo de intervención -->
+                    <div id="bloqueSoftware" class="p-3 mb-3 bg-purple-subtle border border-purple-subtle rounded-3" style="display: none; background: #faf5ff; border: 1px dashed #d8b4fe;">
+                        <label class="form-label fw-bold text-purple"><i class="bi bi-code-slash me-1"></i> Software Instalado o Actualizado</label>
+                        <input type="text" class="form-control mb-1" name="software_instalado" placeholder="Ej: AutoCAD 2026, Office 365 v2401, Antivirus ESET Licencia #12">
+                        <small class="text-muted">Especifique nombres de programas, versiones y licencias institucionales aplicadas.</small>
+                    </div>
+
+                    <div id="bloquePartes" class="p-3 mb-3 rounded-3" style="display: none; background: #fffbeb; border: 1px dashed #fde68a;">
+                        <label class="form-label fw-bold text-warning-emphasis"><i class="bi bi-cpu me-1"></i> Partes / Repuestos Cambiados</label>
+                        <input type="text" class="form-control mb-1" name="partes_cambiadas" placeholder="Ej: Memoria RAM 8GB DDR4 Kingston, Teclado USB, Disco SSD 480GB">
+                        <small class="text-muted">Detalla las piezas sustituidas o incorporadas con su marca, capacidad o serial.</small>
+                    </div>
+
+                    <!-- 4. Diagnóstico y Trabajo Realizado -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Motivo o Falla Detectada <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="motivo" rows="2" placeholder="Motivo de la intervención, síntoma o requerimiento técnico..." required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Procedimiento Técnico / Trabajo Realizado</label>
+                        <textarea class="form-control" name="trabajo_realizado" rows="2" placeholder="Detalle los pasos ejecutados durante la reparación, instalación o prueba..."></textarea>
+                    </div>
+
+                    <!-- 5. Datos Técnicos y Fechas -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Técnico / Responsable</label>
+                            <input type="text" class="form-control" name="tecnico_responsable" value="{{ session.nombre_completo or session.usuario or 'Técnico UNIMINUTO' }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Fecha Intervención</label>
+                            <input type="date" class="form-control" name="fecha_envio" value="{{ hoy_str or '' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Costo Estimado ($)</label>
+                            <input type="number" step="0.01" class="form-control" name="costo" placeholder="0.00" value="0">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Estado de la Intervención</label>
+                            <select class="form-select" name="estado">
+                                <option value="Finalizado" selected>Finalizado (Trabajo Concluido)</option>
+                                <option value="En Proceso">En Proceso (En taller / Espera repuesto)</option>
+                                <option value="No Reparable">No Reparable (Para proceso de baja)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Nuevo Estado del Equipo</label>
+                            <select class="form-select" name="nuevo_estado_equipo">
+                                <option value="Disponible" selected>Disponible / Operativo</option>
+                                <option value="En Mantenimiento">En Mantenimiento</option>
+                                <option value="En Reparación">En Reparación</option>
+                                <option value="De Baja">De Baja Definitiva</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 6. Espacio para Fotos -->
+                    <div class="row g-3 p-3 bg-light rounded-3 border mb-2">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark"><i class="bi bi-camera me-1"></i> Foto de Evidencia Técnica</label>
+                            <input type="file" class="form-control form-control-sm" name="foto_evidencia" accept="image/*">
+                            <small class="text-muted d-block mt-1">Soporte fotográfico del trabajo realizado, parte rota o pantalla de software.</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark"><i class="bi bi-image me-1"></i> Actualizar Foto Oficial del Equipo</label>
+                            <input type="file" class="form-control form-control-sm" name="foto_equipo" accept="image/*">
+                            <small class="text-muted d-block mt-1">Si el equipo aún no tiene foto en su Hoja de Vida, puedes asignarla aquí.</small>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold small text-muted">Próximo Mantenimiento Sugerido</label>
+                        <input type="date" class="form-control form-control-sm" name="proximo_mantenimiento">
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light border-top" style="position: sticky; bottom: 0; z-index: 1055;">
+                    <button type="button" class="btn btn-secondary px-3" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4 shadow-sm" id="btnGuardarMantenimiento">
+                        <i class="bi bi-floppy-fill me-1"></i> Guardar Mantenimiento
+                    </button>
+                </div>
+        </form>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL: DETALLE DE INTERVENCIÓN TÉCNICA -->
+<!-- ========================================================================= -->
+<div class="modal fade" id="modalDetalleIntervencion" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title fw-bold" id="detalleTitulo">Detalle de Intervención</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4" id="detalleCuerpo">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status"></div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a href="#" id="detalleEnlaceHojaVida" class="btn btn-primary fw-semibold">
+                    <i class="bi bi-file-earmark-person me-1"></i> Ir a Hoja de Vida del Equipo
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form oculto para eliminación -->
+<form id="formEliminarIntervencion" method="POST" style="display:none;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+</form>
+
+<script>
+    // Inicializar fecha de hoy por defecto en input
+    document.addEventListener("DOMContentLoaded", () => {
+        const todayIso = new Date().toISOString().split('T')[0];
+        const inputFecha = document.querySelector('input[name="fecha_envio"]');
+        if (inputFecha && !inputFecha.value) inputFecha.value = todayIso;
+    });
+
+    // ── Adaptar formulario según tipo de intervención ──
+    function adaptarFormularioTipo(tipo) {
+        const bSw = document.getElementById('bloqueSoftware');
+        const bPartes = document.getElementById('bloquePartes');
+
+        if (tipo === 'Instalación de Software') {
+            bSw.style.display = 'block';
+            bPartes.style.display = 'none';
+        } else if (tipo === 'Cambio de Partes / Repuestos') {
+            bSw.style.display = 'none';
+            bPartes.style.display = 'block';
+        } else if (tipo === 'Actualización de Equipo') {
+            bSw.style.display = 'block';
+            bPartes.style.display = 'block';
+        } else {
+            bSw.style.display = 'none';
+            bPartes.style.display = 'none';
+        }
+    }
+
+    // ── Buscador AJAX de equipos para el modal ──
+    const inputBuscarEq = document.getElementById('buscadorEquipoMantenimiento');
+    const resBusqueda = document.getElementById('resultadosBusquedaEquipo');
+    let debounceTimer;
+
+    if (inputBuscarEq) {
+        inputBuscarEq.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            const q = this.value.trim();
+            if (q.length < 1) {
+                resBusqueda.style.display = 'none';
+                return;
+            }
+            debounceTimer = setTimeout(async () => {
+                try {
+                    const resp = await fetch(`/mantenimiento/api/buscar-equipo?q=${encodeURIComponent(q)}`);
+                    const data = await resp.json();
+                    if (data.success && data.equipos.length > 0) {
+                        resBusqueda.innerHTML = '';
+                        data.equipos.forEach(eq => {
+                            const btn = document.createElement('button');
+                            btn.type = 'button';
+                            btn.className = 'list-group-item list-group-item-action d-flex align-items-center justify-content-between p-2';
+                            btn.innerHTML = `
+                                <div>
+                                    <strong class="text-primary">${eq.numero_inventario}</strong> - ${eq.item}
+                                    <small class="text-muted d-block">Serial: ${eq.serial || '--'} | Sede: ${eq.sede}</small>
+                                </div>
+                                <span class="badge bg-light text-dark border">${eq.estado}</span>
+                            `;
+                            btn.onclick = () => seleccionarEquipoEnModal(eq);
+                            resBusqueda.appendChild(btn);
+                        });
+                        resBusqueda.style.display = 'block';
+                    } else {
+                        resBusqueda.innerHTML = '<div class="p-2 text-muted small text-center">No se encontraron equipos coincidentes.</div>';
+                        resBusqueda.style.display = 'block';
+                    }
+                } catch(e) {
+                    console.error(e);
+                }
+            }, 250);
+        });
+    }
+
+    function seleccionarEquipoEnModal(eq) {
+        document.getElementById('mant_inventario_id').value = eq.id;
+        document.getElementById('nombreEquipoSeleccionado').textContent = `${eq.numero_inventario} - ${eq.item}`;
+        document.getElementById('metaEquipoSeleccionado').textContent = `Serial: ${eq.serial || '--'} | Sede: ${eq.sede} | Estado actual: ${eq.estado}`;
+        
+        const thumb = document.getElementById('thumbEquipoSeleccionado');
+        if (eq.foto_url) {
+            thumb.innerHTML = `<img src="${eq.foto_url}" style="width:100%; height:100%; object-fit:cover;">`;
+        } else {
+            thumb.innerHTML = `<i class="bi bi-laptop fs-5 text-primary"></i>`;
+        }
+
+        document.getElementById('tarjetaEquipoSeleccionado').style.display = 'block';
+        resBusqueda.style.display = 'none';
+        inputBuscarEq.value = '';
+    }
+
+    document.getElementById('btnQuitarEquipoSeleccionado')?.addEventListener('click', () => {
+        document.getElementById('mant_inventario_id').value = '';
+        document.getElementById('tarjetaEquipoSeleccionado').style.display = 'none';
+        inputBuscarEq.focus();
+    });
+
+    document.getElementById('formNuevoMantenimiento')?.addEventListener('submit', function(e) {
+        const invId = document.getElementById('mant_inventario_id')?.value;
+        if (!invId) {
+            e.preventDefault();
+            alert('Por favor busque y seleccione el equipo de cómputo o elemento a intervenir antes de guardar.');
+            document.getElementById('buscadorEquipoMantenimiento')?.focus();
+            return false;
+        }
+    });
+
+    // Abrir modal con equipo preseleccionado desde una tarjeta
+    function abrirMantenimientoParaEquipo(id, numInv, nombre) {
+        seleccionarEquipoEnModal({
+            id: id,
+            numero_inventario: numInv,
+            item: nombre,
+            serial: '',
+            sede: 'Sede Actual',
+            estado: 'Disponible',
+            foto_url: ''
+        });
+        const modal = new bootstrap.Modal(document.getElementById('modalNuevoMantenimiento'));
+        modal.show();
+    }
+
+    // ── Ver Detalle de Intervención en Modal ──
+    async function verDetalleIntervencion(id) {
+        const modal = new bootstrap.Modal(document.getElementById('modalDetalleIntervencion'));
+        modal.show();
+        const cuerpo = document.getElementById('detalleCuerpo');
+        cuerpo.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary"></div></div>';
+
+        try {
+            const resp = await fetch(`/mantenimiento/api/intervencion/${id}`);
+            const data = await resp.json();
+            if (data.success) {
+                const i = data.intervencion;
+                document.getElementById('detalleTitulo').textContent = i.titulo;
+                if (i.equipo.id) {
+                    document.getElementById('detalleEnlaceHojaVida').href = `/mantenimiento/hoja-de-vida/${i.equipo.id}`;
+                    document.getElementById('detalleEnlaceHojaVida').style.display = 'inline-block';
+                } else {
+                    document.getElementById('detalleEnlaceHojaVida').style.display = 'none';
+                }
+
+                cuerpo.innerHTML = `
+                    <div class="row g-3">
+                        <div class="col-md-7">
+                            <h6 class="fw-bold text-primary mb-2">${i.tipo}</h6>
+                            <p class="mb-3">${i.motivo}</p>
+
+                            ${i.trabajo_realizado ? `
+                            <div class="mb-3">
+                                <label class="small fw-bold text-muted text-uppercase">Trabajo Realizado</label>
+                                <div class="p-2 bg-light rounded border small">${i.trabajo_realizado}</div>
+                            </div>` : ''}
+
+                            ${i.software_instalado ? `
+                            <div class="mb-3">
+                                <label class="small fw-bold text-purple text-uppercase"><i class="bi bi-code-slash me-1"></i> Software Instalado / Licencias</label>
+                                <div class="p-2 bg-purple-subtle rounded border small">${i.software_instalado}</div>
+                            </div>` : ''}
+
+                            ${i.partes_cambiadas ? `
+                            <div class="mb-3">
+                                <label class="small fw-bold text-warning-emphasis text-uppercase"><i class="bi bi-cpu me-1"></i> Partes / Repuestos Cambiados</label>
+                                <div class="p-2 bg-warning-subtle rounded border small">${i.partes_cambiadas}</div>
+                            </div>` : ''}
+
+                            <div class="row g-2 small text-muted">
+                                <div class="col-6"><strong>Técnico:</strong> ${i.tecnico}</div>
+                                <div class="col-6"><strong>Fecha:</strong> ${i.fecha_envio}</div>
+                                <div class="col-6"><strong>Estado:</strong> <span class="badge bg-secondary">${i.estado}</span></div>
+                                <div class="col-6"><strong>Costo:</strong> $${i.costo.toLocaleString()}</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-5">
+                            <div class="p-3 bg-light rounded-3 border text-center">
+                                <h6 class="small fw-bold text-uppercase text-muted mb-2">Equipo Asociado</h6>
+                                ${i.equipo.foto_url ? `<img src="${i.equipo.foto_url}" class="rounded-3 border mb-2" style="max-height: 120px; object-fit: cover; width: 100%;">` : ''}
+                                <strong class="d-block text-dark">${i.equipo.item}</strong>
+                                <span class="badge bg-dark mb-2">${i.equipo.numero_inventario}</span>
+                                <div class="small text-muted">Serial: ${i.equipo.serial}</div>
+                            </div>
+
+                            ${i.foto_evidencia_url ? `
+                            <div class="mt-3 p-2 bg-light rounded border text-center">
+                                <label class="small fw-bold text-muted d-block mb-1">Evidencia Fotográfica</label>
+                                <a href="${i.foto_evidencia_url}" target="_blank">
+                                    <img src="${i.foto_evidencia_url}" class="rounded border" style="max-height: 130px; object-fit: cover; width: 100%;">
+                                </a>
+                            </div>` : ''}
+                        </div>
+                    </div>
+                `;
+            } else {
+                cuerpo.innerHTML = '<div class="alert alert-danger">No se pudo cargar la información.</div>';
+            }
+        } catch(e) {
+            cuerpo.innerHTML = '<div class="alert alert-danger">Error de conexión.</div>';
+        }
+    }
+
+    // ── Eliminar Intervención ──
+    function confirmarEliminarIntervencion(id) {
+        if (confirm(`¿Está seguro de que desea eliminar este registro de mantenimiento #${id}?\nEsta acción no se puede deshacer.`)) {
+            const form = document.getElementById('formEliminarIntervencion');
+            form.action = `/mantenimiento/eliminar/${id}`;
+            form.submit();
+        }
+    }
+</script>
+
+{% include 'components/footer.html' %}

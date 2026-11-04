@@ -5,7 +5,7 @@ import os
 import calendar
 from datetime import datetime, date, timedelta
 
-from flask import Flask, render_template, request, redirect, flash, url_for, session
+from flask import Flask, render_template, request, redirect, flash, url_for, session, jsonify
 from sqlalchemy import func, or_, and_
 
 from extensions import db, csrf, limiter, socketio, migrate, swagger
@@ -15,6 +15,7 @@ from config import config, SystemConstants, AdminConfig
 from validators import DataValidator, BusinessValidator, ValidationError
 from services.prestamo_service import PrestamoService
 from services.auth_service import registrar_auxiliar
+from auth import login_required
 
 # Blueprints
 from blueprints.auth import auth_bp
@@ -31,6 +32,10 @@ from blueprints.sedes import sedes_bp
 from blueprints.colaboradores import colaboradores_bp
 from blueprints.programas import programas_bp
 from blueprints.estudiantes import estudiantes_bp
+from blueprints.mantenimiento import mantenimiento_bp
+from blueprints.usuarios import usuarios_bp
+from blueprints.entregas_turno import entregas_turno_bp
+from blueprints.planillas import planillas_bp
 
 
 def create_app(config_name=None):
@@ -74,6 +79,10 @@ def create_app(config_name=None):
     app.register_blueprint(colaboradores_bp)
     app.register_blueprint(programas_bp)
     app.register_blueprint(estudiantes_bp)
+    app.register_blueprint(mantenimiento_bp)
+    app.register_blueprint(usuarios_bp)
+    app.register_blueprint(entregas_turno_bp)
+    app.register_blueprint(planillas_bp)
 
     # ── Context processor ──────────────────────────────────────────────────────
     @app.context_processor
@@ -91,7 +100,8 @@ def create_app(config_name=None):
             rol     = session.get('rol')
             usuario = session.get('usuario')
             modulos = ['prestamos', 'reservas', 'inventario', 'profesores',
-                       'estadisticas', 'bitacora', 'salas_computo', 'colaboradores']
+                       'estadisticas', 'bitacora', 'salas_computo', 'colaboradores',
+                       'mantenimiento', 'usuarios', 'entregas_turno', 'planillas']
 
             # Admins y superadmins tienen acceso total — sin query ni cache
             if rol in ('admin', 'superadmin'):
@@ -120,13 +130,23 @@ def create_app(config_name=None):
         except Exception:
             app.logger.warning('Error en inject_module_access', exc_info=True)
             modulos = ['prestamos', 'reservas', 'inventario', 'profesores',
-                       'estadisticas', 'bitacora', 'salas_computo', 'colaboradores']
+                       'estadisticas', 'bitacora', 'salas_computo', 'colaboradores', 'mantenimiento']
             return {'mod_access': {m: False for m in modulos}}
 
     # ── Manejadores de error ───────────────────────────────────────────────────
+    from flask_wtf.csrf import CSRFError
+
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(e):
+        app.logger.warning("Error de CSRF (%s) en ruta: %s", getattr(e, 'description', str(e)), request.path)
+        if request.is_json:
+            return jsonify({'success': False, 'message': f'Sesión o token de seguridad expirado: {getattr(e, "description", "")}'}), 400
+        flash('Tu sesión o token de seguridad expiró por inactividad. Por favor, intenta la acción de nuevo.', 'warning')
+        return redirect(request.referrer or url_for('index'))
+
     @app.errorhandler(400)
     def bad_request(e):
-        return render_template('errors/400.html'), 400
+        return render_template('errors/400.html', error=e), 400
 
     @app.errorhandler(403)
     def forbidden(e):
@@ -145,8 +165,14 @@ def create_app(config_name=None):
     def favicon():
         """Redirige las solicitudes de favicon tradicionales al icono estático."""
         return redirect(url_for('static', filename='favicon.svg'))
+
+    @app.route('/turnos')
+    @login_required
+    def turnos_alias():
+        """Alias para el buzón de entregas de turno."""
+        return redirect(url_for('entregas_turno.dashboard_entregas'))
+
     # ── Ruta principal ─────────────────────────────────────────────────────────
-    from auth import login_required
 
     @app.route('/')
     @login_required

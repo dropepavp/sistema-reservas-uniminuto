@@ -254,6 +254,9 @@
                                     <i class="bi bi-x-lg"></i>
                                 </button>
                             </div>
+                            <a href="{{ url_for('planillas.planillas_dashboard', tab='colaboradores') }}" class="btn btn-outline-light btn-sm fw-semibold" title="Descargar o subir planilla Excel de colaboradores">
+                                <i class="bi bi-file-earmark-excel me-1"></i>Planilla Excel
+                            </a>
                             {% if session.rol in ('admin', 'superadmin') %}
                             <button class="btn btn-light btn-sm fw-semibold" id="btnNuevoColab">
                                 <i class="bi bi-plus-lg me-1"></i>Nuevo Colaborador
@@ -933,7 +936,7 @@ document.getElementById('btnImprimirMatriz')?.addEventListener('click', function
 // Botón Exportar CSV
 document.getElementById('btnExportarHorariosCSV')?.addEventListener('click', function() {
     const rows = [];
-    const dias = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
+    const dias = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
     
     // Header
     rows.push(['Colaborador', 'Cargo', 'Sede', ...dias, 'Total Horas Semana'].map(c => `"${c}"`).join(','));
@@ -1339,6 +1342,8 @@ document.getElementById('btnGuardarHorarioModal')?.addEventListener('click', asy
     const payload = {
         horarios,
         total_horas_semana: parseInt(document.getElementById('modalTotalHoras').value) || 42,
+        fecha_inicio_horario: document.getElementById('modalFechaInicio').value.trim() || 'A partir del 15 de julio 2026',
+        horario_texto: document.getElementById('modalHorarioTexto').value.trim() || null
     };
     const r = await fetch(`/colaboradores/api/colaboradores/${colabActualId}/horarios`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
@@ -1489,9 +1494,9 @@ document.getElementById('btnNuevoColab')?.addEventListener('click', function () 
     document.getElementById('colabCargo').value = '';
     document.getElementById('colabCorreo').value = '';
     document.getElementById('colabTel').value = '';
-    document.getElementById('colabSede').value = '';
+    document.getElementById('colabSede').value = '{{ session.get("sede_id", "") }}';
     document.getElementById('colabHoras').value = 42;
-    document.getElementById('colabFechaInicio').value = '';
+    document.getElementById('colabFechaInicio').value = 'A partir del 15 de julio 2026';
     document.getElementById('colabObs').value = '';
     document.getElementById('modalColabTitulo').innerHTML = '<i class="bi bi-person-plus me-2"></i>Nuevo Colaborador';
     modalColab.show();

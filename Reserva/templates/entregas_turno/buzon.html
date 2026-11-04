@@ -1,0 +1,658 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    }
+
+    /* ── Header Institucional ── */
+    .turnos-header {
+        background: linear-gradient(135deg, #1e3a5f 0%, #2d6a9f 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: white;
+        box-shadow: 0 8px 24px rgba(30, 58, 95, 0.16);
+        position: relative;
+        overflow: hidden;
+    }
+    .turnos-header::after {
+        content: '';
+        position: absolute;
+        top: -40px;
+        right: -40px;
+        width: 180px;
+        height: 180px;
+        background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 70%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    /* ── KPIs Tarjetas ── */
+    .turno-kpi-card {
+        background: white;
+        border-radius: 14px;
+        padding: 1.25rem 1.4rem;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        display: flex;
+        align-items: center;
+        gap: 1.1rem;
+        height: 100%;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .turno-kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+    }
+    .turno-kpi-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        flex-shrink: 0;
+    }
+
+    /* ── Sidebar Buzón de Correo ── */
+    .mail-sidebar-card {
+        background: white;
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        padding: 1.25rem;
+    }
+    .mail-folder-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        color: #475569;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        margin-bottom: 0.35rem;
+    }
+    .mail-folder-item:hover {
+        background-color: #f1f5f9;
+        color: #1e3a5f;
+        transform: translateX(3px);
+    }
+    .mail-folder-item.active {
+        background: #1e3a5f;
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(30, 58, 95, 0.22);
+    }
+    .mail-folder-item.active .badge {
+        background: rgba(255,255,255,0.25) !important;
+        color: white !important;
+    }
+
+    /* ── Lista de Correos / Entregas ── */
+    .mail-item {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.15rem 1.35rem;
+        margin-bottom: 0.85rem;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        position: relative;
+    }
+    .mail-item:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+        transform: translateY(-2px);
+    }
+    .mail-item.no-leido {
+        border-left: 5px solid #2d6a9f;
+        background-color: #fbfcfe;
+    }
+    .mail-item.no-leido .mail-subject {
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    /* ── Badges de Jornada ── */
+    .badge-manana {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fde68a;
+        font-weight: 700;
+        padding: 0.35rem 0.65rem;
+        border-radius: 8px;
+    }
+    .badge-tarde {
+        background: #e0e7ff;
+        color: #3730a3;
+        border: 1px solid #c7d2fe;
+        font-weight: 700;
+        padding: 0.35rem 0.65rem;
+        border-radius: 8px;
+    }
+
+    /* ── Avatares ── */
+    .avatar-circle {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1e3a5f, #3b82f6);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.95rem;
+        flex-shrink: 0;
+    }
+
+    .badge-acuse-conforme {
+        background-color: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+        font-weight: 700;
+    }
+    .badge-acuse-obs {
+        background-color: #fef9c3;
+        color: #854d0e;
+        border: 1px solid #fef08a;
+        font-weight: 700;
+    }
+    .badge-acuse-pendiente {
+        background-color: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+        font-weight: 700;
+    }
+</style>
+
+<div class="container-fluid py-4 px-md-4">
+
+    <!-- ── CABECERA PRINCIPAL ── -->
+    <div class="turnos-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <i class="bi bi-envelope-paper-fill fs-2 text-warning"></i>
+                <h1 class="h3 fw-bold mb-0">Entregas de Turno & Correspondencia Interna</h1>
+            </div>
+            <p class="mb-0 text-white-50 small">
+                Gestión formal de traspaso de novedades entre las jornadas de la mañana y tarde/noche en sedes UNIMINUTO.
+            </p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-warning text-dark fw-bold px-3 py-2 shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalRedactarTurno">
+                <i class="bi bi-pencil-square fs-5"></i>
+                <span>Redactar Entrega de Turno</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ── TARJETAS KPI RESUMEN ── -->
+    <div class="row g-3 mb-4">
+        <!-- 1. Turno Mañana -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="turno-kpi-card border-start border-4 border-warning">
+                <div class="turno-kpi-icon bg-warning bg-opacity-15 text-warning-emphasis">
+                    <i class="bi bi-sun-fill"></i>
+                </div>
+                <div>
+                    <div class="text-muted small fw-bold text-uppercase">Jornada Mañana</div>
+                    <div class="fs-4 fw-bold text-dark">{{ stats.manana_count }}</div>
+                    <small class="text-muted">Turnos este mes</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Turno Tarde -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="turno-kpi-card border-start border-4 border-primary">
+                <div class="turno-kpi-icon bg-primary bg-opacity-15 text-primary">
+                    <i class="bi bi-moon-stars-fill"></i>
+                </div>
+                <div>
+                    <div class="text-muted small fw-bold text-uppercase">Jornada Tarde</div>
+                    <div class="fs-4 fw-bold text-dark">{{ stats.tarde_count }}</div>
+                    <small class="text-muted">Turnos este mes</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Pendientes de Acuse -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="turno-kpi-card border-start border-4 border-danger">
+                <div class="turno-kpi-icon bg-danger bg-opacity-15 text-danger">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div>
+                    <div class="text-muted small fw-bold text-uppercase">Por Confirmar</div>
+                    <div class="fs-4 fw-bold text-danger">{{ stats.pendientes_count }}</div>
+                    <small class="text-muted">Sin acuse de recibo</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. No Leídos -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="turno-kpi-card border-start border-4 border-info">
+                <div class="turno-kpi-icon bg-info bg-opacity-15 text-info">
+                    <i class="bi bi-inbox-fill"></i>
+                </div>
+                <div>
+                    <div class="text-muted small fw-bold text-uppercase">Buzón No Leído</div>
+                    <div class="fs-4 fw-bold text-dark">{{ stats.no_leidos_count }}</div>
+                    <small class="text-muted">Nuevas entregas</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── ESTRUCTURA CLIENTE DE CORREO (2 COLUMNAS) ── -->
+    <div class="row g-4">
+
+        <!-- COLUMNA IZQUIERDA: CARPETAS Y FILTROS -->
+        <div class="col-lg-3 col-xl-3">
+            <div class="mail-sidebar-card mb-3">
+                <button class="btn btn-primary w-100 fw-bold py-2 mb-3 shadow-sm d-flex align-items-center justify-content-center gap-2" data-bs-toggle="modal" data-bs-target="#modalRedactarTurno">
+                    <i class="bi bi-pencil-fill"></i> Redactar Turno
+                </button>
+
+                <div class="text-muted small fw-bold text-uppercase px-2 mb-2">Carpetas</div>
+                <nav class="nav flex-column">
+                    <a href="{{ url_for('entregas_turno.dashboard_entregas', tab='recibidos') }}" class="mail-folder-item {% if tab == 'recibidos' %}active{% endif %}">
+                        <span><i class="bi bi-inbox-fill me-2"></i>Bandeja de Entrada</span>
+                        {% if stats.no_leidos_count > 0 %}
+                        <span class="badge bg-danger rounded-pill">{{ stats.no_leidos_count }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="{{ url_for('entregas_turno.dashboard_entregas', tab='enviados') }}" class="mail-folder-item {% if tab == 'enviados' %}active{% endif %}">
+                        <span><i class="bi bi-send-fill me-2"></i>Enviados</span>
+                    </a>
+                    <a href="{{ url_for('entregas_turno.dashboard_entregas', tab='manana') }}" class="mail-folder-item {% if tab == 'manana' %}active{% endif %}">
+                        <span><i class="bi bi-sun-fill me-2 text-warning"></i>Jornadas Mañana</span>
+                        <span class="badge bg-secondary rounded-pill">{{ stats.manana_count }}</span>
+                    </a>
+                    <a href="{{ url_for('entregas_turno.dashboard_entregas', tab='tarde') }}" class="mail-folder-item {% if tab == 'tarde' %}active{% endif %}">
+                        <span><i class="bi bi-moon-stars-fill me-2 text-primary"></i>Jornadas Tarde</span>
+                        <span class="badge bg-secondary rounded-pill">{{ stats.tarde_count }}</span>
+                    </a>
+                    <a href="{{ url_for('entregas_turno.dashboard_entregas', tab='pendientes') }}" class="mail-folder-item {% if tab == 'pendientes' %}active{% endif %}">
+                        <span><i class="bi bi-clock-history me-2 text-danger"></i>Sin Confirmar</span>
+                        {% if stats.pendientes_count > 0 %}
+                        <span class="badge bg-warning text-dark rounded-pill">{{ stats.pendientes_count }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="{{ url_for('entregas_turno.dashboard_entregas', tab='todas') }}" class="mail-folder-item {% if tab == 'todas' %}active{% endif %}">
+                        <span><i class="bi bi-archive-fill me-2"></i>Historial Completo</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Filtros adicionales de búsqueda -->
+            <div class="mail-sidebar-card">
+                <div class="text-muted small fw-bold text-uppercase px-1 mb-3"><i class="bi bi-funnel me-1"></i>Filtrar Entregas</div>
+                <form method="GET" action="{{ url_for('entregas_turno.dashboard_entregas') }}">
+                    <input type="hidden" name="tab" value="{{ tab }}">
+                    
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">SEDE</label>
+                        <select name="sede" class="form-select form-select-sm">
+                            <option value="">Todas las sedes</option>
+                            {% for s in sedes %}
+                            <option value="{{ s.id }}" {% if filtros.sede == s.id|string %}selected{% endif %}>{{ s.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">JORNADA</label>
+                        <select name="jornada" class="form-select form-select-sm">
+                            <option value="">Ambas jornadas</option>
+                            <option value="Mañana" {% if filtros.jornada == 'Mañana' %}selected{% endif %}>☀️ Mañana</option>
+                            <option value="Tarde" {% if filtros.jornada == 'Tarde' %}selected{% endif %}>🌙 Tarde</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">ESTADO DE ACUSE</label>
+                        <select name="estado" class="form-select form-select-sm">
+                            <option value="">Todos los estados</option>
+                            <option value="Pendiente" {% if filtros.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+                            <option value="Recibido Conforme" {% if filtros.estado == 'Recibido Conforme' %}selected{% endif %}>Recibido Conforme</option>
+                            <option value="Con Observaciones" {% if filtros.estado == 'Con Observaciones' %}selected{% endif %}>Con Observaciones</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">FECHA</label>
+                        <input type="date" name="fecha" value="{{ filtros.fecha }}" class="form-control form-control-sm">
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-sm fw-bold">Aplicar Filtros</button>
+                        {% if filtros.sede or filtros.jornada or filtros.estado or filtros.fecha or filtros.busqueda %}
+                        <a href="{{ url_for('entregas_turno.dashboard_entregas', tab=tab) }}" class="btn btn-outline-secondary btn-sm">Limpiar</a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- COLUMNA DERECHA: BANDEJA DE MENSAJES DE ENTREGA -->
+        <div class="col-lg-9 col-xl-9">
+
+            <!-- Barra de búsqueda superior en bandeja -->
+            <div class="card border-0 shadow-sm p-3 mb-3" style="border-radius:12px;">
+                <form method="GET" action="{{ url_for('entregas_turno.dashboard_entregas') }}" class="d-flex gap-2">
+                    <input type="hidden" name="tab" value="{{ tab }}">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                        <input type="text" name="busqueda" value="{{ filtros.busqueda }}" class="form-control border-start-0 ps-0" placeholder="Buscar por asunto, consecutivo, actividades o novedades...">
+                    </div>
+                    <button type="submit" class="btn btn-primary px-4 fw-bold">Buscar</button>
+                </form>
+            </div>
+
+            <!-- Listado de Entregas -->
+            {% if entregas %}
+                {% for e in entregas %}
+                <a href="{{ url_for('entregas_turno.ver_entrega', entrega_id=e.id) }}" class="mail-item {% if not e.leido and e.usuario_emisor_doc != session.usuario %}no-leido{% endif %}">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-2">
+                        <div class="d-flex align-items-center gap-3">
+                            <!-- Avatar Emisor -->
+                            <div class="avatar-circle">
+                                {{ e.emisor.nombre_completo[:2].upper() if e.emisor else 'UN' }}
+                            </div>
+                            <div>
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <span class="fw-bold text-dark">{{ e.emisor.nombre_completo if e.emisor else 'Auxiliar' }}</span>
+                                    <span class="text-muted small">· {{ e.sede.nombre if e.sede else 'Sede General' }}</span>
+                                    
+                                    <!-- Badge Consecutivo -->
+                                    <span class="badge bg-light text-dark border small">{{ e.consecutivo }}</span>
+
+                                    <!-- Badge Jornada -->
+                                    {% if e.jornada == 'Mañana' %}
+                                    <span class="badge-manana small"><i class="bi bi-sun-fill me-1"></i>Jornada Mañana</span>
+                                    {% else %}
+                                    <span class="badge-tarde small"><i class="bi bi-moon-stars-fill me-1"></i>Jornada Tarde</span>
+                                    {% endif %}
+
+                                    <!-- Prioridad si es Alta -->
+                                    {% if e.prioridad == 'Urgente' %}
+                                    <span class="badge bg-danger small"><i class="bi bi-exclamation-triangle-fill me-1"></i>Urgente</span>
+                                    {% elif e.prioridad == 'Importante' %}
+                                    <span class="badge bg-warning text-dark small"><i class="bi bi-bell-fill me-1"></i>Importante</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fecha, Hora y Estado de Acuse -->
+                        <div class="text-md-end">
+                            <div class="small text-muted mb-1">
+                                <i class="bi bi-calendar3 me-1"></i>{{ e.fecha.strftime('%d/%m/%Y') }} a las {{ e.hora.strftime('%H:%M') }}
+                            </div>
+                            <div>
+                                {% if e.estado == 'Recibido Conforme' %}
+                                <span class="badge badge-acuse-conforme small"><i class="bi bi-check-circle-fill me-1"></i>Recibido Conforme</span>
+                                {% elif e.estado == 'Con Observaciones' %}
+                                <span class="badge badge-acuse-obs small"><i class="bi bi-exclamation-circle-fill me-1"></i>Con Observaciones</span>
+                                {% else %}
+                                <span class="badge badge-acuse-pendiente small"><i class="bi bi-hourglass me-1"></i>Pendiente Acuse</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Asunto y Preview -->
+                    <div class="ms-md-5 ps-md-2">
+                        <div class="mail-subject fs-6 mb-1">{{ e.asunto }}</div>
+                        <p class="text-muted small mb-2 text-truncate" style="max-width: 900px;">
+                            {{ e.actividades_realizadas }}
+                        </p>
+
+                        <!-- Píldoras de resumen informativo -->
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                            {% if e.equipos_pendientes %}
+                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle small">
+                                <i class="bi bi-laptop me-1"></i>Equipos Pendientes
+                            </span>
+                            {% endif %}
+                            {% if e.novedades_salas %}
+                            <span class="badge bg-warning bg-opacity-10 text-warning-emphasis border border-warning-subtle small">
+                                <i class="bi bi-pc-display me-1"></i>Novedades Salas
+                            </span>
+                            {% endif %}
+                            {% if e.pendientes_siguiente_turno %}
+                            <span class="badge bg-info bg-opacity-10 text-info border border-info-subtle small">
+                                <i class="bi bi-list-task me-1"></i>Tareas Siguiente Turno
+                            </span>
+                            {% endif %}
+                            {% if e.comentarios|length > 0 %}
+                            <span class="badge bg-light text-muted border small ms-auto">
+                                <i class="bi bi-chat-left-text me-1"></i>{{ e.comentarios|length }} respuesta{{ 's' if e.comentarios|length > 1 else '' }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            {% else %}
+                <div class="card border-0 shadow-sm p-5 text-center" style="border-radius:14px;">
+                    <div class="mb-3 text-muted">
+                        <i class="bi bi-inbox fs-1"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">No hay entregas de turno en esta carpeta</h5>
+                    <p class="text-muted small mb-3">No se encontraron registros que coincidan con la pestaña o los filtros seleccionados.</p>
+                    <div>
+                        <button type="button" class="btn btn-warning text-dark fw-bold px-4" data-bs-toggle="modal" data-bs-target="#modalRedactarTurno">
+                            <i class="bi bi-pencil-square me-1"></i>Redactar Entrega de Turno
+                        </button>
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+<!-- ═════════════════════════════════════════════════════════════════════════ -->
+<!-- MODAL: REDACTAR ENTREGA DE TURNO                                          -->
+<!-- ═════════════════════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalRedactarTurno" tabindex="-1" aria-labelledby="modalRedactarTurnoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #1e3a5f, #2d6a9f); border-radius: 16px 16px 0 0;">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-envelope-plus-fill fs-4 text-warning"></i>
+                    <h5 class="modal-title fw-bold" id="modalRedactarTurnoLabel">Redactar Entrega de Turno</h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form method="POST" action="{{ url_for('entregas_turno.redactar_entrega') }}" enctype="multipart/form-data" id="formRedactarTurno">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="modal-body p-4">
+                    <!-- Selector de Jornada de Trabajo -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted text-uppercase mb-2">1. Seleccionar Jornada de Trabajo</label>
+                        <div class="row g-2">
+                            <div class="col-sm-6">
+                                <input type="radio" class="btn-check" name="jornada" id="jornadaManana" value="Mañana" {% if jornada_sugerida == 'Mañana' %}checked{% endif %} onchange="actualizarAsuntoSugerido()">
+                                <label class="btn btn-outline-warning text-dark w-100 py-3 d-flex align-items-center justify-content-center gap-2 fw-bold" for="jornadaManana">
+                                    <i class="bi bi-sun-fill fs-4 text-warning"></i>
+                                    <div>
+                                        <div>Jornada de la Mañana</div>
+                                        <small class="text-muted fw-normal">06:00 a 14:00 hrs</small>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col-sm-6">
+                                <input type="radio" class="btn-check" name="jornada" id="jornadaTarde" value="Tarde" {% if jornada_sugerida == 'Tarde' %}checked{% endif %} onchange="actualizarAsuntoSugerido()">
+                                <label class="btn btn-outline-primary w-100 py-3 d-flex align-items-center justify-content-center gap-2 fw-bold" for="jornadaTarde">
+                                    <i class="bi bi-moon-stars-fill fs-4 text-primary"></i>
+                                    <div>
+                                        <div>Jornada de la Tarde</div>
+                                        <small class="text-muted fw-normal">14:00 a 22:00 hrs</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Datos Generales: Sede, Destinatario, Prioridad -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-5">
+                            <label class="form-label fw-bold small text-muted">SEDE</label>
+                            <select name="sede_id" id="modalTurnoSede" class="form-select" required onchange="actualizarAsuntoSugerido()">
+                                {% for s in sedes %}
+                                <option value="{{ s.id }}" {% if session.sede_id == s.id %}selected{% endif %}>{{ s.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-muted">DESTINATARIO (ENTRANTE)</label>
+                            <select name="usuario_receptor_doc" class="form-select">
+                                <option value="">Toda la sede / Turno Entrante</option>
+                                {% for a in auxiliares %}
+                                <option value="{{ a.documento }}">{{ a.nombre_completo }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold small text-muted">PRIORIDAD</label>
+                            <select name="prioridad" class="form-select">
+                                <option value="Normal">Normal</option>
+                                <option value="Importante">Importante</option>
+                                <option value="Urgente">Urgente</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Asunto -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">ASUNTO DEL MENSAJE / TURNO</label>
+                        <input type="text" name="asunto" id="modalTurnoAsunto" class="form-control fw-bold" placeholder="Ej: Entrega Turno Mañana — 21/10/2026" required>
+                    </div>
+
+                    <!-- Botón Inteligente: Auto-cargar Novedades -->
+                    <div class="p-3 mb-3 bg-light rounded-3 border d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <div class="fw-bold small text-dark"><i class="bi bi-magic me-1 text-primary"></i>Asistente de Novedades del Turno</div>
+                            <small class="text-muted">Carga automáticamente los préstamos sin devolver y novedades de salas reportadas hoy.</small>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary btn-sm fw-bold" onclick="autoCargarResumenTurno()" id="btnAutoCargar">
+                            <i class="bi bi-lightning-charge-fill me-1"></i>Auto-Cargar Novedades
+                        </button>
+                    </div>
+
+                    <!-- Bloque 1: Actividades Realizadas en el turno -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">
+                            <i class="bi bi-check2-square text-success me-1"></i>ACTIVIDADES REALIZADAS EN LA JORNADA *
+                        </label>
+                        <textarea name="actividades_realizadas" id="modalActividades" class="form-control" rows="3" placeholder="Detalle de actividades: salones habilitados, soporte a docentes, préstamos despachados, etc..." required></textarea>
+                    </div>
+
+                    <!-- Bloque 2: Equipos Pendientes -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">
+                            <i class="bi bi-laptop text-danger me-1"></i>EQUIPOS Y PRÉSTAMOS PENDIENTES POR DEVOLVER
+                        </label>
+                        <textarea name="equipos_pendientes" id="modalEquiposPendientes" class="form-control" rows="2" placeholder="Listado de portátiles o recursos que quedaron prestados y deben recibirse en la tarde..."></textarea>
+                    </div>
+
+                    <!-- Bloque 3: Novedades en Salas / Fallas Técnicas -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">
+                            <i class="bi bi-pc-display text-warning me-1"></i>NOVEDADES EN SALAS O SALONES
+                        </label>
+                        <textarea name="novedades_salas" id="modalNovedadesSalas" class="form-control" rows="2" placeholder="Puestos de cómputo con falla, proyectores con aviso, cables averiados..."></textarea>
+                    </div>
+
+                    <!-- Bloque 4: Pendientes para el Turno Siguiente -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">
+                            <i class="bi bi-pin-angle-fill text-info me-1"></i>TAREAS Y PENDIENTES PARA EL TURNO ENTRANTE
+                        </label>
+                        <textarea name="pendientes_siguiente_turno" class="form-control" rows="2" placeholder="Instrucciones para el compañero de la tarde (ej: recoger equipos a las 16:00 en sala 204)..."></textarea>
+                    </div>
+
+                    <!-- Evidencia Fotográfica y Observaciones -->
+                    <div class="row g-3 mb-2">
+                        <div class="col-md-7">
+                            <label class="form-label fw-bold small text-muted">OBSERVACIONES GENERALES</label>
+                            <input type="text" name="observaciones" class="form-control" placeholder="Notas adicionales o comentarios de cierre">
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label fw-bold small text-muted">ADJUNTAR FOTO / EVIDENCIA</label>
+                            <input type="file" name="evidencia" accept="image/*" class="form-control">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light rounded-bottom-4">
+                    <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">
+                        <i class="bi bi-send-fill me-1"></i>Enviar Entrega de Turno
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function actualizarAsuntoSugerido() {
+        const jornada = document.querySelector('input[name="jornada"]:checked')?.value || 'Mañana';
+        const sedeSelect = document.getElementById('modalTurnoSede');
+        const sedeTexto = sedeSelect.options[sedeSelect.selectedIndex]?.text || '';
+        const hoy = new Date().toLocaleDateString('es-CO');
+        document.getElementById('modalTurnoAsunto').value = `Entrega Turno ${jornada} — ${sedeTexto} (${hoy})`;
+    }
+
+    async function autoCargarResumenTurno() {
+        const btn = document.getElementById('btnAutoCargar');
+        const sedeSelect = document.getElementById('modalTurnoSede');
+        const sedeId = sedeSelect.value;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Consultando...';
+
+        try {
+            const res = await fetch(`/entregas-turno/api/resumen-automatico?sede_id=${sedeId}`);
+            const data = await res.json();
+            if (data.success) {
+                if (data.equipos_pendientes_sugerido) {
+                    const eqArea = document.getElementById('modalEquiposPendientes');
+                    eqArea.value = (eqArea.value ? eqArea.value + "\n" : "") + data.equipos_pendientes_sugerido;
+                }
+                if (data.novedades_salas_sugerido) {
+                    const salArea = document.getElementById('modalNovedadesSalas');
+                    salArea.value = (salArea.value ? salArea.value + "\n" : "") + data.novedades_salas_sugerido;
+                }
+                alert(`Resumen cargado: ${data.total_prestamos_pendientes} préstamos activos y ${data.total_novedades_salas} novedades de salas hoy.`);
+            }
+        } catch(e) {
+            alert('Error al consultar el resumen automático.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-lightning-charge-fill me-1"></i>Auto-Cargar Novedades';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        actualizarAsuntoSugerido();
+    });
+</script>
+
+{% include 'components/footer.html' %}

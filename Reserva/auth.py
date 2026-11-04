@@ -98,6 +98,7 @@ def cargar_permisos_usuario(documento):
             'bitacora': dict(full_access),
             'salas_computo': dict(full_access),
             'usuarios': dict(full_access),
+            'mantenimiento': dict(full_access),
         }
         return session['mod_access']
 

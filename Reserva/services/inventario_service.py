@@ -4,7 +4,7 @@ Servicio para la gestión y consultas complejas del inventario.
 from collections import Counter, defaultdict
 from typing import Dict, Any, List, Tuple
 from sqlalchemy import func, desc, asc
-from database import db, Inventario, Bodega
+from database import db, Inventario, Bodega, InventarioCustodia
 
 
 class InventarioService:
@@ -38,7 +38,8 @@ class InventarioService:
                     Inventario.item.ilike(search_term),
                     Inventario.marca_modelo.ilike(search_term),
                     Inventario.serial.ilike(search_term),
-                    Inventario.numero_inventario.ilike(search_term)
+                    Inventario.numero_inventario.ilike(search_term),
+                    Inventario.hostname.ilike(search_term)
                 )
             )
 
@@ -147,3 +148,106 @@ class InventarioService:
             'stock_info': stock_info,
             'stock_por_tipo': dict(stock_por_tipo)
         }
+
+    @staticmethod
+    def obtener_custodias_filtradas(params: Dict[str, Any], user_rol: str = None, user_sede_id: int = None) -> List[InventarioCustodia]:
+        """
+        Aplica filtros a la tabla de custodia y centros de costo.
+        Columnas: ESTADO, NOMBRE DEL CENTRO DE COSTO, CENTRO DE COSTO, CARGO RESPONSABLE, RESPONSABLE, CEDULA, EDIFICIO, UBICACIÓN.
+        """
+        query = InventarioCustodia.query
+
+        estado_filtro = params.get('estado', '').strip()
+        if estado_filtro:
+            query = query.filter(InventarioCustodia.estado == estado_filtro)
+
+        edificio_filtro = params.get('edificio', '').strip()
+        if edificio_filtro:
+            query = query.filter(InventarioCustodia.edificio == edificio_filtro)
+
+        centro_costo_filtro = params.get('centro_costo', '').strip()
+        if centro_costo_filtro:
+            query = query.filter(InventarioCustodia.centro_costo == centro_costo_filtro)
+
+        nombre_cc_filtro = params.get('nombre_centro_costo', '').strip()
+        if nombre_cc_filtro:
+            query = query.filter(InventarioCustodia.nombre_centro_costo.ilike(f"%{nombre_cc_filtro}%"))
+
+        cargo_filtro = params.get('cargo_custodio', '').strip()
+        if cargo_filtro:
+            query = query.filter(InventarioCustodia.cargo_custodio.ilike(f"%{cargo_filtro}%"))
+
+        responsable_filtro = params.get('responsable_custodia', '').strip()
+        if responsable_filtro:
+            query = query.filter(InventarioCustodia.responsable_custodia.ilike(f"%{responsable_filtro}%"))
+
+        cedula_filtro = params.get('cedula_custodio', '').strip()
+        if cedula_filtro:
+            query = query.filter(InventarioCustodia.cedula_custodio.ilike(f"%{cedula_filtro}%"))
+
+        ubicacion_filtro = params.get('ubicacion', '').strip()
+        if ubicacion_filtro:
+            query = query.filter(InventarioCustodia.ubicacion == ubicacion_filtro)
+
+        tipo_filtro = params.get('tipo_inventario', '').strip()
+        if tipo_filtro:
+            query = query.filter(InventarioCustodia.tipo_inventario == tipo_filtro)
+
+        sede_param = params.get('sede', '').strip()
+        if sede_param and str(sede_param).isdigit():
+            query = query.filter(InventarioCustodia.sede_id == int(sede_param))
+        elif user_sede_id and user_rol not in ('admin', 'superadmin'):
+            query = query.filter(InventarioCustodia.sede_id == user_sede_id)
+
+        busqueda = params.get('busqueda', '').strip()
+        if busqueda:
+            term = f"%{busqueda}%"
+            query = query.filter(
+                db.or_(
+                    InventarioCustodia.descripcion.ilike(term),
+                    InventarioCustodia.placa.ilike(term),
+                    InventarioCustodia.serie.ilike(term),
+                    InventarioCustodia.marca.ilike(term),
+                    InventarioCustodia.responsable_custodia.ilike(term),
+                    InventarioCustodia.cedula_custodio.ilike(term),
+                    InventarioCustodia.cargo_custodio.ilike(term),
+                    InventarioCustodia.nombre_centro_costo.ilike(term),
+                    InventarioCustodia.centro_costo.ilike(term),
+                    InventarioCustodia.edificio.ilike(term),
+                    InventarioCustodia.ubicacion.ilike(term)
+                )
+            )
+
+        return query.order_by(InventarioCustodia.id.asc()).all()
+
+    @staticmethod
+    def calcular_estadisticas_custodia(custodias: List[InventarioCustodia]) -> Dict[str, Any]:
+        """Calcula estadísticas y agrupaciones para la vista de Custodia."""
+        total = len(custodias)
+        por_estado = defaultdict(int)
+        por_edificio = defaultdict(int)
+        por_centro_costo = defaultdict(int)
+        activos_fijos = 0
+        bodega_lote = 0
+
+        for c in custodias:
+            por_estado[c.estado or 'Sin Estado'] += 1
+            if c.edificio:
+                por_edificio[c.edificio] += 1
+            if c.centro_costo:
+                lbl = f"{c.centro_costo} - {c.nombre_centro_costo or ''}".strip(' -')
+                por_centro_costo[lbl] += 1
+            if c.tipo_inventario == 'BODEGA_LOTE':
+                bodega_lote += 1
+            else:
+                activos_fijos += 1
+
+        return {
+            'total': total,
+            'activos_fijos': activos_fijos,
+            'bodega_lote': bodega_lote,
+            'por_estado': dict(por_estado),
+            'por_edificio': dict(por_edificio),
+            'por_centro_costo': dict(por_centro_costo)
+        }
+

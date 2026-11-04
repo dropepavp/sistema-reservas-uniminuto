@@ -1,0 +1,362 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    }
+
+    .redactar-header {
+        background: linear-gradient(135deg, #1e3a5f 0%, #2d6a9f 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: white;
+        box-shadow: 0 8px 24px rgba(30, 58, 95, 0.16);
+        position: relative;
+        overflow: hidden;
+    }
+    .redactar-header::after {
+        content: '';
+        position: absolute;
+        top: -40px;
+        right: -40px;
+        width: 180px;
+        height: 180px;
+        background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 70%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        overflow: hidden;
+    }
+
+    .section-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.25rem;
+        transition: border-color 0.2s ease;
+    }
+    .section-card:focus-within {
+        border-color: #2d6a9f;
+        background: #ffffff;
+    }
+
+    .section-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .jornada-option-card {
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background: white;
+    }
+    .jornada-option-card:hover {
+        border-color: #cbd5e1;
+        transform: translateY(-2px);
+    }
+    .btn-check:checked + .jornada-card-manana {
+        border-color: #f59e0b;
+        background: #fffbeb;
+        box-shadow: 0 4px 14px rgba(245, 158, 11, 0.2);
+    }
+    .btn-check:checked + .jornada-card-tarde {
+        border-color: #3b82f6;
+        background: #eff6ff;
+        box-shadow: 0 4px 14px rgba(59, 130, 246, 0.2);
+    }
+
+    .autocarga-box {
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        border: 1px solid #bae6fd;
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+    }
+</style>
+
+<div class="container py-4">
+    <!-- Header Principal -->
+    <div class="redactar-header mb-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <a href="{{ url_for('entregas_turno.dashboard_entregas') }}" class="text-white text-decoration-none small fw-bold opacity-75 d-inline-flex align-items-center gap-1 mb-2">
+                    <i class="bi bi-arrow-left"></i> Volver a la Bandeja de Entregas
+                </a>
+                <h1 class="h3 fw-bold mb-1">Redactar Entrega de Turno</h1>
+                <p class="mb-0 text-white-50 small">
+                    Traspaso formal de novedades operativas entre las jornadas de la Mañana y de la Tarde.
+                </p>
+            </div>
+            <div class="text-end d-none d-md-block">
+                <span class="badge bg-white text-primary px-3 py-2 fw-bold fs-6">
+                    <i class="bi bi-envelope-paper-fill me-1"></i> Correo Interno de Turno
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensajes Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Formulario Principal -->
+    <form method="POST" action="{{ url_for('entregas_turno.redactar_entrega') }}" enctype="multipart/form-data" id="formRedactarTurnoPage">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-card p-4 p-md-5 mb-4">
+
+            <!-- 1. Selección de Jornada de Trabajo -->
+            <div class="mb-4">
+                <label class="form-label fw-bold text-dark small text-uppercase mb-2">
+                    <i class="bi bi-clock-history me-1 text-primary"></i>1. Jornada de Trabajo que se Entrega *
+                </label>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <input type="radio" class="btn-check" name="jornada" id="radioJornadaManana" value="Mañana" {% if jornada_sugerida == 'Mañana' %}checked{% endif %} onchange="actualizarAsuntoPagina()">
+                        <label class="jornada-option-card jornada-card-manana w-100" for="radioJornadaManana">
+                            <div class="rounded-circle p-3 bg-warning bg-opacity-25 text-warning-emphasis">
+                                <i class="bi bi-sun-fill fs-2"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-bold text-dark fs-5">Jornada de la Mañana</div>
+                                <div class="text-muted small">Horario de 06:00 a 14:00 hrs</div>
+                                <div class="badge bg-warning bg-opacity-25 text-warning-emphasis mt-1">Turno Saliente AM</div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="col-md-6">
+                        <input type="radio" class="btn-check" name="jornada" id="radioJornadaTarde" value="Tarde" {% if jornada_sugerida == 'Tarde' %}checked{% endif %} onchange="actualizarAsuntoPagina()">
+                        <label class="jornada-option-card jornada-card-tarde w-100" for="radioJornadaTarde">
+                            <div class="rounded-circle p-3 bg-primary bg-opacity-25 text-primary">
+                                <i class="bi bi-moon-stars-fill fs-2"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="fw-bold text-dark fs-5">Jornada de la Tarde / Noche</div>
+                                <div class="text-muted small">Horario de 14:00 a 22:00 hrs</div>
+                                <div class="badge bg-primary bg-opacity-25 text-primary mt-1">Turno Saliente PM</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Metadatos de la Entrega: Sede, Fecha, Hora, Destinatario y Prioridad -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold small text-muted text-uppercase">Sede Operativa *</label>
+                    <select name="sede_id" id="selectSedePagina" class="form-select" required onchange="actualizarAsuntoPagina()">
+                        {% for s in sedes %}
+                        <option value="{{ s.id }}" {% if (sede_actual_id and sede_actual_id == s.id) or (session.sede_id == s.id) %}selected{% endif %}>{{ s.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold small text-muted text-uppercase">Fecha del Turno</label>
+                    <input type="date" name="fecha" id="inputFechaPagina" class="form-control" value="{{ hoy_str }}" onchange="actualizarAsuntoPagina()">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold small text-muted text-uppercase">Hora de Entrega</label>
+                    <input type="time" name="hora" class="form-control" value="{{ hora_str }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold small text-muted text-uppercase">Destinatario Entrante</label>
+                    <select name="usuario_receptor_doc" class="form-select">
+                        <option value="">Toda la Sede (General)</option>
+                        {% for a in auxiliares %}
+                        <option value="{{ a.documento }}">{{ a.nombre_completo }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold small text-muted text-uppercase">Prioridad</label>
+                    <select name="prioridad" class="form-select">
+                        <option value="Normal">Normal</option>
+                        <option value="Importante">Importante</option>
+                        <option value="Urgente">Urgente</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Asunto -->
+            <div class="mb-4">
+                <label class="form-label fw-bold small text-muted text-uppercase">Asunto del Traspaso / Mensaje *</label>
+                <input type="text" name="asunto" id="inputAsuntoPagina" class="form-control fw-bold fs-6" placeholder="Ej: Entrega Turno Mañana — Sede Principal (21/10/2026)" required>
+            </div>
+
+            <!-- Asistente Inteligente de Auto-carga de Préstamos y Novedades del día -->
+            <div class="autocarga-box mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle p-2 bg-white text-primary shadow-sm">
+                        <i class="bi bi-magic fs-4"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-dark">Asistente Inteligente de Novedades UNIMINUTO</div>
+                        <small class="text-muted">Carga en un clic los préstamos sin devolver y las novedades reportadas hoy en salas para evitar reescritura.</small>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary fw-bold px-3 py-2 d-flex align-items-center gap-2" onclick="autoCargarResumenPagina()" id="btnAutoCargarPage">
+                    <i class="bi bi-lightning-charge-fill"></i> Auto-Cargar Novedades
+                </button>
+            </div>
+
+            <!-- Sección 1: Actividades Realizadas en la Jornada -->
+            <div class="section-card">
+                <div class="section-title text-success">
+                    <i class="bi bi-check2-square fs-5"></i> 1. Actividades Realizadas en la Jornada *
+                </div>
+                <p class="text-muted small mb-2">Describa las tareas cubiertas, soporte a docentes o estudiantes, rondas de supervisión y actividades concluidas.</p>
+                <textarea name="actividades_realizadas" id="textareaActividades" class="form-control" rows="4" placeholder="Ej: - Apertura de laboratorios 201 y 202 a las 06:15&#10;- Despacho de 8 portátiles para clase de Finanzas&#10;- Verificación de conectividad en Sala de Sistemas B..." required></textarea>
+            </div>
+
+            <!-- Sección 2: Equipos Pendientes por Devolver -->
+            <div class="section-card">
+                <div class="section-title text-danger">
+                    <i class="bi bi-laptop fs-5"></i> 2. Equipos y Préstamos Pendientes por Devolver
+                </div>
+                <p class="text-muted small mb-2">Equipos que aún se encuentran en préstamo docente o activos prestados que deben ser recibidos por la jornada entrante.</p>
+                <textarea name="equipos_pendientes" id="textareaEquipos" class="form-control font-monospace small" rows="3" placeholder="Ej: • Portátil HP [INV-042] prestado al Prof. Carlos Gómez en Salón 302 (Devuelve a las 15:30)."></textarea>
+            </div>
+
+            <!-- Sección 3: Novedades en Salas / Fallas Técnicas -->
+            <div class="section-card">
+                <div class="section-title text-warning">
+                    <i class="bi bi-pc-display fs-5"></i> 3. Novedades Técnicas en Salas o Equipos
+                </div>
+                <p class="text-muted small mb-2">Fallas de software o hardware identificadas en los salones o salas de cómputo durante la jornada.</p>
+                <textarea name="novedades_salas" id="textareaSalas" class="form-control font-monospace small" rows="3" placeholder="Ej: • Sala 104 - Equipo PC-12 no inicia por error de disco. Se reportó novedad a soporte."></textarea>
+            </div>
+
+            <!-- Sección 4: Tareas e Instrucciones para el Siguiente Turno -->
+            <div class="section-card">
+                <div class="section-title text-info">
+                    <i class="bi bi-pin-angle-fill fs-5"></i> 4. Tareas e Instrucciones para el Turno Entrante
+                </div>
+                <p class="text-muted small mb-2">Compromisos, recolección de equipos en aulas o recordatorios prioritarios para la siguiente jornada.</p>
+                <textarea name="pendientes_siguiente_turno" class="form-control" rows="3" placeholder="Ej: • Recibir el proyector del Auditorio a las 16:00.&#10;• Dejar cargando los portátiles del carrito 2 para la jornada de mañana."></textarea>
+            </div>
+
+            <!-- Sección 5: Observaciones Generales y Soporte Fotográfico -->
+            <div class="row g-3">
+                <div class="col-md-7">
+                    <div class="section-card h-100">
+                        <div class="section-title text-secondary">
+                            <i class="bi bi-chat-left-text fs-5"></i> Observaciones Generales
+                        </div>
+                        <textarea name="observaciones" class="form-control" rows="3" placeholder="Comentarios adicionales, felicitaciones, incidentes o notas de cierre de la jornada..."></textarea>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="section-card h-100">
+                        <div class="section-title text-primary">
+                            <i class="bi bi-camera-fill fs-5"></i> Soporte / Evidencia Fotográfica
+                        </div>
+                        <p class="text-muted small mb-2">Adjunte una foto de la bitácora física, del laboratorio o de algún equipo si aplica.</p>
+                        <input type="file" name="evidencia" accept="image/*" class="form-control mb-2">
+                        <small class="text-muted d-block"><i class="bi bi-info-circle me-1"></i>Formatos permitidos: JPG, PNG, WEBP (Máx. 5MB).</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pt-4 mt-3 border-top">
+                <a href="{{ url_for('entregas_turno.dashboard_entregas') }}" class="btn btn-outline-secondary fw-bold px-4 py-2">
+                    <i class="bi bi-x-circle me-1"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary fw-bold px-5 py-2 shadow-sm d-flex align-items-center gap-2">
+                    <i class="bi bi-send-fill"></i> Emitir y Enviar Entrega de Turno
+                </button>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<script>
+    function actualizarAsuntoPagina() {
+        const jornada = document.querySelector('input[name="jornada"]:checked')?.value || 'Mañana';
+        const sedeSelect = document.getElementById('selectSedePagina');
+        const sedeTexto = sedeSelect.options[sedeSelect.selectedIndex]?.text || 'Sede';
+        const fechaInput = document.getElementById('inputFechaPagina')?.value;
+        let fechaFormateada = '';
+        if (fechaInput) {
+            const partes = fechaInput.split('-');
+            if (partes.length === 3) {
+                fechaFormateada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+            }
+        }
+        if (!fechaFormateada) {
+            fechaFormateada = new Date().toLocaleDateString('es-CO');
+        }
+        document.getElementById('inputAsuntoPagina').value = `Entrega Turno ${jornada} — ${sedeTexto} (${fechaFormateada})`;
+    }
+
+    async function autoCargarResumenPagina() {
+        const btn = document.getElementById('btnAutoCargarPage');
+        const sedeSelect = document.getElementById('selectSedePagina');
+        const sedeId = sedeSelect.value;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Consultando...';
+
+        try {
+            const res = await fetch(`/entregas-turno/api/resumen-automatico?sede_id=${sedeId}`);
+            const data = await res.json();
+            if (data.success) {
+                if (data.equipos_pendientes_sugerido) {
+                    const eqArea = document.getElementById('textareaEquipos');
+                    eqArea.value = (eqArea.value ? eqArea.value + "\n" : "") + data.equipos_pendientes_sugerido;
+                }
+                if (data.novedades_salas_sugerido) {
+                    const salArea = document.getElementById('textareaSalas');
+                    salArea.value = (salArea.value ? salArea.value + "\n" : "") + data.novedades_salas_sugerido;
+                }
+                alert(`Resumen cargado con éxito:\n• ${data.total_prestamos_pendientes} préstamos activos sin devolver.\n• ${data.total_novedades_salas} novedades de salas de hoy.`);
+            } else {
+                alert('No se pudo obtener el resumen automático.');
+            }
+        } catch(e) {
+            alert('Error de conexión al consultar el resumen automático.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-lightning-charge-fill me-1"></i> Auto-Cargar Novedades';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!document.getElementById('inputAsuntoPagina').value) {
+            actualizarAsuntoPagina();
+        }
+    });
+</script>
+
+{% include 'components/footer.html' %}

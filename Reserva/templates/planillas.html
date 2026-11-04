@@ -1,0 +1,763 @@
+{% extends "base.html" %}
+
+{% block title %}Módulo de Planillas Excel — UNIMINUTO{% endblock %}
+
+{% block extra_css %}
+<style>
+    .planillas-hero {
+        background: linear-gradient(135deg, #002244 0%, #003366 50%, #004080 100%);
+        color: #ffffff;
+        border-radius: 1rem;
+        padding: 2.2rem 2.5rem;
+        box-shadow: 0 10px 25px -5px rgba(0, 34, 68, 0.25);
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .planillas-hero::after {
+        content: "";
+        position: absolute;
+        top: -40%;
+        right: -10%;
+        width: 320px;
+        height: 320px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 70%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    .module-card {
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        background: #ffffff;
+        overflow: hidden;
+    }
+    .module-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px -8px rgba(15, 23, 42, 0.12);
+        border-color: #cbd5e1;
+    }
+    .card-accent-strip {
+        height: 5px;
+        width: 100%;
+    }
+    .dropzone-box {
+        border: 2px dashed #cbd5e1;
+        border-radius: 0.85rem;
+        padding: 1.5rem 1rem;
+        text-align: center;
+        background: #f8fafc;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .dropzone-box:hover, .dropzone-box.dragover {
+        border-color: #003366;
+        background: #eff6ff;
+    }
+    .dropzone-box input[type="file"] {
+        display: none;
+    }
+    .columns-badge-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        max-height: 85px;
+        overflow-y: auto;
+    }
+    .badge-col-req {
+        background-color: #fee2e2;
+        color: #991b1b;
+        font-weight: 600;
+        font-size: 0.72rem;
+        border: 1px solid #fecaca;
+    }
+    .badge-col-opt {
+        background-color: #f1f5f9;
+        color: #475569;
+        font-size: 0.72rem;
+        border: 1px solid #e2e8f0;
+    }
+    .stat-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 0.85rem;
+        border-radius: 9999px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(4px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3 px-md-4 py-4">
+
+    <!-- HERO HEADER -->
+    <div class="planillas-hero">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-warning text-dark fw-bold px-3 py-1">
+                        <i class="bi bi-file-earmark-excel-fill me-1"></i> EXCEL & CSV
+                    </span>
+                    <span class="stat-pill">
+                        <i class="bi bi-geo-alt-fill text-warning"></i> Sede activa: {{ user_sede_nombre }}
+                    </span>
+                </div>
+                <h1 class="display-6 fw-bold mb-2">Módulo Central de Planillas Excel</h1>
+                <p class="lead mb-0 text-white-50" style="font-size: 1.05rem;">
+                    Descarga plantillas estandarizadas con validación institucional y sube información masiva para actualizar el inventario, profesores, reservas de salones y niñeras, colaboradores, estudiantes y salas de cómputo.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <a href="{{ url_for('reservas.reservas_main') }}" class="btn btn-outline-light me-2 mb-2">
+                    <i class="bi bi-calendar-check me-1"></i> Ir a Reservas
+                </a>
+                <a href="{{ url_for('inventario.inventario_main') }}" class="btn btn-outline-light me-2 mb-2">
+                    <i class="bi bi-box-seam me-1"></i> Ir a Inventario
+                </a>
+                <a href="{{ url_for('usuarios.usuarios_dashboard') }}" class="btn btn-light text-primary fw-bold mb-2">
+                    <i class="bi bi-people me-1"></i> Ir a Usuarios
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICACIONES Y REPORTES DE IMPORTACIÓN -->
+    {% if resultado %}
+    <div class="card border-0 shadow-sm mb-4" style="background:#f0fdf4; border-left: 5px solid #16a34a !important;">
+        <div class="card-body p-4">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-success text-white p-3 d-flex align-items-center justify-content-center" style="width:48px;height:48px;">
+                        <i class="bi bi-check-lg fs-4"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0 text-success">Reporte de Carga Masiva: {{ resultado.modulo }}</h5>
+                        <p class="text-muted small mb-0">{{ resultado.mensaje }}</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" onclick="this.closest('.card').remove()"></button>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-sm-4 col-md-3">
+                    <div class="p-3 bg-white rounded border text-center">
+                        <div class="text-muted small fw-bold text-uppercase">Nuevos Registros</div>
+                        <div class="fs-3 fw-bold text-success">{{ resultado.insertados }}</div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-md-3">
+                    <div class="p-3 bg-white rounded border text-center">
+                        <div class="text-muted small fw-bold text-uppercase">Actualizados</div>
+                        <div class="fs-3 fw-bold text-primary">{{ resultado.actualizados }}</div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-md-3">
+                    <div class="p-3 bg-white rounded border text-center">
+                        <div class="text-muted small fw-bold text-uppercase">Omitidos / Duplicados</div>
+                        <div class="fs-3 fw-bold text-warning">{{ resultado.omitidos }}</div>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-md-3">
+                    <div class="p-3 bg-white rounded border text-center">
+                        <div class="text-muted small fw-bold text-uppercase">Errores en Filas</div>
+                        <div class="fs-3 fw-bold {% if resultado.errores %}text-danger{% else %}text-muted{% endif %}">
+                            {{ resultado.errores|length }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if resultado.errores %}
+            <div class="mt-3">
+                <h6 class="fw-bold text-danger"><i class="bi bi-exclamation-octagon me-1"></i>Detalle de filas con errores:</h6>
+                <div class="table-responsive rounded border bg-white" style="max-height: 220px;">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Fila</th>
+                                <th>Identificador / Código</th>
+                                <th>Causa del Error</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for err in resultado.errores %}
+                            <tr>
+                                <td class="fw-bold">Fila {{ err.fila }}</td>
+                                <td><code>{{ err.id }}</code></td>
+                                <td class="text-danger small">{{ err.razon or err.razones|join(', ') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- GRID DE MÓDULOS DE PLANILLAS -->
+    <div class="row g-4">
+
+        <!-- 1. INVENTARIO & FICHA TÉCNICA (HOJA DE VIDA) -->
+        <div class="col-lg-6 col-xl-4">
+            <div class="card module-card h-100">
+                <div class="card-accent-strip" style="background:#0284c7;"></div>
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="p-2 rounded bg-primary-subtle text-primary">
+                                <i class="bi bi-archive-fill fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-0">Inventario & Ficha Técnica</h5>
+                                <small class="text-muted">{{ stats.inventario }} ítems registrados</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Hoja de Vida</span>
+                    </div>
+
+                    <p class="text-muted small mb-3">
+                        Plantilla con ficha técnica de hardware (CPU, RAM, Almacenamiento, SO), activo fijo, lotes de accesorios y fechas de compra/garantía.
+                    </p>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary mb-1">Columnas reconocidas:</label>
+                        <div class="columns-badge-wrap">
+                            <span class="badge badge-col-req">item *</span>
+                            <span class="badge badge-col-opt">categoria</span>
+                            <span class="badge badge-col-opt">marca_modelo</span>
+                            <span class="badge badge-col-opt">serial</span>
+                            <span class="badge badge-col-opt">activo_fijo</span>
+                            <span class="badge badge-col-opt">numero_inventario</span>
+                            <span class="badge badge-col-opt" style="background:#e0f2fe;color:#0369a1;border:1px solid #bae6fd;"><i class="bi bi-hdd-network me-1"></i>hostname</span>
+                            <span class="badge badge-col-opt">estado</span>
+                            <span class="badge badge-col-opt">es_por_cantidad</span>
+                            <span class="badge badge-col-opt">procesador</span>
+                            <span class="badge badge-col-opt">ram_gb</span>
+                            <span class="badge badge-col-opt">almacenamiento</span>
+                            <span class="badge badge-col-opt">sistema_operativo</span>
+                            <span class="badge badge-col-opt">proveedor</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-3 border-top">
+                        <div class="d-flex flex-column gap-2 mb-3">
+                            <a href="{{ url_for('planillas.descargar_plantilla_inventario') }}" class="btn btn-outline-primary btn-sm fw-bold">
+                                <i class="bi bi-download me-1"></i> Descargar Plantilla Inventario Completa (.xlsx)
+                            </a>
+                            <a href="{{ url_for('planillas.descargar_plantilla_actualizacion_red') }}" class="btn btn-outline-info text-dark btn-sm fw-bold shadow-xs">
+                                <i class="bi bi-hdd-network me-1"></i> Descargar Plantilla Hostnames & Ubicaciones (.xlsx)
+                            </a>
+                        </div>
+
+                        <!-- Dropzone / Form de carga -->
+                        <form action="{{ url_for('planillas.subir_planilla_inventario') }}" method="POST" enctype="multipart/form-data" class="form-subir-planilla" data-modulo="Inventario">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="dropzone-box" onclick="this.querySelector('input[type=file]').click();">
+                                <i class="bi bi-cloud-arrow-up text-primary fs-3 d-block mb-1"></i>
+                                <span class="small fw-bold text-dark d-block file-name-preview">Arrastra tu archivo aquí o haz clic</span>
+                                <span class="text-muted" style="font-size:0.75rem;">Soporta .xlsx, .xls y .csv</span>
+                                <input type="file" name="archivo_excel" accept=".xlsx,.xls,.csv" required onchange="handleFileSelected(this)">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 mt-2 fw-bold btn-submit-upload" disabled>
+                                <i class="bi bi-upload me-1"></i> Subir Planilla Inventario
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1.B ACTUALIZACIÓN MASIVA DE HOSTNAMES Y RED (HERRAMIENTA ESPECIAL) -->
+        <div class="col-lg-6 col-xl-4">
+            <div class="card module-card h-100 border-info border-opacity-25 shadow-sm">
+                <div class="card-accent-strip" style="background:#0284c7;"></div>
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="p-2 rounded bg-info-subtle text-info">
+                                <i class="bi bi-hdd-network-fill fs-4 text-primary"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-0">Hostnames & Red</h5>
+                                <small class="text-muted">Actualización segura sin alterar inventario</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-primary text-white">Equipos</span>
+                    </div>
+
+                    <p class="text-muted small mb-3">
+                        Actualiza en lote el <strong>Hostname / Nombre de red</strong> y la <strong>Ubicación</strong> de tus equipos existentes cruzando por número de inventario o serial.
+                    </p>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold mb-1">COLUMNAS DE CRUCE:</label>
+                        <div class="columns-badge-wrap">
+                            <span class="badge badge-col-req">numero_inventario</span>
+                            <span class="badge badge-col-opt">serial</span>
+                            <span class="badge badge-col-opt">activo_fijo</span>
+                            <span class="badge badge-col-req" style="background:#0284c7;color:#fff;">hostname</span>
+                            <span class="badge badge-col-opt">ubicacion_permanente</span>
+                            <span class="badge badge-col-opt">bodega</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-3 border-top">
+                        <div class="mb-3">
+                            <a href="{{ url_for('planillas.descargar_plantilla_actualizacion_red') }}" class="btn btn-outline-info text-dark btn-sm w-100 fw-bold">
+                                <i class="bi bi-download me-1"></i> Descargar Formato Hostname (.xlsx)
+                            </a>
+                        </div>
+
+                        <!-- Dropzone / Form de carga rápida -->
+                        <form action="{{ url_for('planillas.actualizar_red_masivo') }}" method="POST" enctype="multipart/form-data" class="form-subir-planilla" data-modulo="Hostnames y Red">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="dropzone-box" onclick="this.querySelector('input[type=file]').click();">
+                                <i class="bi bi-cloud-arrow-up text-info fs-3 d-block mb-1"></i>
+                                <span class="small fw-bold text-dark d-block file-name-preview">Arrastra tu archivo aquí o haz clic</span>
+                                <span class="text-muted" style="font-size:0.75rem;">Formato Excel (.xlsx) o .csv</span>
+                                <input type="file" name="archivo_excel" accept=".xlsx,.xls,.csv" required onchange="handleFileSelected(this)">
+                            </div>
+                            <button type="submit" class="btn btn-info text-white w-100 mt-2 fw-bold btn-submit-upload" disabled>
+                                <i class="bi bi-arrow-repeat me-1"></i> Aplicar Hostnames & Ubicaciones
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. DOCENTES / PROFESORES -->
+        <div class="col-lg-6 col-xl-4">
+            <div class="card module-card h-100">
+                <div class="card-accent-strip" style="background:#10b981;"></div>
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="p-2 rounded bg-success-subtle text-success">
+                                <i class="bi bi-person-badge-fill fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-0">Profesores / Docentes</h5>
+                                <small class="text-muted">{{ stats.profesores }} profesores registrados</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle">Académico</span>
+                    </div>
+
+                    <p class="text-muted small mb-3">
+                        Carga masiva de docentes institucionales para agilizar préstamos de equipos y reservas de salones por programa.
+                    </p>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary mb-1">Columnas reconocidas:</label>
+                        <div class="columns-badge-wrap">
+                            <span class="badge badge-col-req">cedula *</span>
+                            <span class="badge badge-col-req">nombre_completo *</span>
+                            <span class="badge badge-col-opt">correo</span>
+                            <span class="badge badge-col-opt">telefono</span>
+                            <span class="badge badge-col-opt">programa</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-3 border-top">
+                        <div class="d-flex gap-2 mb-3">
+                            <a href="{{ url_for('planillas.descargar_plantilla_profesores') }}" class="btn btn-outline-success btn-sm flex-fill fw-bold">
+                                <i class="bi bi-download me-1"></i> Descargar Plantilla
+                            </a>
+                        </div>
+
+                        <form action="{{ url_for('planillas.subir_planilla_profesores') }}" method="POST" enctype="multipart/form-data" class="form-subir-planilla" data-modulo="Profesores">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="dropzone-box" onclick="this.querySelector('input[type=file]').click();">
+                                <i class="bi bi-cloud-arrow-up text-success fs-3 d-block mb-1"></i>
+                                <span class="small fw-bold text-dark d-block file-name-preview">Arrastra tu archivo aquí o haz clic</span>
+                                <span class="text-muted" style="font-size:0.75rem;">Soporta .xlsx, .xls y .csv</span>
+                                <input type="file" name="archivo_excel" accept=".xlsx,.xls,.csv" required onchange="handleFileSelected(this)">
+                            </div>
+                            <button type="submit" class="btn btn-success w-100 mt-2 fw-bold btn-submit-upload" disabled>
+                                <i class="bi bi-upload me-1"></i> Subir Planilla Profesores
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. COLABORADORES (HORARIOS 42H Y TURNOS) -->
+        <div class="col-lg-6 col-xl-4">
+            <div class="card module-card h-100">
+                <div class="card-accent-strip" style="background:#6366f1;"></div>
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="p-2 rounded bg-indigo-subtle text-indigo" style="background:#e0e7ff;color:#4338ca;">
+                                <i class="bi bi-people-fill fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-0">Colaboradores & Turnos</h5>
+                                <small class="text-muted">{{ stats.colaboradores }} auxiliares activos</small>
+                            </div>
+                        </div>
+                        <span class="badge" style="background:#e0e7ff;color:#4338ca;border:1px solid #c7d2fe;">42h Legal</span>
+                    </div>
+
+                    <p class="text-muted small mb-3">
+                        Personal operativo de soporte y salas. Asignación automática de sede activa o sedes específicas (Perdomo / Principal).
+                    </p>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary mb-1">Columnas reconocidas:</label>
+                        <div class="columns-badge-wrap">
+                            <span class="badge badge-col-req">nombre_completo *</span>
+                            <span class="badge badge-col-opt">documento</span>
+                            <span class="badge badge-col-opt">cargo</span>
+                            <span class="badge badge-col-opt">correo</span>
+                            <span class="badge badge-col-opt">telefono</span>
+                            <span class="badge badge-col-opt">sede</span>
+                            <span class="badge badge-col-opt">total_horas_semana</span>
+                            <span class="badge badge-col-opt">horario_resumen</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-3 border-top">
+                        <div class="d-flex gap-2 mb-3">
+                            <a href="{{ url_for('planillas.descargar_plantilla_colaboradores') }}" class="btn btn-outline-primary btn-sm flex-fill fw-bold" style="border-color:#6366f1;color:#6366f1;">
+                                <i class="bi bi-download me-1"></i> Descargar Plantilla
+                            </a>
+                        </div>
+
+                        <form action="{{ url_for('planillas.subir_planilla_colaboradores') }}" method="POST" enctype="multipart/form-data" class="form-subir-planilla" data-modulo="Colaboradores">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="dropzone-box" onclick="this.querySelector('input[type=file]').click();">
+                                <i class="bi bi-cloud-arrow-up fs-3 d-block mb-1" style="color:#6366f1;"></i>
+                                <span class="small fw-bold text-dark d-block file-name-preview">Arrastra tu archivo aquí o haz clic</span>
+                                <span class="text-muted" style="font-size:0.75rem;">Soporta .xlsx, .xls y .csv</span>
+                                <input type="file" name="archivo_excel" accept=".xlsx,.xls,.csv" required onchange="handleFileSelected(this)">
+                            </div>
+                            <button type="submit" class="btn w-100 mt-2 fw-bold text-white btn-submit-upload" style="background:#6366f1;" disabled>
+                                <i class="bi bi-upload me-1"></i> Subir Planilla Colaboradores
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. ESTUDIANTES -->
+        <div class="col-lg-6 col-xl-4">
+            <div class="card module-card h-100">
+                <div class="card-accent-strip" style="background:#8b5cf6;"></div>
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="p-2 rounded bg-purple-subtle text-purple" style="background:#f3e8ff;color:#7e22ce;">
+                                <i class="bi bi-mortarboard-fill fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-0">Estudiantes</h5>
+                                <small class="text-muted">{{ stats.estudiantes }} estudiantes registrados</small>
+                            </div>
+                        </div>
+                        <span class="badge" style="background:#f3e8ff;color:#7e22ce;border:1px solid #e9d5ff;">ID Banner</span>
+                    </div>
+
+                    <p class="text-muted small mb-3">
+                        Padrón estudiantil por código Banner, programa académico, sede y jornada para control de asistencias y soporte.
+                    </p>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary mb-1">Columnas reconocidas:</label>
+                        <div class="columns-badge-wrap">
+                            <span class="badge badge-col-req">codigo_banner *</span>
+                            <span class="badge badge-col-req">nombre_completo *</span>
+                            <span class="badge badge-col-opt">documento</span>
+                            <span class="badge badge-col-opt">tipo_documento</span>
+                            <span class="badge badge-col-opt">correo</span>
+                            <span class="badge badge-col-opt">telefono</span>
+                            <span class="badge badge-col-opt">programa</span>
+                            <span class="badge badge-col-opt">sede</span>
+                            <span class="badge badge-col-opt">jornada</span>
+                            <span class="badge badge-col-opt">semestre</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-3 border-top">
+                        <div class="d-flex gap-2 mb-3">
+                            <a href="{{ url_for('planillas.descargar_plantilla_estudiantes') }}" class="btn btn-outline-purple btn-sm flex-fill fw-bold" style="border-color:#8b5cf6;color:#8b5cf6;">
+                                <i class="bi bi-download me-1"></i> Descargar Plantilla
+                            </a>
+                        </div>
+
+                        <form action="{{ url_for('planillas.subir_planilla_estudiantes') }}" method="POST" enctype="multipart/form-data" class="form-subir-planilla" data-modulo="Estudiantes">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="dropzone-box" onclick="this.querySelector('input[type=file]').click();">
+                                <i class="bi bi-cloud-arrow-up fs-3 d-block mb-1" style="color:#8b5cf6;"></i>
+                                <span class="small fw-bold text-dark d-block file-name-preview">Arrastra tu archivo aquí o haz clic</span>
+                                <span class="text-muted" style="font-size:0.75rem;">Soporta .xlsx, .xls y .csv</span>
+                                <input type="file" name="archivo_excel" accept=".xlsx,.xls,.csv" required onchange="handleFileSelected(this)">
+                            </div>
+                            <button type="submit" class="btn w-100 mt-2 fw-bold text-white btn-submit-upload" style="background:#8b5cf6;" disabled>
+                                <i class="bi bi-upload me-1"></i> Subir Planilla Estudiantes
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. SALAS DE CÓMPUTO & CLASES -->
+        <div class="col-lg-6 col-xl-4">
+            <div class="card module-card h-100">
+                <div class="card-accent-strip" style="background:#06b6d4;"></div>
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="p-2 rounded bg-info-subtle text-info">
+                                <i class="bi bi-pc-display fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-0">Salas de Cómputo</h5>
+                                <small class="text-muted">{{ stats.salas_computo }} clases programadas</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-info-subtle text-info border border-info-subtle">Horarios</span>
+                    </div>
+
+                    <p class="text-muted small mb-3">
+                        Programación académica en bloque para salones de sistemas (LS1, LS2, LS3 en Perdomo o Torres A/B/C/D en Principal).
+                    </p>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary mb-1">Columnas reconocidas:</label>
+                        <div class="columns-badge-wrap">
+                            <span class="badge badge-col-req">fecha *</span>
+                            <span class="badge badge-col-req">hora_inicio *</span>
+                            <span class="badge badge-col-req">hora_fin *</span>
+                            <span class="badge badge-col-req">salon *</span>
+                            <span class="badge badge-col-req">nombre_profesor *</span>
+                            <span class="badge badge-col-req">materia *</span>
+                            <span class="badge badge-col-opt">asistencia</span>
+                            <span class="badge badge-col-opt">num_estudiantes</span>
+                            <span class="badge badge-col-opt">programa</span>
+                            <span class="badge badge-col-opt">observaciones</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-3 border-top">
+                        <div class="d-flex gap-2 mb-3">
+                            <a href="{{ url_for('planillas.descargar_plantilla_salas_computo') }}" class="btn btn-outline-info btn-sm flex-fill fw-bold">
+                                <i class="bi bi-download me-1"></i> Descargar Plantilla
+                            </a>
+                        </div>
+
+                        <form action="{{ url_for('planillas.subir_planilla_salas_computo') }}" method="POST" enctype="multipart/form-data" class="form-subir-planilla" data-modulo="Salas">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="dropzone-box" onclick="this.querySelector('input[type=file]').click();">
+                                <i class="bi bi-cloud-arrow-up text-info fs-3 d-block mb-1"></i>
+                                <span class="small fw-bold text-dark d-block file-name-preview">Arrastra tu archivo aquí o haz clic</span>
+                                <span class="text-muted" style="font-size:0.75rem;">Soporta .xlsx, .xls y .csv</span>
+                                <input type="file" name="archivo_excel" accept=".xlsx,.xls,.csv" required onchange="handleFileSelected(this)">
+                            </div>
+                            <button type="submit" class="btn btn-info w-100 mt-2 fw-bold text-white btn-submit-upload" disabled>
+                                <i class="bi bi-upload me-1"></i> Subir Planilla Salas
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. USUARIOS DEL SISTEMA -->
+        <div class="col-lg-6 col-xl-4">
+            <div class="card module-card h-100">
+                <div class="card-accent-strip" style="background:#f59e0b;"></div>
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="p-2 rounded bg-warning-subtle text-warning-emphasis">
+                                <i class="bi bi-shield-lock-fill fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-0">Usuarios & Auxiliares</h5>
+                                <small class="text-muted">{{ stats.usuarios }} cuentas del sistema</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">Seguridad</span>
+                    </div>
+
+                    <p class="text-muted small mb-3">
+                        Creación masiva de auxiliares y administradores con credenciales encriptadas y asignación de roles.
+                    </p>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary mb-1">Columnas reconocidas:</label>
+                        <div class="columns-badge-wrap">
+                            <span class="badge badge-col-req">documento *</span>
+                            <span class="badge badge-col-req">nombre_completo *</span>
+                            <span class="badge badge-col-req">correo *</span>
+                            <span class="badge badge-col-req">contrasena *</span>
+                            <span class="badge badge-col-opt">rol</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-3 border-top">
+                        <div class="d-flex gap-2 mb-3">
+                            <a href="{{ url_for('planillas.descargar_plantilla_usuarios') }}" class="btn btn-outline-warning btn-sm flex-fill fw-bold text-dark">
+                                <i class="bi bi-download me-1"></i> Descargar Plantilla
+                            </a>
+                        </div>
+
+                        <form action="{{ url_for('planillas.subir_planilla_usuarios') }}" method="POST" enctype="multipart/form-data" class="form-subir-planilla" data-modulo="Usuarios">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="dropzone-box" onclick="this.querySelector('input[type=file]').click();">
+                                <i class="bi bi-cloud-arrow-up text-warning fs-3 d-block mb-1"></i>
+                                <span class="small fw-bold text-dark d-block file-name-preview">Arrastra tu archivo aquí o haz clic</span>
+                                <span class="text-muted" style="font-size:0.75rem;">Soporta .xlsx, .xls y .csv</span>
+                                <input type="file" name="archivo_excel" accept=".xlsx,.xls,.csv" required onchange="handleFileSelected(this)">
+                            </div>
+                            <button type="submit" class="btn btn-warning w-100 mt-2 fw-bold text-dark btn-submit-upload" disabled>
+                                <i class="bi bi-upload me-1"></i> Subir Planilla Usuarios
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. RESERVAS DE SALONES, ESPACIOS Y RECURSOS -->
+        <div class="col-lg-6 col-xl-4">
+            <div class="card module-card h-100">
+                <div class="card-accent-strip" style="background:#e11d48;"></div>
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="p-2 rounded bg-danger-subtle text-danger" style="background:#ffe4e6;color:#e11d48;">
+                                <i class="bi bi-calendar-check-fill fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-0">Reservas de Espacios</h5>
+                                <small class="text-muted">{{ stats.reservas }} reservas registradas</small>
+                            </div>
+                        </div>
+                        <span class="badge" style="background:#ffe4e6;color:#e11d48;border:1px solid #fecdd3;">Salones & Niñeras</span>
+                    </div>
+
+                    <p class="text-muted small mb-3">
+                        Programación masiva de reservas para salones, aulas de cómputo, niñeras móviles y auditorios por docente, jornada y sede.
+                    </p>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary mb-1">Columnas reconocidas:</label>
+                        <div class="columns-badge-wrap">
+                            <span class="badge badge-col-req">cedula_profesor *</span>
+                            <span class="badge badge-col-req">recurso_nombre *</span>
+                            <span class="badge badge-col-req">fecha *</span>
+                            <span class="badge badge-col-req">hora_inicio *</span>
+                            <span class="badge badge-col-req">hora_fin *</span>
+                            <span class="badge badge-col-opt">nombre_profesor</span>
+                            <span class="badge badge-col-opt">recurso_tipo</span>
+                            <span class="badge badge-col-opt">jornada</span>
+                            <span class="badge badge-col-opt">nrc</span>
+                            <span class="badge badge-col-opt">programa</span>
+                            <span class="badge badge-col-opt">sede</span>
+                            <span class="badge badge-col-opt">tipo_reserva</span>
+                            <span class="badge badge-col-opt">observaciones</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-3 border-top">
+                        <div class="d-flex gap-2 mb-3">
+                            <a href="{{ url_for('planillas.descargar_plantilla_reservas') }}" class="btn btn-outline-danger btn-sm flex-fill fw-bold" style="border-color:#e11d48;color:#e11d48;">
+                                <i class="bi bi-download me-1"></i> Descargar Plantilla
+                            </a>
+                        </div>
+
+                        <form action="{{ url_for('planillas.subir_planilla_reservas') }}" method="POST" enctype="multipart/form-data" class="form-subir-planilla" data-modulo="Reservas">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="dropzone-box" onclick="this.querySelector('input[type=file]').click();">
+                                <i class="bi bi-cloud-arrow-up fs-3 d-block mb-1" style="color:#e11d48;"></i>
+                                <span class="small fw-bold text-dark d-block file-name-preview">Arrastra tu archivo aquí o haz clic</span>
+                                <span class="text-muted" style="font-size:0.75rem;">Soporta .xlsx, .xls y .csv</span>
+                                <input type="file" name="archivo_excel" accept=".xlsx,.xls,.csv" required onchange="handleFileSelected(this)">
+                            </div>
+                            <button type="submit" class="btn w-100 mt-2 fw-bold text-white btn-submit-upload" style="background:#e11d48;" disabled>
+                                <i class="bi bi-upload me-1"></i> Subir Planilla Reservas
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- SCRIPT DE INTERACTIVIDAD PARA DRAG & DROP Y SUBIDA -->
+<script>
+function handleFileSelected(input) {
+    const form = input.closest('form');
+    const preview = form.querySelector('.file-name-preview');
+    const submitBtn = form.querySelector('.btn-submit-upload');
+
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        preview.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+        preview.classList.add('text-primary');
+        if (submitBtn) submitBtn.disabled = false;
+    } else {
+        preview.textContent = 'Arrastra tu archivo aquí o haz clic';
+        preview.classList.remove('text-primary');
+        if (submitBtn) submitBtn.disabled = true;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Soporte visual Drag & Drop
+    document.querySelectorAll('.dropzone-box').forEach(box => {
+        ['dragenter', 'dragover'].forEach(eventName => {
+            box.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                box.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            box.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                box.classList.remove('dragover');
+            }, false);
+        });
+
+        box.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            const input = box.querySelector('input[type=file]');
+            if (files && files.length > 0) {
+                input.files = files;
+                handleFileSelected(input);
+            }
+        });
+    });
+
+    // Estado de carga al enviar cualquier formulario de planilla
+    document.querySelectorAll('.form-subir-planilla').forEach(form => {
+        form.addEventListener('submit', function () {
+            const btn = this.querySelector('.btn-submit-upload');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Procesando planilla...';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

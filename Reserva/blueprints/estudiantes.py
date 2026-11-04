@@ -19,75 +19,8 @@ estudiantes_bp = Blueprint('estudiantes', __name__, url_prefix='/estudiantes')
 @estudiantes_bp.route('/', methods=['GET'])
 @login_required
 def estudiantes_main():
-    """Vista principal de gestión de estudiantes."""
-    sede_filtro = request.args.get('sede', '').strip()
-    programa_filtro = request.args.get('programa', '').strip()
-    busqueda = request.args.get('q', '').strip()
-
-    query = Estudiante.query
-
-    if sede_filtro:
-        query = query.filter(
-            or_(
-                Estudiante.descripcion_sede.ilike(f"%{sede_filtro}%"),
-                Estudiante.sede_id == int(sede_filtro) if sede_filtro.isdigit() else False
-            )
-        )
-
-    if programa_filtro:
-        if programa_filtro.isdigit():
-            query = query.filter(Estudiante.programa_id == int(programa_filtro))
-        else:
-            query = query.filter(
-                or_(
-                    Estudiante.atributo_programa.ilike(f"%{programa_filtro}%"),
-                    Estudiante.programa_rel.has(ProgramaAcademico.nombre.ilike(f"%{programa_filtro}%"))
-                )
-            )
-
-    if busqueda:
-        query = query.filter(
-            or_(
-                Estudiante.nombre_completo.ilike(f"%{busqueda}%"),
-                Estudiante.codigo_banner.ilike(f"%{busqueda}%"),
-                Estudiante.documento.ilike(f"%{busqueda}%"),
-                Estudiante.correo.ilike(f"%{busqueda}%")
-            )
-        )
-
-    # Limitar la carga en la vista a los primeros 500 registros para velocidad óptima
-    estudiantes = query.order_by(Estudiante.nombre_completo.asc()).limit(500).all()
-
-    # Métricas / KPIs
-    total_estudiantes = Estudiante.query.count()
-    total_activos = Estudiante.query.filter_by(activo=True).count()
-    total_engativa = Estudiante.query.filter(Estudiante.descripcion_sede.ilike('%ENGATIVA%')).count()
-    total_cd_bolivar = Estudiante.query.filter(Estudiante.descripcion_sede.ilike('%BOLIVAR%')).count()
-
-    programas = ProgramaAcademico.query.filter_by(activo=True).order_by(ProgramaAcademico.nombre.asc()).all()
-    sedes = Sede.query.order_by(Sede.nombre.asc()).all()
-
-    kpis = {
-        'total': total_estudiantes,
-        'activos': total_activos,
-        'engativa': total_engativa,
-        'cd_bolivar': total_cd_bolivar
-    }
-
-    filtros = {
-        'sede': sede_filtro,
-        'programa': programa_filtro,
-        'q': busqueda
-    }
-
-    return render_template(
-        'estudiantes.html',
-        estudiantes=estudiantes,
-        programas=programas,
-        sedes=sedes,
-        kpis=kpis,
-        filtros=filtros
-    )
+    """Redirige a la pestaña de estudiantes en el Directorio Unificado de Usuarios."""
+    return redirect(url_for('usuarios.usuarios_dashboard', tab='estudiantes'))
 
 
 @estudiantes_bp.route('/api/buscar', methods=['GET'])

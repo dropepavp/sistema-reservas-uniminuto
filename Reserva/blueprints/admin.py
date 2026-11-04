@@ -41,7 +41,10 @@ PERMISSION_MODULES = [
     'salas_computo',
     'colaboradores',
     'estadisticas',
-    'bitacora'
+    'bitacora',
+    'mantenimiento',
+    'usuarios',
+    'entregas_turno'
 ]
 
 ROLE_PRESETS = {
@@ -1064,24 +1067,38 @@ def eliminar_categoria(id):
 @admin_required
 def agregar_sede():
     """Agrega una nueva sede."""
+    is_json = request.is_json or request.headers.get('Accept') == 'application/json' or request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     try:
-        nombre = request.form.get('nombre', '').strip().upper()
+        data = request.get_json(silent=True) or request.form
+        nombre = (data.get('nombre') or '').strip().upper()
         if not nombre:
-            flash('El nombre de la sede es requerido.', 'warning')
+            msg = 'El nombre de la sede es requerido.'
+            if is_json:
+                return jsonify({'success': False, 'message': msg}), 400
+            flash(msg, 'warning')
             return redirect(url_for('admin.sedes_bodegas_main'))
         
         if Sede.query.filter_by(nombre=nombre).first():
-            flash(f'La sede "{nombre}" ya existe.', 'warning')
+            msg = f'La sede "{nombre}" ya existe.'
+            if is_json:
+                return jsonify({'success': False, 'message': msg}), 400
+            flash(msg, 'warning')
             return redirect(url_for('admin.sedes_bodegas_main'))
         
         nueva_sede = Sede(nombre=nombre)
         db.session.add(nueva_sede)
         db.session.commit()
         
-        flash(f'Sede "{nombre}" agregada exitosamente.', 'success')
+        msg = f'Sede "{nombre}" agregada exitosamente.'
+        if is_json:
+            return jsonify({'success': True, 'message': msg, 'id': nueva_sede.id, 'nombre': nueva_sede.nombre})
+        flash(msg, 'success')
     except Exception as e:
         db.session.rollback()
-        flash(f'Error al agregar sede: {str(e)}', 'danger')
+        msg = f'Error al agregar sede: {str(e)}'
+        if is_json:
+            return jsonify({'success': False, 'message': msg}), 500
+        flash(msg, 'danger')
     
     return redirect(url_for('admin.sedes_bodegas_main'))
 
@@ -1090,27 +1107,41 @@ def agregar_sede():
 @admin_required
 def agregar_bodega():
     """Agrega una nueva bodega vinculada a una sede."""
+    is_json = request.is_json or request.headers.get('Accept') == 'application/json' or request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     try:
-        nombre = request.form.get('nombre', '').strip().upper()
-        sede_id = request.form.get('sede_id')
+        data = request.get_json(silent=True) or request.form
+        nombre = (data.get('nombre') or '').strip().upper()
+        sede_id = data.get('sede_id')
         
         if not nombre or not sede_id:
-            flash('Nombre y Sede son requeridos.', 'warning')
+            msg = 'Nombre y Sede son requeridos.'
+            if is_json:
+                return jsonify({'success': False, 'message': msg}), 400
+            flash(msg, 'warning')
             return redirect(url_for('admin.sedes_bodegas_main'))
         
-        sede = Sede.query.get(sede_id)
+        sede = Sede.query.get(int(sede_id)) if str(sede_id).isdigit() else None
         if not sede:
-            flash('Sede no válida.', 'danger')
+            msg = 'Sede no válida.'
+            if is_json:
+                return jsonify({'success': False, 'message': msg}), 400
+            flash(msg, 'danger')
             return redirect(url_for('admin.sedes_bodegas_main'))
             
-        nueva_bodega = Bodega(nombre=nombre, sede_id=sede_id)
+        nueva_bodega = Bodega(nombre=nombre, sede_id=sede.id)
         db.session.add(nueva_bodega)
         db.session.commit()
         
-        flash(f'Bodega "{nombre}" agregada a {sede.nombre} exitosamente.', 'success')
+        msg = f'Bodega "{nombre}" agregada a {sede.nombre} exitosamente.'
+        if is_json:
+            return jsonify({'success': True, 'message': msg, 'id': nueva_bodega.id, 'nombre': nueva_bodega.nombre})
+        flash(msg, 'success')
     except Exception as e:
         db.session.rollback()
-        flash(f'Error al agregar bodega: {str(e)}', 'danger')
+        msg = f'Error al agregar bodega: {str(e)}'
+        if is_json:
+            return jsonify({'success': False, 'message': msg}), 500
+        flash(msg, 'danger')
     
     return redirect(url_for('admin.sedes_bodegas_main'))
 
@@ -1119,32 +1150,49 @@ def agregar_bodega():
 @admin_required
 def editar_sede():
     """Modifica el nombre de una sede."""
+    is_json = request.is_json or request.headers.get('Accept') == 'application/json' or request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     try:
-        id = request.form.get('id')
-        nuevo_nombre = request.form.get('nombre', '').strip().upper()
+        data = request.get_json(silent=True) or request.form
+        id = data.get('id')
+        nuevo_nombre = (data.get('nombre') or '').strip().upper()
         
-        sede = Sede.query.get(id)
+        sede = Sede.query.get(int(id)) if id and str(id).isdigit() else None
         if not sede:
-            flash('Sede no encontrada.', 'danger')
+            msg = 'Sede no encontrada.'
+            if is_json:
+                return jsonify({'success': False, 'message': msg}), 404
+            flash(msg, 'danger')
             return redirect(url_for('admin.sedes_bodegas_main'))
             
         if not nuevo_nombre:
-            flash('El nombre es requerido.', 'warning')
+            msg = 'El nombre es requerido.'
+            if is_json:
+                return jsonify({'success': False, 'message': msg}), 400
+            flash(msg, 'warning')
             return redirect(url_for('admin.sedes_bodegas_main'))
 
         # Verificar si ya existe otra sede con ese nombre
         existente = Sede.query.filter_by(nombre=nuevo_nombre).first()
-        if existente and existente.id != int(id):
-            flash(f'Ya existe otra sede con el nombre "{nuevo_nombre}".', 'warning')
+        if existente and existente.id != sede.id:
+            msg = f'Ya existe otra sede con el nombre "{nuevo_nombre}".'
+            if is_json:
+                return jsonify({'success': False, 'message': msg}), 400
+            flash(msg, 'warning')
             return redirect(url_for('admin.sedes_bodegas_main'))
 
         sede.nombre = nuevo_nombre
         db.session.commit()
-        flash('Sede actualizada exitosamente.', 'success')
+        msg = 'Sede actualizada exitosamente.'
+        if is_json:
+            return jsonify({'success': True, 'message': msg})
+        flash(msg, 'success')
         
     except Exception as e:
         db.session.rollback()
-        flash(f'Error al editar sede: {str(e)}', 'danger')
+        msg = f'Error al editar sede: {str(e)}'
+        if is_json:
+            return jsonify({'success': False, 'message': msg}), 500
+        flash(msg, 'danger')
     
     return redirect(url_for('admin.sedes_bodegas_main'))
 
@@ -1185,28 +1233,42 @@ def eliminar_sede(id):
 @admin_required
 def editar_bodega():
     """Modifica una bodega."""
+    is_json = request.is_json or request.headers.get('Accept') == 'application/json' or request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     try:
-        id = request.form.get('id')
-        nuevo_nombre = request.form.get('nombre', '').strip().upper()
-        nueva_sede_id = request.form.get('sede_id')
+        data = request.get_json(silent=True) or request.form
+        id = data.get('id')
+        nuevo_nombre = (data.get('nombre') or '').strip().upper()
+        nueva_sede_id = data.get('sede_id')
         
-        bodega = Bodega.query.get(id)
+        bodega = Bodega.query.get(int(id)) if id and str(id).isdigit() else None
         if not bodega:
-            flash('Bodega no encontrada.', 'danger')
+            msg = 'Bodega no encontrada.'
+            if is_json:
+                return jsonify({'success': False, 'message': msg}), 404
+            flash(msg, 'danger')
             return redirect(url_for('admin.sedes_bodegas_main'))
             
         if not nuevo_nombre or not nueva_sede_id:
-            flash('Nombre y Sede son requeridos.', 'warning')
+            msg = 'Nombre y Sede son requeridos.'
+            if is_json:
+                return jsonify({'success': False, 'message': msg}), 400
+            flash(msg, 'warning')
             return redirect(url_for('admin.sedes_bodegas_main'))
 
         bodega.nombre = nuevo_nombre
-        bodega.sede_id = nueva_sede_id
+        bodega.sede_id = int(nueva_sede_id)
         db.session.commit()
-        flash('Bodega actualizada exitosamente.', 'success')
+        msg = 'Bodega actualizada exitosamente.'
+        if is_json:
+            return jsonify({'success': True, 'message': msg})
+        flash(msg, 'success')
         
     except Exception as e:
         db.session.rollback()
-        flash(f'Error al editar bodega: {str(e)}', 'danger')
+        msg = f'Error al editar bodega: {str(e)}'
+        if is_json:
+            return jsonify({'success': False, 'message': msg}), 500
+        flash(msg, 'danger')
     
     return redirect(url_for('admin.sedes_bodegas_main'))
 

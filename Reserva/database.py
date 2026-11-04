@@ -1,7 +1,7 @@
-from sqlalchemy import Integer, String, Text, Date, Time, Enum, ForeignKey, Index, Boolean
+from sqlalchemy import Integer, String, Text, Date, Time, Enum, ForeignKey, Index, Boolean, Float, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import Optional
-from datetime import date as date_type, time as time_type
+from datetime import date as date_type, time as time_type, datetime
 import json
 from extensions import db, Base
 
@@ -154,11 +154,34 @@ class Inventario(Base):
     )
     observaciones: Mapped[str] = mapped_column(Text, nullable=True)
 
+    # === CAMPOS DE HOJA DE VIDA Y ESPECIFICACIONES TÉCNICAS ===
+    foto_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    hostname: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, index=True)
+    procesador: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
+    ram_gb: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    almacenamiento: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    sistema_operativo: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    especificaciones_tecnicas: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    fecha_adquisicion: Mapped[Optional[date_type]] = mapped_column(Date, nullable=True)
+    proveedor: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
+    garantia_vencimiento: Mapped[Optional[date_type]] = mapped_column(Date, nullable=True)
+
     # === CAMPOS DE GESTIÓN POR CANTIDAD ===
     # Si es True, el item se gestiona por stock (cantidad) en vez de por serial/número individual
     es_por_cantidad: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     cantidad_total: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)      # Stock total registrado
     cantidad_disponible: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # Stock disponible ahora
+
+    # === CAMPOS DE CUSTODIA Y CENTRO DE COSTO ===
+    tipo_inventario: Mapped[Optional[str]] = mapped_column(String(50), nullable=True, default='ACTIVO_FIJO')
+    centro_costo: Mapped[Optional[str]] = mapped_column(String(50), nullable=True, index=True)
+    nombre_centro_costo: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
+    responsable_custodia: Mapped[Optional[str]] = mapped_column(String(200), nullable=True, index=True)
+    cedula_custodio: Mapped[Optional[str]] = mapped_column(String(50), nullable=True, index=True)
+    cargo_custodio: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
+    edificio: Mapped[Optional[str]] = mapped_column(String(150), nullable=True, index=True)
+    ubicacion_detalle: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
+    programa_area: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
 
     bodega_id: Mapped[Optional[int]] = mapped_column(ForeignKey('bodegas.id'), nullable=True)
     bodega: Mapped[Optional["Bodega"]] = relationship(back_populates="items")
@@ -179,6 +202,55 @@ class Inventario(Base):
         if self.es_por_cantidad:
             return (self.cantidad_disponible or 0) > 0
         return self.estado == 'Disponible'
+
+
+class InventarioCustodia(Base):
+    """
+    Tabla para registro de custodia y centros de costo de inventario (Sede Perdomo y Sedes).
+    Columnas requeridas:
+    - ESTADO
+    - NOMBRE DEL CENTRO DE COSTO
+    - CENTRO DE COSTO
+    - CARGO RESPONSABLE (CUSTODIA)
+    - RESPONSABLE (CUSTODIA)
+    - CEDULA
+    - EDIFICIO
+    - UBICACIÓN
+    """
+    __tablename__ = 'inventario_custodia'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+
+    # 8 Columnas principales solicitadas
+    estado: Mapped[str] = mapped_column(String(150), index=True)  # ESTADO
+    nombre_centro_costo: Mapped[Optional[str]] = mapped_column(String(200), nullable=True, index=True)  # NOMBRE DEL CENTRO DE COSTO
+    centro_costo: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, index=True)  # CENTRO DE COSTO
+    cargo_custodio: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)  # CARGO RESPONSABLE (CUSTODIA)
+    responsable_custodia: Mapped[Optional[str]] = mapped_column(String(250), nullable=True, index=True)  # RESPONSABLE (CUSTODIA)
+    cedula_custodio: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, index=True)  # CEDULA
+    edificio: Mapped[Optional[str]] = mapped_column(String(200), nullable=True, index=True)  # EDIFICIO
+    ubicacion: Mapped[Optional[str]] = mapped_column(String(200), nullable=True, index=True)  # UBICACIÓN
+
+    # Datos complementarios del activo/lote
+    tipo_inventario: Mapped[str] = mapped_column(String(100), default='ACTIVO_FIJO', index=True)
+    placa: Mapped[Optional[str]] = mapped_column(String(150), nullable=True, index=True)
+    serie: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
+    descripcion: Mapped[str] = mapped_column(String(500), index=True)
+    marca: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
+    cantidad: Mapped[int] = mapped_column(Integer, default=1)
+    cantidad_anterior: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
+    programa_area: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
+    funcionario_inventario: Mapped[Optional[str]] = mapped_column(String(300), nullable=True)
+    fecha_inventario: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    anio_llegada: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    es_investigacion: Mapped[Optional[str]] = mapped_column(String(150), default='No')
+    observaciones: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    sede_id: Mapped[Optional[int]] = mapped_column(ForeignKey('sedes.id'), nullable=True, index=True)
+    sede: Mapped[Optional["Sede"]] = relationship()
+
+    inventario_id: Mapped[Optional[int]] = mapped_column(ForeignKey('inventario.id', ondelete='SET NULL'), nullable=True)
+    inventario_item: Mapped[Optional["Inventario"]] = relationship()
+
 
 class PrestamoEquipo(Base):
     __tablename__ = 'prestamos_equipos'
@@ -389,13 +461,47 @@ def init_db(app):
             "ALTER TABLE profesores ADD COLUMN IF NOT EXISTS programa_id INTEGER REFERENCES programas_academicos(id);",
             "ALTER TABLE reservas ADD COLUMN IF NOT EXISTS programa_id INTEGER REFERENCES programas_academicos(id);",
             "ALTER TABLE reservas ADD COLUMN IF NOT EXISTS programa VARCHAR(200);",
-            "ALTER TABLE clases_salas_computo ADD COLUMN IF NOT EXISTS programa_id INTEGER REFERENCES programas_academicos(id);"
+            "ALTER TABLE clases_salas_computo ADD COLUMN IF NOT EXISTS programa_id INTEGER REFERENCES programas_academicos(id);",
+            "ALTER TABLE inventario ADD COLUMN IF NOT EXISTS foto_url VARCHAR(500);",
+            "ALTER TABLE inventario ADD COLUMN IF NOT EXISTS procesador VARCHAR(150);",
+            "ALTER TABLE inventario ADD COLUMN IF NOT EXISTS ram_gb VARCHAR(50);",
+            "ALTER TABLE inventario ADD COLUMN IF NOT EXISTS almacenamiento VARCHAR(100);",
+            "ALTER TABLE inventario ADD COLUMN IF NOT EXISTS sistema_operativo VARCHAR(100);",
+            "ALTER TABLE inventario ADD COLUMN IF NOT EXISTS especificaciones_tecnicas TEXT;",
+            "ALTER TABLE inventario ADD COLUMN IF NOT EXISTS fecha_adquisicion DATE;",
+            "ALTER TABLE inventario ADD COLUMN IF NOT EXISTS proveedor VARCHAR(150);",
+            "ALTER TABLE inventario ADD COLUMN IF NOT EXISTS garantia_vencimiento DATE;",
+            "ALTER TABLE mantenimientos_inventario ADD COLUMN IF NOT EXISTS titulo VARCHAR(200);",
+            "ALTER TABLE mantenimientos_inventario ADD COLUMN IF NOT EXISTS software_instalado TEXT;",
+            "ALTER TABLE mantenimientos_inventario ADD COLUMN IF NOT EXISTS partes_cambiadas TEXT;",
+            "ALTER TABLE mantenimientos_inventario ADD COLUMN IF NOT EXISTS trabajo_realizado TEXT;",
+            "ALTER TABLE mantenimientos_inventario ADD COLUMN IF NOT EXISTS proximo_mantenimiento DATE;",
+            "ALTER TABLE mantenimientos_inventario ADD COLUMN IF NOT EXISTS foto_evidencia_url VARCHAR(500);",
+            "ALTER TABLE mantenimientos_inventario ADD COLUMN IF NOT EXISTS sede_id INTEGER REFERENCES sedes(id);",
+            "ALTER TABLE inventario ADD COLUMN IF NOT EXISTS tipo_inventario VARCHAR(50);",
+            "ALTER TABLE inventario ADD COLUMN IF NOT EXISTS centro_costo VARCHAR(50);",
+            "ALTER TABLE inventario ADD COLUMN IF NOT EXISTS nombre_centro_costo VARCHAR(150);",
+            "ALTER TABLE inventario ADD COLUMN IF NOT EXISTS responsable_custodia VARCHAR(200);",
+            "ALTER TABLE inventario ADD COLUMN IF NOT EXISTS cedula_custodio VARCHAR(50);",
+            "ALTER TABLE inventario ADD COLUMN IF NOT EXISTS cargo_custodio VARCHAR(150);",
+            "ALTER TABLE inventario ADD COLUMN IF NOT EXISTS edificio VARCHAR(150);",
+            "ALTER TABLE inventario ADD COLUMN IF NOT EXISTS ubicacion_detalle VARCHAR(150);",
+            "ALTER TABLE inventario ADD COLUMN IF NOT EXISTS programa_area VARCHAR(150);"
         ]:
             try:
                 db.session.execute(text(stmt))
             except Exception:
                 pass
         db.session.commit()
+
+        # Asegurar valores de enum en PostgreSQL
+        try:
+            conn = db.engine.connect()
+            autocommit_conn = conn.execution_options(isolation_level="AUTOCOMMIT")
+            autocommit_conn.execute(text("ALTER TYPE estado_inventario_enum ADD VALUE IF NOT EXISTS 'En Reparación'"))
+            conn.close()
+        except Exception:
+            pass
 
         # Poblar Sedes si la tabla está vacía
         if not Sede.query.first():
@@ -648,22 +754,35 @@ class NovedadTecnicaSala(Base):
 # =========================================================================
 
 class MantenimientoInventario(Base):
-    """Historial de mantenimientos preventivos y correctivos de equipos."""
+    """Historial de mantenimientos, actualizaciones, cambio de partes y software de equipos."""
     __tablename__ = 'mantenimientos_inventario'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     inventario_id: Mapped[int] = mapped_column(ForeignKey('inventario.id', ondelete='CASCADE'), nullable=False, index=True)
-    tipo: Mapped[str] = mapped_column(String(50), default='Correctivo', nullable=False)  # Preventivo, Correctivo, Calibración, Garantía
+    tipo: Mapped[str] = mapped_column(String(80), default='Mantenimiento Preventivo', nullable=False, index=True)
+    # Tipos: 'Actualización de Equipo', 'Instalación de Software', 'Cambio de Partes / Repuestos', 'Arreglo / Reparación', 'Mantenimiento Preventivo', 'Mantenimiento Correctivo'
+    
+    titulo: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
     motivo: Mapped[str] = mapped_column(Text, nullable=False)
     proveedor_tecnico: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)  # Técnico UNIMINUTO o Proveedor Externo
-    costo: Mapped[Optional[float]] = mapped_column(db.Float, nullable=True)
+    costo: Mapped[Optional[float]] = mapped_column(Float, nullable=True, default=0.0)
     
+    # Especificaciones solicitadas por el usuario
+    software_instalado: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # Programas, versiones, licencias
+    partes_cambiadas: Mapped[Optional[str]] = mapped_column(Text, nullable=True)    # Repuestos / partes sustituidas
+    diagnostico_solucion: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    trabajo_realizado: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    proximo_mantenimiento: Mapped[Optional[date_type]] = mapped_column(Date, nullable=True)
+    foto_evidencia_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+
     fecha_envio: Mapped[date_type] = mapped_column(Date, nullable=False, index=True)
     fecha_estimada_retorno: Mapped[Optional[date_type]] = mapped_column(Date, nullable=True)
     fecha_retorno_real: Mapped[Optional[date_type]] = mapped_column(Date, nullable=True)
     
-    estado: Mapped[str] = mapped_column(String(30), default='En Proceso', nullable=False, index=True)  # En Proceso, Finalizado, No Reparable
-    diagnostico_solucion: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    estado: Mapped[str] = mapped_column(String(30), default='Finalizado', nullable=False, index=True)  # En Proceso, Finalizado, No Reparable
     auxiliar_responsable: Mapped[str] = mapped_column(String(150), nullable=False)
+    
+    sede_id: Mapped[Optional[int]] = mapped_column(ForeignKey('sedes.id'), nullable=True, index=True)
+    sede: Mapped[Optional["Sede"]] = relationship()
 
     equipo: Mapped["Inventario"] = relationship(backref="mantenimientos")
 
@@ -706,5 +825,186 @@ class PracticaLibre(Base):
     estudiante: Mapped[Optional["Estudiante"]] = relationship()
     recurso: Mapped[Optional["Recurso"]] = relationship()
     sede: Mapped[Optional["Sede"]] = relationship()
+
+
+# =========================================================================
+# MODELOS PARA ENTREGA DE TURNO Y MENSAJERÍA INTERNA (JORNADAS MAÑANA/TARDE)
+# =========================================================================
+
+class EntregaTurno(Base):
+    """
+    Registro y comunicación formal de Entrega de Turno (tipo correo interno institucional).
+    Permite el traspaso de información operativa, novedades y pendientes entre jornadas
+    (Jornada Mañana y Jornada Tarde / Noche).
+    """
+    __tablename__ = 'entregas_turno'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    consecutivo: Mapped[str] = mapped_column(String(30), unique=True, index=True, nullable=False)  # ej: ET-20261021-001
+    
+    # Contexto del turno
+    sede_id: Mapped[int] = mapped_column(ForeignKey('sedes.id'), nullable=False, index=True)
+    jornada: Mapped[str] = mapped_column(String(30), nullable=False, index=True)  # 'Mañana', 'Tarde'
+    fecha: Mapped[date_type] = mapped_column(Date, nullable=False, index=True)
+    hora: Mapped[time_type] = mapped_column(Time, nullable=False)
+    
+    # Participantes (Remitente y Destinatario)
+    usuario_emisor_doc: Mapped[str] = mapped_column(ForeignKey('auxiliares.documento'), nullable=False, index=True)
+    usuario_receptor_doc: Mapped[Optional[str]] = mapped_column(ForeignKey('auxiliares.documento'), nullable=True, index=True)
+    para_toda_sede: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    
+    # Contenido tipo correo
+    asunto: Mapped[str] = mapped_column(String(200), nullable=False)
+    prioridad: Mapped[str] = mapped_column(String(20), default='Normal', nullable=False)  # 'Normal', 'Importante', 'Urgente'
+    
+    # Novedades estructuradas de la jornada
+    actividades_realizadas: Mapped[str] = mapped_column(Text, nullable=False)  # Resumen de lo realizado en el turno
+    equipos_pendientes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # Equipos que quedan en préstamo o pendientes
+    novedades_salas: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # Incidentes técnicos en salas o salones
+    pendientes_siguiente_turno: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # Tareas para la jornada entrante
+    observaciones: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # Notas generales
+    
+    # Evidencia adjunta
+    evidencia_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    
+    # Estado de lectura y Acuse de Recibo
+    leido: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    fecha_lectura: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    
+    estado: Mapped[str] = mapped_column(String(30), default='Pendiente', nullable=False, index=True)  # 'Pendiente', 'Recibido Conforme', 'Con Observaciones'
+    usuario_acuse_doc: Mapped[Optional[str]] = mapped_column(ForeignKey('auxiliares.documento'), nullable=True)
+    fecha_acuse: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    observaciones_acuse: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False)
+    
+    # Relaciones
+    sede: Mapped["Sede"] = relationship()
+    emisor: Mapped["Auxiliar"] = relationship(foreign_keys=[usuario_emisor_doc])
+    receptor: Mapped[Optional["Auxiliar"]] = relationship(foreign_keys=[usuario_receptor_doc])
+    usuario_acuse: Mapped[Optional["Auxiliar"]] = relationship(foreign_keys=[usuario_acuse_doc])
+    comentarios: Mapped[list["ComentarioEntregaTurno"]] = relationship(
+        back_populates="entrega", cascade="all, delete-orphan", order_by="ComentarioEntregaTurno.created_at.asc()"
+    )
+
+
+class ComentarioEntregaTurno(Base):
+    """Comentarios o respuestas en el hilo de una entrega de turno (estilo correspondencia interna)."""
+    __tablename__ = 'comentarios_entrega_turno'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    entrega_id: Mapped[int] = mapped_column(ForeignKey('entregas_turno.id', ondelete='CASCADE'), nullable=False, index=True)
+    usuario_doc: Mapped[str] = mapped_column(ForeignKey('auxiliares.documento'), nullable=False)
+    usuario_nombre: Mapped[str] = mapped_column(String(150), nullable=False)
+    mensaje: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False)
+
+    entrega: Mapped["EntregaTurno"] = relationship(back_populates="comentarios")
+    usuario: Mapped[Optional["Auxiliar"]] = relationship()
+
+
+# =========================================================================
+# MODELO PARA PROGRAMACIÓN ACADÉMICA / OFERTA BANNER
+# =========================================================================
+
+class ProgramacionBanner(Base):
+    """
+    Modelo maestro de Oferta y Programación Académica Banner (Génesis/Banner).
+    Almacena la malla de NRCs, asignaturas, docentes, salones y horarios.
+    """
+    __tablename__ = 'programacion_banner'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    periodo: Mapped[str] = mapped_column(String(20), index=True)                          # PERIODO (ej: 202650)
+    nrc: Mapped[str] = mapped_column(String(20), index=True)                              # NRC (ej: 73674)
+    modo_calificar: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)     # MODO_CALIFICAR (S, A)
+    secuencia: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)          # SECUENCIA (1, 2, 3...)
+    lista_cruzada: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)      # LISTA_CRUZADA
+    alfa: Mapped[Optional[str]] = mapped_column(String(20), nullable=True, index=True)   # ALFA (ECEC, LFDD, ECEM)
+    num: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)                 # NUM (D4005, IE313)
+    estado_nrc: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)         # ESTADO_NRC (Activo)
+    titulo: Mapped[str] = mapped_column(String(255), index=True)                          # TITULO (Nombre asignatura)
+    horas_minimas: Mapped[Optional[float]] = mapped_column(Float, nullable=True)         # HORAS_MINIMAS
+    horas_maximas: Mapped[Optional[float]] = mapped_column(Float, nullable=True)         # HORAS_MAXIMAS
+    conector: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)           # CONECTOR (A)
+    horas_creditos_sede: Mapped[Optional[float]] = mapped_column(Float, nullable=True)   # HORAS_CREDITOS_SEDE
+    intensidad_horaria: Mapped[Optional[float]] = mapped_column(Float, nullable=True)    # INTENSIDAD_HORARIA
+    rectoria: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)           # RECTORIA (RPR)
+    desc_rectoria: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)     # DESC_RECTORIA (S BOGOTA)
+    sede: Mapped[Optional[str]] = mapped_column(String(50), nullable=True, index=True)   # SEDE (CBD)
+    desc_sede: Mapped[Optional[str]] = mapped_column(String(150), nullable=True, index=True) # DESC_SEDE (CD BOLIVAR DISTANCIA)
+    facultad_responsable: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)  # FACULTAD_RESPONSABLE
+    departamento_responsable: Mapped[Optional[str]] = mapped_column(String(200), nullable=True) # DEPARTAMENTO_RESPONSABLE
+    cupo: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)                  # CUPO
+    inscritos: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)             # INSCRITOS
+    saldo: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)                 # SALDO
+    id_docente: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)         # ID_DOCENTE (Banner ID)
+    identificacion: Mapped[Optional[str]] = mapped_column(String(50), nullable=True, index=True) # IDENTIFICACION (Cédula)
+    nombre_docente: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, index=True) # NOMBRE_DOCENTE
+    parte_periodo: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)      # PARTE_PERIODO (UVC, UV2)
+    edificio: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, index=True) # EDIFICIO (CBRGH, SSANCA, RGH)
+    salon: Mapped[Optional[str]] = mapped_column(String(50), nullable=True, index=True)   # SALON (202, 704LS1, SINCR)
+    fecha_inicial_1: Mapped[Optional[date_type]] = mapped_column(Date, nullable=True)    # FECHA_INICIAL_1
+    fecha_final_1: Mapped[Optional[date_type]] = mapped_column(Date, nullable=True)      # FECHA_FINAL_1
+    hi: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)                  # HI (ej: 1300)
+    hf: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)                  # HF (ej: 1429)
+    l: Mapped[Optional[str]] = mapped_column(String(5), nullable=True)                    # L
+    m: Mapped[Optional[str]] = mapped_column(String(5), nullable=True)                    # M
+    i: Mapped[Optional[str]] = mapped_column(String(5), nullable=True)                    # I (Miércoles / W)
+    j: Mapped[Optional[str]] = mapped_column(String(5), nullable=True)                    # J (Jueves / R)
+    v: Mapped[Optional[str]] = mapped_column(String(5), nullable=True)                    # V (Viernes / F)
+    s: Mapped[Optional[str]] = mapped_column(String(5), nullable=True)                    # S (Sábado)
+
+    # Campos complementarios de categorización y auditoría
+    es_sala_computo: Mapped[bool] = mapped_column(Boolean, default=False, index=True)    # True si salón termina en LS o es sala de cómputo
+    dias_semana: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)        # Ej: "Sábado", "Lunes, Martes"
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'periodo': self.periodo,
+            'nrc': self.nrc,
+            'modo_calificar': self.modo_calificar,
+            'secuencia': self.secuencia,
+            'lista_cruzada': self.lista_cruzada,
+            'alfa': self.alfa,
+            'num': self.num,
+            'estado_nrc': self.estado_nrc,
+            'titulo': self.titulo,
+            'horas_minimas': self.horas_minimas,
+            'horas_maximas': self.horas_maximas,
+            'conector': self.conector,
+            'horas_creditos_sede': self.horas_creditos_sede,
+            'intensidad_horaria': self.intensidad_horaria,
+            'rectoria': self.rectoria,
+            'desc_rectoria': self.desc_rectoria,
+            'sede': self.sede,
+            'desc_sede': self.desc_sede,
+            'facultad_responsable': self.facultad_responsable,
+            'departamento_responsable': self.departamento_responsable,
+            'cupo': self.cupo,
+            'inscritos': self.inscritos,
+            'saldo': self.saldo,
+            'id_docente': self.id_docente,
+            'identificacion': self.identificacion,
+            'nombre_docente': self.nombre_docente,
+            'parte_periodo': self.parte_periodo,
+            'edificio': self.edificio,
+            'salon': self.salon,
+            'fecha_inicial_1': self.fecha_inicial_1.isoformat() if self.fecha_inicial_1 else None,
+            'fecha_final_1': self.fecha_final_1.isoformat() if self.fecha_final_1 else None,
+            'hi': self.hi,
+            'hf': self.hf,
+            'l': self.l,
+            'm': self.m,
+            'i': self.i,
+            'j': self.j,
+            'v': self.v,
+            's': self.s,
+            'es_sala_computo': self.es_sala_computo,
+            'dias_semana': self.dias_semana,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+        }
+
+
 
 

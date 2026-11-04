@@ -58,10 +58,11 @@ class Config:
     # Entorno Vercel
     VERCEL = bool(os.environ.get('VERCEL'))
 
-    # Flags de seguridad en cookies de sesión
+    # Flags de seguridad en cookies de sesión y CSRF
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
     PERMANENT_SESSION_LIFETIME = timedelta(hours=8)
+    WTF_CSRF_TIME_LIMIT = None  # No expirar tokens CSRF antes de que finalice la sesión (evita errores 400 por inactividad)
 
     # Parámetros para envío de correos (alertas, reportes)
     SMTP_SERVER = os.environ.get('SMTP_SERVER', 'localhost')
@@ -129,8 +130,23 @@ class SystemConstants:
         "D501","D502","D503","D504","D505","D506",
         "D601","D602","D603","D605","D606","D607"
     ]
-    SALONES_PERDOMO = ["LS1", "LS2", "LS3"]
-    SALONES = SALONES_PRINCIPAL + SALONES_PERDOMO
+    SALONES_PERDOMO_NORMALES = [
+        "202", "204", "303", "403", "404", "406", "407", "501", "503", "504",
+        "506", "507", "508", "603", "604", "605", "606", "607", "608", "706",
+        "707", "708", "806", "807", "808", "903", "904", "905", "906", "907",
+        "908", "1003", "1004", "1006", "1007", "1008"
+    ]
+    SALONES_PERDOMO_COMPUTO = ["801LS4", "803LS2", "804LS3", "703LS5", "704LS1"]
+    SALONES_PERDOMO = SALONES_PERDOMO_NORMALES + SALONES_PERDOMO_COMPUTO
+
+    SALONES_PRINCIPAL_COMPUTO = [
+        "A207LS12", "A208LS13", "A209LS6", "A210LS14", "A211LS10", "A212LS11", "A213LS15",
+        "A305LS5", "A306LS1", "A307LS2", "A308LS3", "A309LS4", "A310LS7", "A311LS9", "A312LS20", "A313LS8",
+        "A401LS24", "A402LS25", "A404LS26", "A405LS23", "A406LS27", "A408LS16", "A409LS17", "A410LS18", "A411LS19",
+        "A207LS", "A310"
+    ]
+    SALONES = SALONES_PRINCIPAL + SALONES_PRINCIPAL_COMPUTO + SALONES_PERDOMO
+    AULAS = SALONES
     SALON_MARCA = {
         "A205": "S","A301": "P","A304": "S","A403": "S","A501": "P","A502": "P","A503": "P","A504": "P","A505": "S",
         "A506": "P","A507": "P","A508": "P","A509": "P","A510": "P",
@@ -150,7 +166,7 @@ class SystemConstants:
         "C601": "S","C602": "S","C603": "S","C604": "S","C605": "P","C606": "P","C607": "P","C608": "S","C609": "S",
         "D501": "S","D502": "P","D503": "P","D504": "P","D505": "P","D506": "P",
         "D601": "P","D602": "P","D603": "S","D605": "P","D606": "P","D607": "P",
-        "LS1": "P", "LS2": "P", "LS3": "P"
+        "801LS4": "P", "803LS2": "P", "804LS3": "P", "703LS5": "P", "704LS1": "P"
     }
     NINERAS = ["Niñera 1 (31 PC)", "Niñera 2 (31 PC)"]
 

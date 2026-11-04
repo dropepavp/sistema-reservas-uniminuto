@@ -1,0 +1,1843 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    }
+
+    /* ── Header Principal con Gradiente Institucional ── */
+    .usuarios-header {
+        background: linear-gradient(135deg, #1e3a5f 0%, #2d6a9f 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: white;
+        box-shadow: 0 8px 24px rgba(30, 58, 95, 0.16);
+        position: relative;
+        overflow: hidden;
+    }
+    .usuarios-header::after {
+        content: '';
+        position: absolute;
+        top: -40px;
+        right: -40px;
+        width: 180px;
+        height: 180px;
+        background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 70%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    /* ── Píldoras / Pestañas Principales ── */
+    .user-nav-pills {
+        display: flex;
+        gap: 0.75rem;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+    .user-nav-pills .nav-link {
+        border-radius: 12px;
+        padding: 0.75rem 1.4rem;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: #64748b;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .user-nav-pills .nav-link:hover {
+        color: #1e3a5f;
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        transform: translateY(-1px);
+    }
+    .user-nav-pills .nav-link.active {
+        background: #1e3a5f;
+        color: #ffffff !important;
+        border-color: #1e3a5f;
+        box-shadow: 0 4px 12px rgba(30, 58, 95, 0.22);
+    }
+    .user-nav-pills .nav-link .badge-counter {
+        font-size: 0.78rem;
+        padding: 0.25rem 0.55rem;
+        border-radius: 20px;
+        font-weight: 800;
+        transition: all 0.2s;
+    }
+    .user-nav-pills .nav-link.active .badge-counter {
+        background: rgba(255, 255, 255, 0.25) !important;
+        color: #ffffff !important;
+    }
+    .user-nav-pills .nav-link:not(.active) .badge-counter {
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    /* ── Tarjetas Stat / KPI ── */
+    .u-stat-card {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 1.15rem 1.35rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        border: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        height: 100%;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .u-stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+    }
+    .u-stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.45rem;
+        flex-shrink: 0;
+    }
+    .u-stat-val {
+        font-size: 1.6rem;
+        font-weight: 800;
+        line-height: 1;
+        color: #0f172a;
+    }
+    .u-stat-lbl {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        color: #64748b;
+        margin-bottom: 0.2rem;
+    }
+
+    /* ── Tablas estilizadas ── */
+    .table-custom-usuarios {
+        width: 100% !important;
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .table-custom-usuarios thead th {
+        position: sticky;
+        top: 0;
+        background-color: #f8fafc !important;
+        color: #334155 !important;
+        z-index: 5;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 0.85rem 1rem !important;
+        border-bottom: 2px solid #e2e8f0;
+        white-space: nowrap;
+    }
+    .table-custom-usuarios td {
+        padding: 0.75rem 1rem !important;
+        vertical-align: middle;
+        font-size: 0.88rem;
+        color: #1e293b;
+    }
+    .table-custom-usuarios tbody tr:hover {
+        background-color: rgba(45, 106, 159, 0.04) !important;
+    }
+
+    /* ── Grilla Horario Colaborador ── */
+    .horario-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 0.5rem;
+    }
+    .horario-cell {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.5rem;
+        text-align: center;
+    }
+    .horario-cell .dia-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #64748b;
+        margin-bottom: 0.35rem;
+    }
+    .horario-cell input {
+        font-size: 0.78rem;
+        text-align: center;
+    }
+
+    /* ── Permisos Matrix ── */
+    .permiso-row {
+        display: grid;
+        grid-template-columns: 140px repeat(4, 1fr);
+        gap: 0.5rem;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .permiso-modulo {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #334155;
+        text-transform: capitalize;
+    }
+    .permiso-check {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.2rem;
+        font-size: 0.7rem;
+        color: #64748b;
+    }
+
+    /* ── Tareas List ── */
+    .tarea-item {
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.5rem;
+        background: white;
+        transition: box-shadow 0.15s;
+    }
+    .tarea-item:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    @media (max-width: 992px) {
+        .horario-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+
+<div class="container-fluid py-4 px-md-4">
+
+    <!-- ── CABECERA PRINCIPAL ── -->
+    <div class="usuarios-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <i class="bi bi-people-fill fs-2"></i>
+                <h1 class="h3 fw-bold mb-0">Directorio & Gestión de Usuarios</h1>
+            </div>
+            <p class="mb-0 text-white-50 small">
+                Gestión centralizada del personal y comunidad académica: Colaboradores, Profesores y Estudiantes UNIMINUTO.
+            </p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <!-- Acceso directo al Módulo de Planillas Excel -->
+            <a href="{{ url_for('planillas.planillas_dashboard') }}" class="btn btn-outline-success fw-bold px-3 py-2 shadow-sm d-flex align-items-center gap-2" title="Descargar o subir planillas Excel masivas">
+                <i class="bi bi-file-earmark-excel-fill"></i> <span>Planillas Excel</span>
+            </a>
+            <!-- Botón condicional según pestaña activa -->
+            <button type="button" class="btn btn-warning text-dark fw-bold px-3 py-2 shadow-sm d-flex align-items-center gap-2" id="btnAccionPrincipal" onclick="abrirModalSegunTabActiva()">
+                <i class="bi bi-person-plus-fill"></i> <span id="lblAccionPrincipal">Nuevo Colaborador</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ── PESTAÑAS PRINCIPALES: COLABORADORES, PROFESORES, ESTUDIANTES ── -->
+    <ul class="nav user-nav-pills" id="tabsUsuarios" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {% if tab_activa == 'colaboradores' %}active{% endif %}" id="pills-colaboradores-tab" data-bs-toggle="pill" data-bs-target="#pills-colaboradores" type="button" role="tab" onclick="activarPestana('colaboradores')">
+                <i class="bi bi-person-workspace fs-5"></i>
+                <span>Colaboradores</span>
+                <span class="badge-counter">{{ stats_colaboradores.total }}</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {% if tab_activa == 'profesores' %}active{% endif %}" id="pills-profesores-tab" data-bs-toggle="pill" data-bs-target="#pills-profesores" type="button" role="tab" onclick="activarPestana('profesores')">
+                <i class="bi bi-person-video3 fs-5"></i>
+                <span>Profesores</span>
+                <span class="badge-counter">{{ stats_profesores.total }}</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {% if tab_activa == 'estudiantes' %}active{% endif %}" id="pills-estudiantes-tab" data-bs-toggle="pill" data-bs-target="#pills-estudiantes" type="button" role="tab" onclick="activarPestana('estudiantes')">
+                <i class="bi bi-mortarboard-fill fs-5"></i>
+                <span>Estudiantes</span>
+                <span class="badge-counter">{{ kpis_estudiantes.total }}</span>
+            </button>
+        </li>
+    </ul>
+
+    <!-- ── CONTENIDO DE LAS PESTAÑAS ── -->
+    <div class="tab-content" id="tabsUsuariosContent">
+
+        <!-- ============================================================== -->
+        <!-- PESTAÑA 1: COLABORADORES                                        -->
+        <!-- ============================================================== -->
+        <div class="tab-pane fade {% if tab_activa == 'colaboradores' %}show active{% endif %}" id="pills-colaboradores" role="tabpanel">
+
+            <!-- KPIs Colaboradores -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="u-stat-card border-start border-4 border-primary">
+                        <div class="u-stat-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div>
+                            <div class="u-stat-lbl">Activos</div>
+                            <div class="u-stat-val">{{ stats_colaboradores.total }}</div>
+                            <span class="badge bg-primary-subtle text-primary mt-1">Colaboradores</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="u-stat-card border-start border-4 border-warning">
+                        <div class="u-stat-icon bg-warning bg-opacity-10 text-warning">
+                            <i class="bi bi-list-check"></i>
+                        </div>
+                        <div>
+                            <div class="u-stat-lbl">Tareas Pendientes</div>
+                            <div class="u-stat-val">{{ stats_colaboradores.tareas_pendientes }}</div>
+                            <span class="badge bg-warning-subtle text-warning-emphasis mt-1">Operativas</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="u-stat-card border-start border-4 border-success">
+                        <div class="u-stat-icon bg-success bg-opacity-10 text-success">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <div>
+                            <div class="u-stat-lbl">Horas Programadas</div>
+                            <div class="u-stat-val">{{ stats_colaboradores.total_horas_programadas }}h</div>
+                            <span class="badge bg-success-subtle text-success mt-1">Semana actual</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="u-stat-card border-start border-4 border-info">
+                        <div class="u-stat-icon bg-info bg-opacity-10 text-info">
+                            <i class="bi bi-pie-chart"></i>
+                        </div>
+                        <div>
+                            <div class="u-stat-lbl">Cumplimiento Meta</div>
+                            <div class="u-stat-val">{{ stats_colaboradores.cumplimiento_pct }}%</div>
+                            <span class="badge bg-info-subtle text-info mt-1">{{ stats_colaboradores.total_horas_meta }}h meta</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros y Búsqueda Colaboradores -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-3">
+                    <form method="GET" action="{{ url_for('usuarios.usuarios_dashboard') }}" class="row g-2 align-items-center">
+                        <input type="hidden" name="tab" value="colaboradores">
+                        <div class="col-md-5">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                                <input type="text" name="busqueda" class="form-control border-start-0" placeholder="Buscar por nombre, documento o cargo..." value="{{ filtros.busqueda if tab_activa == 'colaboradores' else '' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <select name="sede" class="form-select form-select-sm">
+                                <option value="">-- Todas las Sedes --</option>
+                                {% for s in sedes %}
+                                <option value="{{ s.id }}" {% if filtros.sede == s.id|string and tab_activa == 'colaboradores' %}selected{% endif %}>{{ s.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex gap-2">
+                            <button type="submit" class="btn btn-sm btn-primary w-100 fw-semibold"><i class="bi bi-funnel-fill me-1"></i> Filtrar</button>
+                            <a href="{{ url_for('usuarios.usuarios_dashboard', tab='colaboradores') }}" class="btn btn-sm btn-outline-secondary" title="Limpiar"><i class="bi bi-x-lg"></i></a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tabla de Colaboradores -->
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div class="card-header bg-white border-0 py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <div>
+                        <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-person-workspace text-primary me-2"></i>Personal de Colaboradores</h5>
+                        <small class="text-muted">Horarios en formato militar (00:00 a 24:00) • Meta 42 horas semanales • Vigencia desde julio 2026</small>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="button" class="btn btn-sm btn-outline-primary fw-semibold" onclick="abrirModalMatrizHorarios()">
+                            <i class="bi bi-calendar3-range me-1"></i> Ver Matriz Semanal (42h)
+                        </button>
+                        {% if session.rol in ('admin', 'superadmin') %}
+                        <button type="button" class="btn btn-sm btn-primary fw-semibold" onclick="abrirModalColabNuevo()">
+                            <i class="bi bi-plus-lg me-1"></i> Registrar Colaborador
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-custom-usuarios align-middle mb-0" id="tablaColaboradores">
+                        <thead>
+                            <tr>
+                                <th>Colaborador</th>
+                                <th>Cargo & Sede</th>
+                                <th>Documento</th>
+                                <th>Contacto</th>
+                                <th>Horas Prog. / Meta</th>
+                                <th>Vigencia & Horario</th>
+                                <th>Estado</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in colaboradores %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 0.85rem;">
+                                            {{ c.nombre_completo[:2].upper() }}
+                                        </div>
+                                        <div>
+                                            <strong class="text-dark d-block">{{ c.nombre_completo }}</strong>
+                                            <span class="small text-muted">{{ c.cargo or 'Colaborador' }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">{{ c.sede.nombre if c.sede else 'Sin Sede Asignada' }}</span>
+                                </td>
+                                <td><code>{{ c.documento or '--' }}</code></td>
+                                <td class="small">
+                                    {% if c.correo %}<div><i class="bi bi-envelope text-muted me-1"></i>{{ c.correo }}</div>{% endif %}
+                                    {% if c.telefono %}<div><i class="bi bi-telephone text-muted me-1"></i>{{ c.telefono }}</div>{% endif %}
+                                </td>
+                                <td>
+                                    {% set prog = c.horas_programadas_total | round(1) %}
+                                    {% set meta = c.total_horas_semana or 42 %}
+                                    {% set diff = (prog - meta) | round(1) %}
+                                    <strong class="text-primary fs-6">{{ prog }}h</strong>
+                                    {% if (diff | abs) <= 0.2 %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle ms-1" title="Meta cumplida exacta: {{ prog }}h / {{ meta }}h">
+                                        / {{ meta }}h <i class="bi bi-check-lg"></i>
+                                    </span>
+                                    {% elif diff < 0 %}
+                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle ms-1" title="Faltan {{ (-diff) | round(1) }}h para la meta">
+                                        / {{ meta }}h
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-1" title="Excedente +{{ diff }}h">
+                                        / {{ meta }}h
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="small fw-semibold text-dark">
+                                        <i class="bi bi-calendar-check text-primary me-1"></i>{{ c.fecha_inicio_horario or 'A partir del 15 de julio 2026' }}
+                                    </div>
+                                    {% if c.horario_texto %}
+                                    <div class="text-muted text-truncate small" style="max-width: 220px;" title="{{ c.horario_texto }}">
+                                        <i class="bi bi-clock-history me-1"></i>{{ c.horario_texto }}
+                                    </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if c.activo %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">Activo</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary-subtle text-secondary">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="abrirDetalleColab({{ c.id }})" title="Ver Horarios, Tareas y Permisos">
+                                        <i class="bi bi-calendar3-week"></i> Horario & Tareas
+                                    </button>
+                                    {% if session.rol in ('admin', 'superadmin') %}
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="abrirEditarColab({{ c.id }})" title="Editar Datos">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5 text-muted">
+                                    <i class="bi bi-person-x fs-1 d-block mb-2"></i>
+                                    No se encontraron colaboradores registrados o coincidentes.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- PESTAÑA 2: PROFESORES                                          -->
+        <!-- ============================================================== -->
+        <div class="tab-pane fade {% if tab_activa == 'profesores' %}show active{% endif %}" id="pills-profesores" role="tabpanel">
+
+            <!-- KPIs Profesores -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6 col-xl-4">
+                    <div class="u-stat-card border-start border-4 border-primary">
+                        <div class="u-stat-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="bi bi-person-video3"></i>
+                        </div>
+                        <div>
+                            <div class="u-stat-lbl">Total Docentes</div>
+                            <div class="u-stat-val">{{ stats_profesores.total }}</div>
+                            <span class="badge bg-primary-subtle text-primary mt-1">Registrados</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-4">
+                    <div class="u-stat-card border-start border-4 border-success">
+                        <div class="u-stat-icon bg-success bg-opacity-10 text-success">
+                            <i class="bi bi-laptop"></i>
+                        </div>
+                        <div>
+                            <div class="u-stat-lbl">Con Préstamos</div>
+                            <div class="u-stat-val">{{ stats_profesores.con_prestamos }}</div>
+                            <span class="badge bg-success-subtle text-success mt-1">Historial activo</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-4">
+                    <div class="u-stat-card border-start border-4 border-info">
+                        <div class="u-stat-icon bg-info bg-opacity-10 text-info">
+                            <i class="bi bi-mortarboard"></i>
+                        </div>
+                        <div>
+                            <div class="u-stat-lbl">Programas Académicos</div>
+                            <div class="u-stat-val">{{ stats_profesores.programas }}</div>
+                            <span class="badge bg-info-subtle text-info mt-1">Adscritos</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros y Exportación Profesores -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-3">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div class="d-flex flex-wrap gap-2 align-items-center flex-grow-1">
+                            <div class="input-group input-group-sm" style="max-width: 320px;">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                                <input type="text" id="buscarProfesorLive" class="form-control border-start-0" placeholder="Buscar por nombre, cédula o correo...">
+                            </div>
+                            <select id="filtroProgramaProfesor" class="form-select form-select-sm" style="max-width: 280px;" onchange="filtrarProfesoresPorPrograma(this.value)">
+                                <option value="">-- Todos los Programas --</option>
+                                {% for prog in programas_prof_unicos %}
+                                <option value="{{ prog }}">{{ prog }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-download me-1"></i> Exportar
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow">
+                                    <li><a class="dropdown-item" href="/profesores/exportar/excel"><i class="bi bi-file-earmark-excel text-success me-2"></i>Excel (.xlsx)</a></li>
+                                    <li><a class="dropdown-item" href="/profesores/exportar/csv"><i class="bi bi-file-earmark-text text-secondary me-2"></i>CSV (.csv)</a></li>
+                                </ul>
+                            </div>
+                            {% if session.rol in ('admin', 'superadmin') or mod_access.profesores.crear %}
+                            <button type="button" class="btn btn-sm btn-primary fw-semibold" data-bs-toggle="collapse" data-bs-target="#collapseNuevoProfesor">
+                                <i class="bi bi-person-plus-fill me-1"></i> Registrar Docente
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Formulario de Creación Rápida de Docente -->
+                    <div class="collapse mt-3" id="collapseNuevoProfesor">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <h6 class="fw-bold mb-3 text-primary"><i class="bi bi-person-plus-fill me-1"></i> Formulario de Nuevo Profesor</h6>
+                            <form id="formCrearProfesor">
+                                <div class="row g-2">
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold">CÉDULA *</label>
+                                        <input type="number" id="p_cedula" class="form-control form-control-sm" required placeholder="Ej: 10203040">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold">NOMBRE COMPLETO *</label>
+                                        <input type="text" id="p_nombre" class="form-control form-control-sm" required placeholder="Apellidos y Nombres">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold">CORREO INSTITUCIONAL</label>
+                                        <input type="email" id="p_correo" class="form-control form-control-sm" placeholder="usuario@uniminuto.edu.co">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold">TELÉFONO</label>
+                                        <input type="text" id="p_telefono" class="form-control form-control-sm" placeholder="300...">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">PROGRAMA ACADÉMICO</label>
+                                        <input type="text" id="p_programa" class="form-control form-control-sm" placeholder="Ej: Ingeniería de Sistemas">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold">FACULTAD</label>
+                                        <input type="text" id="p_facultad" class="form-control form-control-sm" placeholder="Ej: Facultad de Ingeniería">
+                                    </div>
+                                    <div class="col-md-2 d-flex align-items-end">
+                                        <button type="submit" class="btn btn-sm btn-primary w-100 fw-bold"><i class="bi bi-save me-1"></i> Guardar</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Profesores -->
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div class="table-responsive" style="max-height: 70vh;">
+                    <table class="table table-hover table-custom-usuarios align-middle mb-0" id="tablaProfesores">
+                        <thead>
+                            <tr>
+                                <th style="width: 140px;">Cédula</th>
+                                <th>Nombre Completo</th>
+                                <th>Correo Institucional</th>
+                                <th>Teléfono</th>
+                                <th>Programa Académico</th>
+                                <th class="text-end" style="width: 160px;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyProfesores">
+                            {% for p in profesores %}
+                            <tr class="profesor-row-item" data-programa="{{ (p.programa or '')|lower }}">
+                                <td>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle fw-bold px-2 py-1">
+                                        {{ p.cedula }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong class="text-dark d-block text-nombre">{{ p.nombre_completo }}</strong>
+                                </td>
+                                <td>
+                                    {% if p.correo %}
+                                    <a href="mailto:{{ p.correo }}" class="text-decoration-none text-muted small text-correo">
+                                        <i class="bi bi-envelope me-1"></i>{{ p.correo }}
+                                    </a>
+                                    {% else %}
+                                    <span class="text-muted small">--</span>
+                                    {% endif %}
+                                </td>
+                                <td class="small text-muted text-telefono">{{ p.telefono or '--' }}</td>
+                                <td>
+                                    <span class="badge bg-light text-dark border text-programa">{{ p.programa or 'Sin Programa' }}</span>
+                                </td>
+                                <td class="text-end">
+                                    <a href="/profesores/historial/{{ p.cedula }}" class="btn btn-sm btn-outline-info" title="Ver Historial de Préstamos y Reservas">
+                                        <i class="bi bi-clock-history"></i>
+                                    </a>
+                                    {% if session.rol in ('admin', 'superadmin') or mod_access.profesores.editar %}
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="abrirModalEditarProfesor({{ p.cedula }}, '{{ p.nombre_completo }}', '{{ p.correo or '' }}', '{{ p.telefono or '' }}', '{{ p.programa or '' }}')" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    {% endif %}
+                                    {% if session.rol in ('admin', 'superadmin') or mod_access.profesores.eliminar %}
+                                    <button class="btn btn-sm btn-outline-danger ms-1" onclick="eliminarProfesor({{ p.cedula }})" title="Eliminar">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-person-x fs-1 d-block mb-2"></i>
+                                    No se encontraron profesores registrados.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- PESTAÑA 3: ESTUDIANTES                                         -->
+        <!-- ============================================================== -->
+        <div class="tab-pane fade {% if tab_activa == 'estudiantes' %}show active{% endif %}" id="pills-estudiantes" role="tabpanel">
+
+            <!-- KPIs Estudiantes -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="u-stat-card border-start border-4 border-primary">
+                        <div class="u-stat-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="bi bi-mortarboard"></i>
+                        </div>
+                        <div>
+                            <div class="u-stat-lbl">Total Estudiantes</div>
+                            <div class="u-stat-val">{{ kpis_estudiantes.total }}</div>
+                            <span class="badge bg-primary-subtle text-primary mt-1">Matriculados</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="u-stat-card border-start border-4 border-success">
+                        <div class="u-stat-icon bg-success bg-opacity-10 text-success">
+                            <i class="bi bi-check2-circle"></i>
+                        </div>
+                        <div>
+                            <div class="u-stat-lbl">Activos Habilitados</div>
+                            <div class="u-stat-val">{{ kpis_estudiantes.activos }}</div>
+                            <span class="badge bg-success-subtle text-success mt-1">Con acceso</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="u-stat-card border-start border-4 border-info">
+                        <div class="u-stat-icon bg-info bg-opacity-10 text-info">
+                            <i class="bi bi-building"></i>
+                        </div>
+                        <div>
+                            <div class="u-stat-lbl">Sede Engativá</div>
+                            <div class="u-stat-val">{{ kpis_estudiantes.engativa }}</div>
+                            <span class="badge bg-info-subtle text-info mt-1">Presencial</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="u-stat-card border-start border-4 border-warning">
+                        <div class="u-stat-icon bg-warning bg-opacity-10 text-warning">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                        <div>
+                            <div class="u-stat-lbl">Ciudad Bolívar</div>
+                            <div class="u-stat-val">{{ kpis_estudiantes.cd_bolivar }}</div>
+                            <span class="badge bg-warning-subtle text-warning-emphasis mt-1">Sede Sur</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros y Búsqueda Estudiantes -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-3">
+                    <form method="GET" action="{{ url_for('usuarios.usuarios_dashboard') }}" class="row g-2 align-items-center">
+                        <input type="hidden" name="tab" value="estudiantes">
+                        <div class="col-md-4">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                                <input type="text" name="busqueda" class="form-control border-start-0" placeholder="Buscar por Banner, Cédula o Nombre..." value="{{ filtros.busqueda if tab_activa == 'estudiantes' else '' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select name="sede" class="form-select form-select-sm">
+                                <option value="">-- Todas las Sedes --</option>
+                                {% for s in sedes %}
+                                <option value="{{ s.id }}" {% if filtros.sede == s.id|string and tab_activa == 'estudiantes' %}selected{% endif %}>{{ s.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select name="programa" class="form-select form-select-sm">
+                                <option value="">-- Todos los Programas --</option>
+                                {% for p in programas %}
+                                <option value="{{ p.id }}" {% if filtros.programa == p.id|string and tab_activa == 'estudiantes' %}selected{% endif %}>{{ p.codigo }} - {{ p.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex gap-2">
+                            <button type="submit" class="btn btn-sm btn-primary w-100 fw-semibold"><i class="bi bi-funnel-fill me-1"></i> Filtrar</button>
+                            <a href="{{ url_for('usuarios.usuarios_dashboard', tab='estudiantes') }}" class="btn btn-sm btn-outline-secondary" title="Limpiar"><i class="bi bi-x-lg"></i></a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tabla de Estudiantes -->
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-mortarboard-fill text-primary me-2"></i>Base Oficial de Estudiantes</h5>
+                    <div class="d-flex gap-2">
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-download me-1"></i> Exportar
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                <li><a class="dropdown-item" href="{{ url_for('estudiantes.exportar_estudiantes', formato='excel') }}"><i class="bi bi-file-earmark-excel text-success me-2"></i>Excel (.xlsx)</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('estudiantes.exportar_estudiantes', formato='csv') }}"><i class="bi bi-file-earmark-text text-secondary me-2"></i>CSV (.csv)</a></li>
+                            </ul>
+                        </div>
+                        {% if session.rol in ('admin', 'superadmin') %}
+                        <button type="button" class="btn btn-sm btn-primary fw-semibold" data-bs-toggle="modal" data-bs-target="#modalCrearEstudiante">
+                            <i class="bi bi-person-plus-fill me-1"></i> Nuevo Estudiante
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="table-responsive" style="max-height: 70vh;">
+                    <table class="table table-hover table-custom-usuarios align-middle mb-0" id="tablaEstudiantes">
+                        <thead>
+                            <tr>
+                                <th style="width: 120px;">ID Banner</th>
+                                <th style="width: 130px;">Documento</th>
+                                <th>Nombre Completo</th>
+                                <th>Programa Académico</th>
+                                <th>Sede</th>
+                                <th>Contacto</th>
+                                <th>Estado</th>
+                                <th class="text-end" style="width: 140px;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for e in estudiantes %}
+                            <tr>
+                                <td>
+                                    <span class="badge bg-primary text-white font-monospace px-2 py-1">
+                                        {{ e.codigo_banner }}
+                                    </span>
+                                </td>
+                                <td><code>{{ e.documento or '--' }}</code></td>
+                                <td>
+                                    <strong class="text-dark d-block">{{ e.nombre_completo }}</strong>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        {{ e.programa_rel.nombre if e.programa_rel else (e.atributo_programa or 'General') }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <small class="text-muted"><i class="bi bi-geo-alt me-1"></i>{{ e.descripcion_sede or (e.sede.nombre if e.sede else '--') }}</small>
+                                </td>
+                                <td class="small">
+                                    {% if e.correo %}<div><i class="bi bi-envelope text-muted me-1"></i>{{ e.correo }}</div>{% endif %}
+                                    {% if e.telefono %}<div><i class="bi bi-telephone text-muted me-1"></i>{{ e.telefono }}</div>{% endif %}
+                                </td>
+                                <td>
+                                    {% if e.activo %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">Activo</span>
+                                    {% else %}
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="abrirModalEditarEstudiante({{ e.id }}, '{{ e.codigo_banner }}', '{{ e.documento or '' }}', '{{ e.nombre_completo|replace('\'', '\\\'') }}', '{{ e.programa_id or '' }}', '{{ e.sede_id or '' }}', '{{ e.correo or '' }}', '{{ e.telefono or '' }}')" title="Editar Estudiante">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <form method="POST" action="{{ url_for('estudiantes.toggle_estado', id=e.id) }}" class="d-inline ms-1">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                        <button type="submit" class="btn btn-sm {% if e.activo %}btn-outline-warning{% else %}btn-outline-success{% endif %}" title="{% if e.activo %}Desactivar{% else %}Activar{% endif %}">
+                                            <i class="bi {% if e.activo %}bi-person-slash{% else %}bi-person-check{% endif %}"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5 text-muted">
+                                    <i class="bi bi-people fs-1 d-block mb-2"></i>
+                                    No se encontraron estudiantes registrados.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ============================================================== -->
+<!-- MODALES COMPARTIDOS Y ESPECÍFICOS                              -->
+<!-- ============================================================== -->
+
+<!-- 1. MODAL DETALLE / HORARIO / TAREAS / PERMISOS DE COLABORADOR -->
+<div class="modal fade" id="modalDetalleColab" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content border-0 shadow rounded-4">
+            <div class="modal-header bg-primary text-white rounded-top-4">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-person-badge fs-4"></i>
+                    <div>
+                        <h5 class="modal-title fw-bold mb-0" id="detalleNombre">Colaborador</h5>
+                        <small class="text-white-50" id="detalleCargoSede">Cargo - Sede</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <ul class="nav nav-tabs mb-3" id="detalleColabTabs">
+                    <li class="nav-item">
+                        <button class="nav-link active fw-bold" data-bs-toggle="tab" data-bs-target="#tabHorariosColab">
+                            <i class="bi bi-clock me-1"></i> Horario Semanal
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link fw-bold" data-bs-toggle="tab" data-bs-target="#tabTareasColab">
+                            <i class="bi bi-list-task me-1"></i> Tareas (<span id="countTareas">0</span>)
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link fw-bold" data-bs-toggle="tab" data-bs-target="#tabPermisosColab">
+                            <i class="bi bi-shield-lock me-1"></i> Permisos de Módulos
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <!-- Tab Horarios -->
+                    <div class="tab-pane fade show active" id="tabHorariosColab">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3 bg-light p-3 rounded-3 border">
+                            <div>
+                                <span class="small text-muted d-block">
+                                    <i class="bi bi-info-circle text-primary me-1"></i>
+                                    Horas en <strong>hora militar (00:00 a 24:00)</strong>. Ejemplo: <code>06:30</code> a <code>13:15</code>, <code>14:00</code> a <code>22:00</code>.
+                                </span>
+                                <div class="d-flex align-items-center gap-2 mt-2">
+                                    <span class="badge bg-primary px-3 py-1 fs-6 fw-bold" id="badgeTotalHorasModal">Total: 0.0 hrs / 42 hrs</span>
+                                    <span class="badge bg-secondary-subtle text-secondary" id="badgeVigenciaHorarioModal">A partir del 15 de julio 2026</span>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-primary fw-semibold" id="btnGuardarHorarios">
+                                    <i class="bi bi-save me-1"></i> Guardar Horario
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-muted mb-1">DOCUMENTO / C.C.</label>
+                                <input type="text" id="detalleDocumento" class="form-control form-control-sm" placeholder="Cédula de ciudadanía">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small fw-bold text-muted mb-1">TOTAL HORAS (META)</label>
+                                <input type="number" id="detalleMetaHoras" class="form-control form-control-sm" value="42">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-muted mb-1">VIGENCIA / FECHA INICIO</label>
+                                <input type="text" id="detalleFechaInicio" class="form-control form-control-sm" value="A partir del 15 de julio 2026">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted mb-1">RESUMEN DE HORARIO</label>
+                                <input type="text" id="detalleHorarioTexto" class="form-control form-control-sm" placeholder="Ej: Lunes 6:30 am a 2:00 pm, Martes a viernes...">
+                            </div>
+                        </div>
+
+                        <div class="horario-grid" id="gridHorarios">
+                            {% for dia in dias_semana %}
+                            <div class="horario-cell" data-dia="{{ dia }}">
+                                <div class="dia-label fw-bold text-primary">{{ dia }}</div>
+                                <div class="mb-1 text-start">
+                                    <label class="form-label text-muted mb-0" style="font-size:0.68rem;">ENTRADA</label>
+                                    <input type="text" class="form-control form-control-sm entrada-inp text-center" placeholder="00:00" title="Hora militar entrada (ej: 06:30)">
+                                </div>
+                                <div class="mb-1 text-start">
+                                    <label class="form-label text-muted mb-0" style="font-size:0.68rem;">SALIDA</label>
+                                    <input type="text" class="form-control form-control-sm salida-inp text-center" placeholder="00:00" title="Hora militar salida (ej: 13:15)">
+                                </div>
+                                <div class="mb-1 text-start">
+                                    <label class="form-label text-muted mb-0" style="font-size:0.68rem;">JORNADA/PISO</label>
+                                    <input type="text" class="form-control form-control-sm jornada-inp" placeholder="Piso / Laboratorio">
+                                </div>
+                                <div class="small fw-bold text-primary horas-badge mt-1">0 hrs</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Tab Tareas -->
+                    <div class="tab-pane fade" id="tabTareasColab">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="fw-bold mb-0">Tareas Asignadas</h6>
+                            <button type="button" class="btn btn-sm btn-warning text-dark fw-bold" onclick="abrirModalNuevaTarea()">
+                                <i class="bi bi-plus-lg me-1"></i> Asignar Tarea
+                            </button>
+                        </div>
+                        <div id="contenedorTareas" style="max-height: 400px; overflow-y: auto;">
+                            <!-- Dinámico con JS -->
+                        </div>
+                    </div>
+
+                    <!-- Tab Permisos -->
+                    <div class="tab-pane fade" id="tabPermisosColab">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="small text-muted">Configuración de acceso por módulo del sistema:</span>
+                            <button type="button" class="btn btn-sm btn-primary fw-semibold" id="btnGuardarPermisos">
+                                <i class="bi bi-save me-1"></i> Guardar Permisos
+                            </button>
+                        </div>
+                        <div id="listaPermisos">
+                            {% for mod in modulos_sistema %}
+                            <div class="permiso-row" data-modulo="{{ mod }}">
+                                <span class="permiso-modulo">{{ mod }}</span>
+                                <label class="permiso-check">
+                                    <input type="checkbox" class="perm-ver"> Ver
+                                </label>
+                                <label class="permiso-check">
+                                    <input type="checkbox" class="perm-crear"> Crear
+                                </label>
+                                <label class="permiso-check">
+                                    <input type="checkbox" class="perm-editar"> Editar
+                                </label>
+                                <label class="permiso-check">
+                                    <input type="checkbox" class="perm-eliminar"> Eliminar
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 2. MODAL CREAR / EDITAR COLABORADOR -->
+<div class="modal fade" id="modalColab" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow rounded-4">
+            <div class="modal-header bg-primary text-white rounded-top-4">
+                <h5 class="modal-title fw-bold" id="modalColabTitulo"><i class="bi bi-person-plus me-2"></i>Nuevo Colaborador</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" id="colabId">
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">NOMBRE COMPLETO *</label>
+                    <input type="text" id="colabNombre" class="form-control" required placeholder="Nombres y Apellidos">
+                </div>
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label small fw-bold">DOCUMENTO</label>
+                        <input type="text" id="colabDoc" class="form-control" placeholder="Cédula">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-bold">CARGO</label>
+                        <input type="text" id="colabCargo" class="form-control" placeholder="Ej: Auxiliar Sala">
+                    </div>
+                </div>
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label small fw-bold">CORREO</label>
+                        <input type="email" id="colabCorreo" class="form-control" placeholder="ejemplo@uniminuto.edu">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-bold">TELÉFONO</label>
+                        <input type="text" id="colabTel" class="form-control" placeholder="300...">
+                    </div>
+                </div>
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label small fw-bold">SEDE ASIGNADA</label>
+                        <select id="colabSede" class="form-select">
+                            <option value="">-- Seleccionar Sede --</option>
+                            {% for s in sedes %}
+                            <option value="{{ s.id }}">{{ s.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-bold">TOTAL HORAS/SEM</label>
+                        <input type="number" id="colabHoras" class="form-control" value="42">
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label small fw-bold">OBSERVACIONES</label>
+                    <textarea id="colabObs" class="form-control" rows="2" placeholder="Notas adicionales..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer bg-light rounded-bottom-4">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary btn-sm fw-bold px-4" id="btnGuardarColab">Guardar Colaborador</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 3. MODAL EDITAR PROFESOR -->
+<div class="modal fade" id="modalEditarProfesor" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow rounded-4">
+            <div class="modal-header bg-primary text-white rounded-top-4">
+                <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2"></i>Editar Profesor</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" id="editProfCedula">
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">CÉDULA</label>
+                    <input type="text" id="editProfCedulaView" class="form-control bg-light" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">NOMBRE COMPLETO *</label>
+                    <input type="text" id="editProfNombre" class="form-control" required>
+                </div>
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label small fw-bold">CORREO INSTITUCIONAL</label>
+                        <input type="email" id="editProfCorreo" class="form-control">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-bold">TELÉFONO</label>
+                        <input type="text" id="editProfTelefono" class="form-control">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">PROGRAMA ACADÉMICO</label>
+                    <input type="text" id="editProfPrograma" class="form-control">
+                </div>
+            </div>
+            <div class="modal-footer bg-light rounded-bottom-4">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary btn-sm fw-bold" id="btnGuardarEditProfesor">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 4. MODAL CREAR ESTUDIANTE -->
+<div class="modal fade" id="modalCrearEstudiante" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow rounded-4">
+            <form method="POST" action="{{ url_for('estudiantes.crear_estudiante') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="modal-header bg-primary text-white rounded-top-4">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-person-plus-fill me-2"></i>Registrar Nuevo Estudiante</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-bold small text-muted">CÓDIGO BANNER *</label>
+                            <input type="text" name="codigo_banner" class="form-control fw-bold" placeholder="Ej: 1129759" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold small text-muted">DOCUMENTO / C.C.</label>
+                            <input type="text" name="documento" class="form-control" placeholder="Cédula o ID">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">NOMBRE COMPLETO *</label>
+                        <input type="text" name="nombre_completo" class="form-control text-uppercase" placeholder="Nombres y Apellidos" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">PROGRAMA ACADÉMICO</label>
+                        <select name="programa_id" class="form-select">
+                            <option value="">-- Seleccionar Programa --</option>
+                            {% for p in programas %}
+                            <option value="{{ p.id }}">{{ p.codigo }} - {{ p.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">SEDE</label>
+                        <select name="sede_id" class="form-select">
+                            <option value="">-- Seleccionar Sede --</option>
+                            {% for s in sedes %}
+                            <option value="{{ s.id }}">{{ s.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-bold small text-muted">CORREO INSTITUCIONAL</label>
+                            <input type="email" name="correo" class="form-control" placeholder="usuario@uniminuto.edu.co">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold small text-muted">TELÉFONO</label>
+                            <input type="text" name="telefono" class="form-control" placeholder="300...">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light rounded-bottom-4">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary btn-sm fw-bold"><i class="bi bi-save me-1"></i> Registrar Estudiante</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 5. MODAL EDITAR ESTUDIANTE (REUTILIZABLE) -->
+<div class="modal fade" id="modalEditarEstudiante" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow rounded-4">
+            <form id="formEditarEstudiante" method="POST" action="">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="modal-header bg-primary text-white rounded-top-4">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2"></i>Editar Estudiante</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-bold small text-muted">CÓDIGO BANNER</label>
+                            <input type="text" id="editEstBanner" name="codigo_banner" class="form-control" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold small text-muted">DOCUMENTO</label>
+                            <input type="text" id="editEstDoc" name="documento" class="form-control">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">NOMBRE COMPLETO</label>
+                        <input type="text" id="editEstNombre" name="nombre_completo" class="form-control text-uppercase" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">PROGRAMA</label>
+                        <select id="editEstPrograma" name="programa_id" class="form-select">
+                            <option value="">-- Sin programa --</option>
+                            {% for p in programas %}
+                            <option value="{{ p.id }}">{{ p.codigo }} - {{ p.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">SEDE</label>
+                        <select id="editEstSede" name="sede_id" class="form-select">
+                            <option value="">-- Sin sede --</option>
+                            {% for s in sedes %}
+                            <option value="{{ s.id }}">{{ s.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label fw-bold small text-muted">CORREO</label>
+                            <input type="email" id="editEstCorreo" name="correo" class="form-control">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold small text-muted">TELÉFONO</label>
+                            <input type="text" id="editEstTel" name="telefono" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light rounded-bottom-4">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary btn-sm fw-bold">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 6. MODAL MATRIZ SEMANAL DE HORARIOS (42 HORAS MILITARES) -->
+<div class="modal fade" id="modalMatrizHorarios" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen-xl-down modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow rounded-4">
+            <div class="modal-header text-white rounded-top-4" style="background: linear-gradient(135deg, #1e3a5f 0%, #2d6a9f 100%);">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-calendar3-range fs-4"></i>
+                    <div>
+                        <h5 class="modal-title fw-bold mb-0">Matriz Semanal de Horarios de Colaboradores (42h)</h5>
+                        <small class="text-white-50">Horarios en formato militar (00:00 a 24:00) • Vigencia: A partir del 15 de julio 2026</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-3">
+                <div class="row g-2 align-items-center mb-3">
+                    <div class="col-md-6">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                            <input type="text" id="filtroMatrizModal" class="form-control border-start-0" placeholder="Buscar colaborador por nombre..." oninput="filtrarMatrizModalLive(this.value)">
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2">
+                            <i class="bi bi-geo-alt-fill me-1"></i>Sede actual de sesión: <strong>{{ session.get('sede_nombre', 'Sede Activa') }}</strong>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="table-responsive" style="max-height: 65vh;">
+                    <table class="table table-bordered table-hover align-middle mb-0" id="tablaMatrizModal" style="font-size:0.84rem;">
+                        <thead class="table-light text-center sticky-top">
+                            <tr>
+                                <th style="min-width: 200px; text-align: left;" class="ps-3">Colaborador</th>
+                                <th style="min-width: 105px;">Lunes</th>
+                                <th style="min-width: 105px;">Martes</th>
+                                <th style="min-width: 105px;">Miércoles</th>
+                                <th style="min-width: 105px;">Jueves</th>
+                                <th style="min-width: 105px;">Viernes</th>
+                                <th style="min-width: 105px;">Sábado</th>
+                                <th style="min-width: 90px;" class="text-center">Total</th>
+                                <th style="min-width: 90px;" class="text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyMatrizModal">
+                            <tr>
+                                <td colspan="9" class="text-center py-4 text-muted">
+                                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                                    Cargando matriz de horarios...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer bg-light rounded-bottom-4 justify-content-between">
+                <small class="text-muted">
+                    <i class="bi bi-info-circle me-1"></i>Cada colaborador cuenta con una carga exacta de 42 horas semanales en hora militar.
+                </small>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts interactivos de la página unificada -->
+<script>
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    let colabActualId = null;
+    let tabActual = '{{ tab_activa }}';
+
+    function obtenerModal(id) {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            return bootstrap.Modal.getOrCreateInstance(el);
+        }
+        return null;
+    }
+
+    function abrirModalEditarEstudiante(id, banner, doc, nombre, programaId, sedeId, correo, tel) {
+        document.getElementById('formEditarEstudiante').action = `/estudiantes/editar/${id}`;
+        document.getElementById('editEstBanner').value = banner;
+        document.getElementById('editEstDoc').value = doc;
+        document.getElementById('editEstNombre').value = nombre;
+        document.getElementById('editEstPrograma').value = programaId;
+        document.getElementById('editEstSede').value = sedeId;
+        document.getElementById('editEstCorreo').value = correo;
+        document.getElementById('editEstTel').value = tel;
+        obtenerModal('modalEditarEstudiante')?.show();
+    }
+
+    function actualizarLabelBotonPrincipal() {
+        const lbl = document.getElementById('lblAccionPrincipal');
+        if (!lbl) return;
+        if (tabActual === 'colaboradores') {
+            lbl.innerText = 'Nuevo Colaborador';
+        } else if (tabActual === 'profesores') {
+            lbl.innerText = 'Nuevo Profesor';
+        } else if (tabActual === 'estudiantes') {
+            lbl.innerText = 'Nuevo Estudiante';
+        }
+    }
+
+    function activarPestana(tabName) {
+        tabActual = tabName;
+        actualizarLabelBotonPrincipal();
+        const url = new URL(window.location);
+        url.searchParams.set('tab', tabName);
+        window.history.replaceState({}, '', url);
+    }
+
+    function abrirModalSegunTabActiva() {
+        if (tabActual === 'colaboradores') {
+            abrirModalColabNuevo();
+        } else if (tabActual === 'profesores') {
+            const collapse = document.getElementById('collapseNuevoProfesor');
+            if (collapse) {
+                if (typeof bootstrap !== 'undefined' && bootstrap.Collapse) {
+                    bootstrap.Collapse.getOrCreateInstance(collapse).toggle();
+                }
+                document.getElementById('p_cedula')?.focus();
+            }
+        } else if (tabActual === 'estudiantes') {
+            obtenerModal('modalCrearEstudiante')?.show();
+        }
+    }
+
+    // ── Colaboradores JS ──
+    let matrizColaboradoresData = [];
+
+    function normalizarHoraMilitar(str) {
+        if (!str) return '';
+        str = str.trim().replace('.', ':');
+        if (/^\d{1,2}$/.test(str)) {
+            const n = parseInt(str, 10);
+            if (n >= 0 && n <= 23) return String(n).padStart(2, '0') + ':00';
+        }
+        if (/^\d{3}$/.test(str)) {
+            return '0' + str[0] + ':' + str.slice(1);
+        }
+        if (/^\d{4}$/.test(str)) {
+            return str.slice(0, 2) + ':' + str.slice(2);
+        }
+        if (/^\d{1}:\d{2}$/.test(str)) {
+            return '0' + str;
+        }
+        return str;
+    }
+
+    function parseMinutosMilitar(str) {
+        if (!str) return null;
+        str = normalizarHoraMilitar(str);
+        const parts = str.split(':');
+        if (parts.length !== 2) return null;
+        const h = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10);
+        if (isNaN(h) || isNaN(m) || h < 0 || h > 23 || m < 0 || m > 59) return null;
+        return h * 60 + m;
+    }
+
+    function recalcularHorasModalDetalle() {
+        let total = 0.0;
+        document.querySelectorAll('#gridHorarios .horario-cell').forEach(cell => {
+            const inpEnt = cell.querySelector('.entrada-inp');
+            const inpSal = cell.querySelector('.salida-inp');
+            const badgeHoras = cell.querySelector('.horas-badge');
+
+            const entStr = inpEnt ? inpEnt.value.trim() : '';
+            const salStr = inpSal ? inpSal.value.trim() : '';
+
+            if (entStr && salStr) {
+                const minEnt = parseMinutosMilitar(entStr);
+                const minSal = parseMinutosMilitar(salStr);
+                if (minEnt !== null && minSal !== null) {
+                    if (minSal > minEnt) {
+                        inpSal.classList.remove('is-invalid');
+                        const diff = Math.round(((minSal - minEnt) / 60) * 100) / 100;
+                        badgeHoras.textContent = `${diff} hrs`;
+                        badgeHoras.className = 'small fw-bold text-success horas-badge mt-1';
+                        total += diff;
+                    } else {
+                        inpSal.classList.add('is-invalid');
+                        badgeHoras.textContent = 'Salida <= Entrada';
+                        badgeHoras.className = 'small fw-bold text-danger horas-badge mt-1';
+                    }
+                } else {
+                    badgeHoras.textContent = '0 hrs';
+                    badgeHoras.className = 'small fw-bold text-muted horas-badge mt-1';
+                }
+            } else {
+                if (inpSal) inpSal.classList.remove('is-invalid');
+                badgeHoras.textContent = '0 hrs';
+                badgeHoras.className = 'small fw-bold text-muted horas-badge mt-1';
+            }
+        });
+
+        total = Math.round(total * 100) / 100;
+        const meta = parseFloat(document.getElementById('detalleMetaHoras')?.value) || 42;
+        const badgeTotal = document.getElementById('badgeTotalHorasModal');
+        if (badgeTotal) {
+            badgeTotal.textContent = `Total: ${total.toFixed(2)} hrs / ${meta} hrs`;
+            if (Math.abs(total - meta) <= 0.2) {
+                badgeTotal.className = 'badge bg-success px-3 py-1 fs-6 fw-bold';
+            } else if (total < meta) {
+                badgeTotal.className = 'badge bg-warning text-dark px-3 py-1 fs-6 fw-bold';
+            } else {
+                badgeTotal.className = 'badge bg-primary px-3 py-1 fs-6 fw-bold';
+            }
+        }
+        return total;
+    }
+
+    // Eventos interactivos en el grid de horarios
+    document.querySelectorAll('#gridHorarios .entrada-inp, #gridHorarios .salida-inp').forEach(inp => {
+        inp.addEventListener('blur', function() {
+            this.value = normalizarHoraMilitar(this.value);
+            recalcularHorasModalDetalle();
+        });
+        inp.addEventListener('input', function() {
+            recalcularHorasModalDetalle();
+        });
+    });
+
+    document.getElementById('detalleMetaHoras')?.addEventListener('input', recalcularHorasModalDetalle);
+
+    function abrirModalColabNuevo() {
+        document.getElementById('colabId').value = '';
+        document.getElementById('colabNombre').value = '';
+        document.getElementById('colabDoc').value = '';
+        document.getElementById('colabCargo').value = '';
+        document.getElementById('colabCorreo').value = '';
+        document.getElementById('colabTel').value = '';
+        // Preseleccionar la sede de acuerdo a la sesión activa
+        document.getElementById('colabSede').value = '{{ session.get("sede_id", "") }}';
+        document.getElementById('colabHoras').value = 42;
+        document.getElementById('colabObs').value = '';
+        document.getElementById('modalColabTitulo').innerHTML = '<i class="bi bi-person-plus me-2"></i>Nuevo Colaborador';
+        obtenerModal('modalColab')?.show();
+    }
+
+    async function abrirEditarColab(id) {
+        try {
+            const r = await fetch(`/colaboradores/api/colaboradores/${id}`);
+            const { colaborador: c } = await r.json();
+            document.getElementById('colabId').value = c.id;
+            document.getElementById('colabNombre').value = c.nombre_completo || '';
+            document.getElementById('colabDoc').value = c.documento || '';
+            document.getElementById('colabCargo').value = c.cargo || '';
+            document.getElementById('colabCorreo').value = c.correo || '';
+            document.getElementById('colabTel').value = c.telefono || '';
+            document.getElementById('colabSede').value = c.sede_id || '{{ session.get("sede_id", "") }}';
+            document.getElementById('colabHoras').value = c.total_horas_semana || 42;
+            document.getElementById('colabObs').value = c.observaciones || '';
+            document.getElementById('modalColabTitulo').innerHTML = '<i class="bi bi-pencil me-2"></i>Editar Colaborador';
+            obtenerModal('modalColab')?.show();
+        } catch(e) {
+            alert('Error al cargar datos del colaborador.');
+        }
+    }
+
+    document.getElementById('btnGuardarColab')?.addEventListener('click', async function () {
+        const id = document.getElementById('colabId').value;
+        const nombre = document.getElementById('colabNombre').value.trim();
+        if (!nombre) {
+            alert('El nombre completo es requerido.');
+            return;
+        }
+
+        const payload = {
+            nombre_completo: nombre,
+            documento: document.getElementById('colabDoc').value.trim(),
+            cargo: document.getElementById('colabCargo').value.trim(),
+            correo: document.getElementById('colabCorreo').value.trim(),
+            telefono: document.getElementById('colabTel').value.trim(),
+            sede_id: document.getElementById('colabSede').value || '{{ session.get("sede_id", "") }}' || null,
+            total_horas_semana: parseInt(document.getElementById('colabHoras').value) || 42,
+            fecha_inicio_horario: 'A partir del 15 de julio 2026',
+            observaciones: document.getElementById('colabObs').value.trim(),
+        };
+
+        const url = id ? `/colaboradores/api/colaboradores/${id}` : '/colaboradores/api/colaboradores';
+        const method = id ? 'PUT' : 'POST';
+
+        const r = await fetch(url, {
+            method,
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken},
+            body: JSON.stringify(payload)
+        });
+        const d = await r.json();
+        if (d.success) {
+            obtenerModal('modalColab')?.hide();
+            window.location.href = '/usuarios?tab=colaboradores';
+        } else {
+            alert(d.message || 'Error al guardar.');
+        }
+    });
+
+    async function abrirDetalleColab(id) {
+        colabActualId = id;
+        try {
+            const r = await fetch(`/colaboradores/api/colaboradores/${id}`);
+            const { colaborador: c } = await r.json();
+
+            document.getElementById('detalleNombre').textContent = c.nombre_completo;
+            document.getElementById('detalleCargoSede').textContent = `${c.cargo || 'Colaborador'} — ${c.sede || 'Sin Sede Asignada'}${c.documento ? ' • Documento: ' + c.documento : ''}`;
+            document.getElementById('detalleDocumento').value = c.documento || '';
+            document.getElementById('detalleMetaHoras').value = c.total_horas_semana || 42;
+            document.getElementById('detalleFechaInicio').value = c.fecha_inicio_horario || 'A partir del 15 de julio 2026';
+            document.getElementById('detalleHorarioTexto').value = c.horario_texto || '';
+            document.getElementById('badgeVigenciaHorarioModal').textContent = c.fecha_inicio_horario || 'A partir del 15 de julio 2026';
+
+            // Cargar Horarios diarios en formato militar
+            document.querySelectorAll('#gridHorarios .horario-cell').forEach(cell => {
+                const dia = cell.dataset.dia;
+                const h = (c.horarios || []).find(x => x.dia === dia) || {};
+                cell.querySelector('.entrada-inp').value = h.hora_entrada || '';
+                cell.querySelector('.salida-inp').value = h.hora_salida || '';
+                cell.querySelector('.jornada-inp').value = h.jornada || '';
+                cell.querySelector('.horas-badge').textContent = h.horas_dia ? `${h.horas_dia} hrs` : '0 hrs';
+            });
+
+            recalcularHorasModalDetalle();
+
+            // Cargar Tareas
+            const contTareas = document.getElementById('contenedorTareas');
+            contTareas.innerHTML = '';
+            document.getElementById('countTareas').textContent = (c.tareas || []).length;
+            (c.tareas || []).forEach(t => {
+                const item = document.createElement('div');
+                item.className = 'tarea-item d-flex justify-content-between align-items-center';
+                item.innerHTML = `
+                    <div>
+                        <div class="fw-bold">${t.titulo}</div>
+                        <small class="text-muted">${t.descripcion || 'Sin descripción'}</small>
+                    </div>
+                    <span class="badge ${t.estado === 'completada' ? 'bg-success' : 'bg-warning'}">${t.estado}</span>
+                `;
+                contTareas.appendChild(item);
+            });
+
+            // Cargar Permisos
+            const rP = await fetch(`/colaboradores/api/colaboradores/${id}/permisos`);
+            const { permisos } = await rP.json();
+            document.querySelectorAll('#listaPermisos .permiso-row').forEach(row => {
+                const mod = row.dataset.modulo;
+                const p = (permisos || []).find(x => x.modulo === mod) || {};
+                row.querySelector('.perm-ver').checked = p.puede_ver || false;
+                row.querySelector('.perm-crear').checked = p.puede_crear || false;
+                row.querySelector('.perm-editar').checked = p.puede_editar || false;
+                row.querySelector('.perm-eliminar').checked = p.puede_eliminar || false;
+            });
+
+            obtenerModal('modalDetalleColab')?.show();
+        } catch(e) {
+            alert('Error al cargar la información detallada del colaborador.');
+        }
+    }
+
+    document.getElementById('btnGuardarHorarios')?.addEventListener('click', async function () {
+        if (!colabActualId) return;
+        const horarios = [];
+        document.querySelectorAll('#gridHorarios .horario-cell').forEach(cell => {
+            const inpEnt = cell.querySelector('.entrada-inp');
+            const inpSal = cell.querySelector('.salida-inp');
+            horarios.push({
+                dia: cell.dataset.dia,
+                hora_entrada: normalizarHoraMilitar(inpEnt ? inpEnt.value : '') || null,
+                hora_salida: normalizarHoraMilitar(inpSal ? inpSal.value : '') || null,
+                jornada: cell.querySelector('.jornada-inp')?.value || null,
+            });
+        });
+
+        const payload = {
+            documento: document.getElementById('detalleDocumento').value.trim() || null,
+            horarios: horarios,
+            total_horas_semana: parseInt(document.getElementById('detalleMetaHoras').value) || 42,
+            fecha_inicio_horario: document.getElementById('detalleFechaInicio').value.trim() || 'A partir del 15 de julio 2026',
+            horario_texto: document.getElementById('detalleHorarioTexto').value.trim() || null
+        };
+
+        const r = await fetch(`/colaboradores/api/colaboradores/${colabActualId}/horarios`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken},
+            body: JSON.stringify(payload)
+        });
+        const d = await r.json();
+        if (d.success) {
+            obtenerModal('modalDetalleColab')?.hide();
+            window.location.href = '/usuarios?tab=colaboradores';
+        } else {
+            alert(d.message || 'Error al guardar.');
+        }
+    });
+
+    document.getElementById('btnGuardarPermisos')?.addEventListener('click', async function () {
+        if (!colabActualId) return;
+        const permisos = [];
+        document.querySelectorAll('#listaPermisos .permiso-row').forEach(row => {
+            permisos.push({
+                modulo: row.dataset.modulo,
+                puede_ver: row.querySelector('.perm-ver').checked,
+                puede_crear: row.querySelector('.perm-crear').checked,
+                puede_editar: row.querySelector('.perm-editar').checked,
+                puede_eliminar: row.querySelector('.perm-eliminar').checked,
+            });
+        });
+        const r = await fetch(`/colaboradores/api/colaboradores/${colabActualId}/permisos`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken},
+            body: JSON.stringify(payload = { permisos })
+        });
+        const d = await r.json();
+        alert(d.message);
+    });
+
+    // ── Matriz Semanal de Horarios (42h Militares) ──
+    async function abrirModalMatrizHorarios() {
+        obtenerModal('modalMatrizHorarios')?.show();
+        const tbody = document.getElementById('tbodyMatrizModal');
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Cargando matriz general de horarios...</td></tr>`;
+        try {
+            const r = await fetch('/colaboradores/api/horarios-todos');
+            const data = await r.json();
+            if (data.success) {
+                matrizColaboradoresData = data.colaboradores || [];
+                renderizarMatrizModal(matrizColaboradoresData);
+            } else {
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-danger">${data.message || 'Error al cargar horarios'}</td></tr>`;
+            }
+        } catch (e) {
+            tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-danger">Error de red al consultar horarios.</td></tr>`;
+        }
+    }
+
+    function renderizarMatrizModal(lista) {
+        const tbody = document.getElementById('tbodyMatrizModal');
+        if (!tbody) return;
+        if (!lista || lista.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted">No se encontraron colaboradores en la sede activa.</td></tr>`;
+            return;
+        }
+
+        const diasConfig = [
+            { clave: 'Lunes', etiqueta: 'Lunes' },
+            { clave: 'Martes', etiqueta: 'Martes' },
+            { clave: 'Miercoles', claveAlt: 'Miércoles', etiqueta: 'Miércoles' },
+            { clave: 'Jueves', etiqueta: 'Jueves' },
+            { clave: 'Viernes', etiqueta: 'Viernes' },
+            { clave: 'Sabado', claveAlt: 'Sábado', etiqueta: 'Sábado' }
+        ];
+        let html = '';
+
+        lista.forEach(c => {
+            const mapaH = {};
+            (c.horarios || []).forEach(h => {
+                if (!h || !h.dia) return;
+                mapaH[h.dia] = h;
+                const sinTilde = h.dia.normalize ? h.dia.normalize("NFD").replace(/[\u0300-\u036f]/g, "") : h.dia;
+                mapaH[sinTilde] = h;
+            });
+            const prog = Math.round((c.horas_programadas || 0) * 10) / 10;
+            const meta = c.total_horas_semana || 42;
+            const diff = Math.round((prog - meta) * 10) / 10;
+
+            let badgeTotal = '';
+            if (Math.abs(diff) <= 0.2) {
+                badgeTotal = `<span class="badge bg-success-subtle text-success border border-success-subtle fw-bold">${prog}h / 42h <i class="bi bi-check-lg"></i></span>`;
+            } else if (diff < 0) {
+                badgeTotal = `<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-bold">${prog}h / 42h</span>`;
+            } else {
+                badgeTotal = `<span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-bold">${prog}h / 42h</span>`;
+            }
+
+            html += `<tr>`;
+            html += `<td class="ps-3">
+                        <strong class="d-block text-dark">${c.nombre_completo}</strong>
+                        <span class="small text-muted">${c.cargo || 'Colaborador'}${c.documento ? ' • Doc: ' + c.documento : ''}</span>
+                     </td>`;
+
+            diasConfig.forEach(d => {
+                const h = mapaH[d.clave] || (d.claveAlt ? mapaH[d.claveAlt] : null);
+                if (h && (h.hora_entrada || h.hora_salida)) {
+                    html += `<td class="text-center p-1 bg-light bg-opacity-50">
+                                <div class="fw-bold text-dark" style="font-size:0.8rem;"><i class="bi bi-clock me-1 text-primary"></i>${h.hora_entrada || '--'} - ${h.hora_salida || '--'}</div>
+                                <div class="small text-primary fw-semibold">${h.horas_dia ? h.horas_dia + 'h' : ''}</div>
+                             </td>`;
+                } else {
+                    html += `<td class="text-center p-1 text-muted opacity-50"><small>Descanso</small></td>`;
+                }
+            });
+
+            html += `<td class="text-center">${badgeTotal}</td>`;
+            html += `<td class="text-center">
+                        <button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="obtenerModal('modalMatrizHorarios')?.hide(); abrirDetalleColab(${c.id})" title="Editar Horario">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                     </td>`;
+            html += `</tr>`;
+        });
+
+        tbody.innerHTML = html;
+    }
+
+    function filtrarMatrizModalLive(query) {
+        const q = (query || '').toLowerCase().trim();
+        if (!q) {
+            renderizarMatrizModal(matrizColaboradoresData);
+            return;
+        }
+        const filtrados = matrizColaboradoresData.filter(c => 
+            (c.nombre_completo || '').toLowerCase().includes(q) ||
+            (c.cargo || '').toLowerCase().includes(q)
+        );
+        renderizarMatrizModal(filtrados);
+    }
+
+    // ── Profesores JS ──
+    document.getElementById('formCrearProfesor')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const payload = {
+            cedula: document.getElementById('p_cedula').value,
+            nombre_completo: document.getElementById('p_nombre').value,
+            correo: document.getElementById('p_correo').value,
+            telefono: document.getElementById('p_telefono').value,
+            programa: document.getElementById('p_programa').value,
+            facultad: document.getElementById('p_facultad').value
+        };
+
+        const r = await fetch('/profesores/agregar', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken},
+            body: JSON.stringify(payload)
+        });
+        const d = await r.json();
+        if (d.success) {
+            window.location.href = '/usuarios?tab=profesores';
+        } else {
+            alert(d.message || 'Error al agregar profesor.');
+        }
+    });
+
+    function abrirModalEditarProfesor(cedula, nombre, correo, telefono, programa) {
+        document.getElementById('editProfCedula').value = cedula;
+        document.getElementById('editProfCedulaView').value = cedula;
+        document.getElementById('editProfNombre').value = nombre;
+        document.getElementById('editProfCorreo').value = correo;
+        document.getElementById('editProfTelefono').value = telefono;
+        document.getElementById('editProfPrograma').value = programa;
+        obtenerModal('modalEditarProfesor')?.show();
+    }
+
+    document.getElementById('btnGuardarEditProfesor')?.addEventListener('click', async function () {
+        const cedula = document.getElementById('editProfCedula').value;
+        const payload = {
+            nombre_completo: document.getElementById('editProfNombre').value,
+            correo: document.getElementById('editProfCorreo').value,
+            telefono: document.getElementById('editProfTelefono').value,
+            programa: document.getElementById('editProfPrograma').value
+        };
+
+        const r = await fetch(`/profesores/${cedula}`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken},
+            body: JSON.stringify(payload)
+        });
+        const d = await r.json();
+        if (d.success) {
+            obtenerModal('modalEditarProfesor')?.hide();
+            window.location.href = '/usuarios?tab=profesores';
+        } else {
+            alert(d.message || 'Error al actualizar.');
+        }
+    });
+
+    async function eliminarProfesor(cedula) {
+        if (!confirm(`¿Está seguro de eliminar al profesor con cédula ${cedula}?`)) return;
+        const r = await fetch(`/profesores/${cedula}`, {
+            method: 'DELETE',
+            headers: {'X-CSRFToken': csrfToken}
+        });
+        const d = await r.json();
+        alert(d.message);
+        if (d.success) {
+            window.location.href = '/usuarios?tab=profesores';
+        }
+    }
+
+    // Live search para Profesores
+    document.getElementById('buscarProfesorLive')?.addEventListener('input', function() {
+        const q = this.value.toLowerCase().trim();
+        document.querySelectorAll('#tbodyProfesores tr.profesor-row-item').forEach(tr => {
+            const texto = tr.textContent.toLowerCase();
+            tr.style.display = (!q || texto.includes(q)) ? '' : 'none';
+        });
+    });
+
+    function filtrarProfesoresPorPrograma(prog) {
+        const p = prog.toLowerCase().trim();
+        document.querySelectorAll('#tbodyProfesores tr.profesor-row-item').forEach(tr => {
+            const dataProg = tr.dataset.programa || '';
+            tr.style.display = (!p || dataProg.includes(p)) ? '' : 'none';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        actualizarLabelBotonPrincipal();
+    });
+</script>
+
+{% include 'components/footer.html' %}

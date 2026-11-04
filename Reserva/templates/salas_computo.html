@@ -63,15 +63,39 @@
     <!-- ENCABEZADO Y TÍTULO -->
     <div class="row mb-3 align-items-center">
         <div class="col-md-7">
-            <h2 class="mb-1 fw-bold text-dark d-flex align-items-center gap-2">
+            <h2 class="mb-1 fw-bold text-dark d-flex align-items-center gap-2 flex-wrap">
                 <i class="bi bi-pc-display-horizontal text-primary"></i>
                 Salas de Cómputo e Informática
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 fs-6 rounded-pill">
+                    <i class="bi bi-geo-alt-fill me-1"></i>Sede: {{ sede_activa_obj.nombre if sede_activa_obj else (session.get('sede_nombre') or 'General') }}
+                </span>
             </h2>
             <p class="text-muted mb-0 small">
                 Gestión de disponibilidad de puestos, software instalado, novedades técnicas y programación de clases.
             </p>
         </div>
-        <div class="col-md-5 text-md-end mt-2 mt-md-0 d-flex justify-content-md-end gap-2 flex-wrap">
+        <div class="col-md-5 text-md-end mt-2 mt-md-0 d-flex justify-content-md-end gap-2 flex-wrap align-items-center">
+            {% if session.rol in ('admin', 'superadmin') or session.get('puede_cambiar_sede') %}
+            <div class="dropdown">
+                <button class="btn btn-outline-primary btn-sm dropdown-toggle fw-semibold shadow-xs" type="button" id="dropdownSedeSalas" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-arrow-left-right me-1"></i> Cambiar Sede
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="dropdownSedeSalas">
+                    <li><h6 class="dropdown-header text-uppercase small fw-bold">Sedes Disponibles</h6></li>
+                    {% for s in sedes %}
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center justify-content-between {% if (filtros.sede|string) == (s.id|string) %}active fw-bold{% endif %}" 
+                           href="{{ url_for('salas_computo.dashboard_salas', sede=s.id, tab=tab_activa) }}">
+                            <span><i class="bi bi-geo-alt{% if (filtros.sede|string) == (s.id|string) %}-fill text-warning{% endif %} me-2"></i>{{ s.nombre }}</span>
+                            {% if (filtros.sede|string) == (s.id|string) %}
+                            <i class="bi bi-check-lg text-white"></i>
+                            {% endif %}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
             <button type="button" class="btn btn-outline-danger shadow-xs btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#modalNuevaNovedad">
                 <i class="bi bi-exclamation-triangle-fill me-1"></i> Reportar Falla Técnica
             </button>
@@ -80,6 +104,9 @@
                 <i class="bi bi-plus-circle me-1"></i> Nuevo Software
             </button>
             {% endif %}
+            <a href="{{ url_for('planillas.planillas_dashboard', tab='salas_computo') }}" class="btn btn-outline-success shadow-xs btn-sm fw-semibold" title="Subir o descargar programación de clases en Excel">
+                <i class="bi bi-file-earmark-excel me-1"></i> Planilla Excel
+            </a>
             <a href="{{ url_for('index') }}" class="btn btn-light btn-sm border shadow-xs">
                 <i class="bi bi-house-door"></i> Inicio
             </a>
@@ -205,6 +232,8 @@
                                     <option value="{{ sm.sala.id }}" {% if loop.first %}selected{% endif %}>
                                         {{ sm.sala.nombre }} ({{ sm.sede_nombre }}) - {{ sm.operativos }}/{{ sm.total_puestos }} Operativos
                                     </option>
+                                    {% else %}
+                                    <option value="">No hay salas registradas en esta sede</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -323,7 +352,7 @@
                                 
                                 <div class="mb-3">
                                     <small class="fw-bold d-block text-secondary mb-1">
-                                        <i class="bi bi-geo-alt me-1"></i> Instalado en {{ item.total_salas }} salas:
+                                        <i class="bi bi-geo-alt me-1"></i> Instalado en {{ item.total_salas }} salas ({{ sede_activa_obj.nombre if sede_activa_obj else (session.get('sede_nombre') or 'Sede') }}):
                                     </small>
                                     <div class="d-flex gap-1 flex-wrap" style="max-height: 60px; overflow-y: auto;">
                                         {% if item.salas_nombres %}
@@ -331,7 +360,7 @@
                                             <span class="software-badge"><i class="bi bi-pc me-1"></i>{{ s_nombre }}</span>
                                             {% endfor %}
                                         {% else %}
-                                            <span class="text-muted small fst-italic">No asignado a ninguna sala</span>
+                                            <span class="text-muted small fst-italic">No asignado en esta sede</span>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -339,7 +368,7 @@
                                 <div class="mt-auto pt-2 border-top d-flex justify-content-between align-items-center">
                                     <span class="badge bg-secondary-subtle text-secondary">{{ item.item.categoria }}</span>
                                     <button type="button" class="btn btn-outline-primary btn-sm fw-semibold" 
-                                            onclick="abrirModalAsignarSalas('{{ item.item.id }}', '{{ item.item.nombre }}')">
+                                            onclick="abrirModalAsignarSalas('{{ item.item.id }}', '{{ item.item.nombre }}', {{ item.salas_nombres | tojson | safe }})">
                                         <i class="bi bi-pencil-square me-1"></i> Asignar Salas
                                     </button>
                                 </div>
@@ -503,9 +532,10 @@
                                         <div class="col-md-3">
                                             <label class="form-label small fw-bold">Sede:</label>
                                             <select class="form-select form-select-sm" id="form_sede_id" name="sede_id" required>
-                                                <option value="">Seleccionar...</option>
                                                 {% for s in sedes %}
-                                                <option value="{{ s.id }}">{{ s.nombre }}</option>
+                                                    {% if not filtros.sede or (s.id|string) == (filtros.sede|string) or session.rol in ('admin', 'superadmin') %}
+                                                    <option value="{{ s.id }}" {% if (s.id|string) == (filtros.sede|string) %}selected{% endif %}>{{ s.nombre }}</option>
+                                                    {% endif %}
                                                 {% endfor %}
                                             </select>
                                         </div>
@@ -572,25 +602,187 @@
                 <!-- Filtros y Listado de Clases -->
                 <div class="col-12">
                     <div class="card shadow-xs border-0">
-                        <div class="card-header bg-white py-3 border-bottom">
+                        <div class="card-header bg-white py-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-3">
+                                <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-calendar3 me-1 text-primary"></i> Programación de Clases y Asistencia Docente</h6>
+                                <!-- Selector de Modo de Vista -->
+                                <div class="btn-group btn-group-sm shadow-2xs" role="group">
+                                    <button type="button" class="btn btn-primary active" id="btnModoRonda" onclick="alternarModoVistaClases('ronda')">
+                                        <i class="bi bi-card-checklist me-1"></i> Ronda Rápida por Salón
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary" id="btnModoTabla" onclick="alternarModoVistaClases('tabla')">
+                                        <i class="bi bi-table me-1"></i> Vista Tabla
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex align-items-center gap-2">
+                                <button type="button" class="btn btn-sm btn-success fw-semibold" id="btnMarcarVisiblesSi" title="Marcar todas las clases visibles como asistidas con 1 clic">
+                                    <i class="bi bi-check-all me-1"></i> Marcar Todo SÍ
+                                </button>
+                                {% if session.rol in ('admin', 'superadmin') or mod_access.salas_computo.crear %}
+                                <form action="{{ url_for('salas_computo.sincronizar_reservas_a_clases') }}" method="POST" class="d-inline" onsubmit="return confirm('¿Sincronizar las reservas hacia las clases programadas y asistencia docente?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="sede_id" value="{{ filtros.sede }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary fw-semibold" title="Sincronizar reservas hacia clases y asistencia docente">
+                                        <i class="bi bi-arrow-repeat me-1"></i> Sincronizar desde Reservas
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Barra de Resumen Rápido de Asistencia en Tiempo Real -->
+                        <div class="bg-light px-3 py-2 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-3 small">
+                                <span>Total Clases: <strong id="contadorTotalClases">{{ clases|length }}</strong></span>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle py-1 px-2">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Asistieron: <strong id="contadorAsistieron">{{ total_asistieron }}</strong>
+                                </span>
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle py-1 px-2">
+                                    <i class="bi bi-x-circle-fill me-1"></i> No Asistieron / Pendientes: <strong id="contadorSinAsistencia">{{ total_no_asistieron }}</strong>
+                                </span>
+                            </div>
+                            <!-- Toast de feedback instantáneo -->
+                            <div id="toastAsistenciaRapida" class="badge bg-success text-white py-1 px-3 shadow-sm d-none animate__animated animate__fadeIn">
+                                <i class="bi bi-check2-circle me-1"></i> <span id="toastAsistenciaTexto">Guardado</span>
+                            </div>
+                        </div>
+
+                        <!-- Filtros de búsqueda y jornada -->
+                        <div class="card-body p-3 bg-light-subtle border-bottom">
                             <form method="GET" action="{{ url_for('salas_computo.dashboard_salas') }}" class="row g-2 align-items-center">
                                 <input type="hidden" name="tab" value="clases">
-                                <div class="col-md-3">
-                                    <input type="date" class="form-control form-control-sm" name="fecha" value="{{ filtros.fecha or '' }}">
+                                <input type="hidden" name="sede" value="{{ filtros.sede }}">
+                                <div class="col-md-2">
+                                    <input type="date" class="form-control form-control-sm" name="fecha" value="{{ filtros.fecha or '' }}" title="Filtrar por fecha">
                                 </div>
-                                <div class="col-md-3">
-                                    <input type="text" class="form-control form-control-sm" name="salon" value="{{ filtros.salon or '' }}" placeholder="Filtrar por salón (ej: LS1, A501)">
+                                <div class="col-md-2">
+                                    <select class="form-select form-select-sm" name="jornada" title="Filtrar por jornada">
+                                        <option value="">Todas las Jornadas</option>
+                                        <option value="MAÑANA" {% if filtros.jornada == 'MAÑANA' %}selected{% endif %}>Mañana (07:00-13:44)</option>
+                                        <option value="TARDE" {% if filtros.jornada == 'TARDE' %}selected{% endif %}>Tarde (13:45-18:14)</option>
+                                        <option value="NOCHE" {% if filtros.jornada == 'NOCHE' %}selected{% endif %}>Noche (18:15-22:00)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="text" class="form-control form-control-sm" name="salon" value="{{ filtros.salon or '' }}" placeholder="Salón (ej: 801LS4)">
                                 </div>
                                 <div class="col-md-4">
                                     <input type="text" class="form-control form-control-sm" name="busqueda" value="{{ filtros.busqueda or '' }}" placeholder="Profesor, materia, programa...">
                                 </div>
                                 <div class="col-md-2 d-flex gap-2">
                                     <button type="submit" class="btn btn-sm btn-secondary w-100"><i class="bi bi-funnel me-1"></i> Filtrar</button>
-                                    <a href="{{ url_for('salas_computo.dashboard_salas', tab='clases') }}" class="btn btn-sm btn-light border"><i class="bi bi-x"></i></a>
+                                    <a href="{{ url_for('salas_computo.dashboard_salas', tab='clases', sede=filtros.sede) }}" class="btn btn-sm btn-light border" title="Limpiar filtros"><i class="bi bi-x"></i></a>
                                 </div>
                             </form>
                         </div>
-                        <div class="table-responsive">
+
+                        <!-- ======================================================== -->
+                        <!-- VISTA 1: RONDA RÁPIDA POR SALÓN (CHECKLIST AUXILIARES)   -->
+                        <!-- ======================================================== -->
+                        <div id="contenedorRondaRapida" class="p-3">
+                            {% if clases_agrupadas %}
+                                {% for grupo_nombre, salones in clases_agrupadas.items() %}
+                                <div class="mb-4">
+                                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="fs-5 fw-bold text-primary"><i class="bi bi-building me-1"></i> {{ grupo_nombre }}</span>
+                                            <span class="badge bg-primary-subtle text-primary border">{{ salones.values()|map('length')|sum }} clases</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row g-3">
+                                        {% for salon_nombre, clases_salon in salones.items() %}
+                                        <div class="col-12 col-xl-6">
+                                            <div class="card h-100 shadow-sm border-0 border-top border-3 border-primary">
+                                                <div class="card-header bg-light d-flex justify-content-between align-items-center py-2 px-3">
+                                                    <div>
+                                                        <span class="fw-bold fs-6 text-dark"><i class="bi bi-display me-1 text-primary"></i> {{ salon_nombre }}</span>
+                                                        <small class="text-muted ms-2">({{ clases_salon|length }} clases programadas)</small>
+                                                    </div>
+                                                    <button type="button" class="btn btn-sm btn-outline-success py-0 px-2 btn-marcar-salon" 
+                                                            data-salon="{{ salon_nombre }}"
+                                                            data-ids="{{ clases_salon|map(attribute='id_clase')|join(',') }}"
+                                                            title="Marcar todas las clases de {{ salon_nombre }} como Asistió">
+                                                        <i class="bi bi-check2-all me-1"></i> Todo Asistió
+                                                    </button>
+                                                </div>
+                                                <div class="card-body p-2">
+                                                    <div class="d-flex flex-column gap-2">
+                                                        {% for c in clases_salon %}
+                                                        <div class="p-2 rounded border bg-white item-clase-ronda {% if c.asistencia == 'Sí' %}border-success-subtle bg-success-subtle{% endif %}" id="cardClase{{ c.id_clase }}" data-id="{{ c.id_clase }}">
+                                                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                                                <div class="flex-grow-1">
+                                                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                                                        <span class="badge bg-secondary-subtle text-dark border">
+                                                                            <i class="bi bi-clock me-1"></i>{{ c.hora_inicio.strftime('%H:%M') }} - {{ c.hora_fin.strftime('%H:%M') }}
+                                                                        </span>
+                                                                        {% if c.jornada %}
+                                                                        <span class="badge bg-light text-muted border small">{{ c.jornada }}</span>
+                                                                        {% endif %}
+                                                                        <span class="badge bg-light text-muted border small">{{ c.fecha.strftime('%d/%m') }}</span>
+                                                                    </div>
+                                                                    <div class="fw-bold text-dark">{{ c.nombre_profesor }}</div>
+                                                                    <div class="small text-muted">{{ c.materia }}</div>
+                                                                </div>
+                                                                
+                                                                <!-- Botones de Acción Inmediata SÍ / NO -->
+                                                                <div class="d-flex flex-column align-items-end gap-1">
+                                                                    <div class="btn-group btn-group-sm" role="group">
+                                                                        <button type="button" 
+                                                                                class="btn btn-sm btn-toggle-asistencia btn-asist-si {% if c.asistencia == 'Sí' %}btn-success text-white shadow-2xs{% else %}btn-outline-success{% endif %}"
+                                                                                data-id="{{ c.id_clase }}" data-val="Sí"
+                                                                                title="Marcar como Asistió">
+                                                                            <i class="bi bi-check-lg"></i> SÍ
+                                                                        </button>
+                                                                        <button type="button" 
+                                                                                class="btn btn-sm btn-toggle-asistencia btn-asist-no {% if c.asistencia != 'Sí' %}btn-danger text-white shadow-2xs{% else %}btn-outline-danger{% endif %}"
+                                                                                data-id="{{ c.id_clase }}" data-val="No"
+                                                                                title="Marcar como No Asistió">
+                                                                            <i class="bi bi-x-lg"></i> NO
+                                                                        </button>
+                                                                    </div>
+                                                                    <small class="badge {% if c.asistencia == 'Sí' %}bg-success{% else %}bg-secondary{% endif %}" id="statusBadgeRonda{{ c.id_clase }}">
+                                                                        {{ 'Asistió' if c.asistencia == 'Sí' else 'No Asistió' }}
+                                                                    </small>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Input Rápido de Observación con guardado automático al salir -->
+                                                            <div class="input-group input-group-sm mt-2">
+                                                                <span class="input-group-text bg-light border-end-0 py-0"><i class="bi bi-chat-left-dots text-muted"></i></span>
+                                                                <input type="text" class="form-control form-control-sm border-start-0 py-0 input-obs-rapida" 
+                                                                       id="obsRonda{{ c.id_clase }}" data-id="{{ c.id_clase }}"
+                                                                       placeholder="Nota rápida de ronda (ej. puntual, 25 PCs encendidos)..." 
+                                                                       value="{{ c.observaciones or '' }}">
+                                                                <button class="btn btn-light border btn-guardar-obs py-0" data-id="{{ c.id_clase }}" title="Guardar nota">
+                                                                    <i class="bi bi-check2 text-success"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-5 text-muted">
+                                    <i class="bi bi-calendar-x fs-1 d-block mb-3 text-secondary"></i>
+                                    <h5>No se encontraron clases para la ronda con los filtros seleccionados</h5>
+                                    <p class="small text-muted">Ajusta la fecha o la jornada seleccionada en el filtro superior.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- ======================================================== -->
+                        <!-- VISTA 2: TABLA DETALLADA CON CONTROLES RÁPIDOS          -->
+                        <!-- ======================================================== -->
+                        <div id="contenedorTablaClases" class="table-responsive d-none">
                             <table class="table table-hover align-middle mb-0">
                                 <thead class="table-light">
                                     <tr>
@@ -599,7 +791,7 @@
                                         <th>Salón</th>
                                         <th>Profesor</th>
                                         <th>Materia</th>
-                                        <th>Asistencia</th>
+                                        <th>Asistencia Rápida</th>
                                         <th>Estudiantes</th>
                                         <th>Modalidad</th>
                                         <th class="text-end">Acciones</th>
@@ -607,12 +799,13 @@
                                 </thead>
                                 <tbody>
                                     {% for c in clases %}
-                                    <tr>
+                                    <tr id="rowTablaClase{{ c.id_clase }}">
                                         <td><strong>{{ c.fecha.strftime('%d/%m/%Y') }}</strong></td>
                                         <td>
                                             <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
                                                 <i class="bi bi-clock me-1"></i>{{ c.hora_inicio.strftime('%H:%M') }} - {{ c.hora_fin.strftime('%H:%M') }}
                                             </span>
+                                            {% if c.jornada %}<small class="d-block text-muted">{{ c.jornada }}</small>{% endif %}
                                         </td>
                                         <td><span class="badge bg-light text-dark border fw-bold">{{ c.salon }}</span></td>
                                         <td><strong class="text-dark">{{ c.nombre_profesor }}</strong></td>
@@ -621,19 +814,39 @@
                                             <small class="text-muted">{{ c.programa or '--' }}</small>
                                         </td>
                                         <td>
-                                            {% if c.asistencia == 'Sí' %}
-                                            <span class="badge bg-success"><i class="bi bi-check-lg me-1"></i>Asistió</span>
-                                            {% else %}
-                                            <span class="badge bg-danger"><i class="bi bi-x-lg me-1"></i>No Asistió</span>
-                                            {% endif %}
+                                            <!-- Control Rápido de 1 Clic en Tabla -->
+                                            <div class="d-flex align-items-center gap-1">
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-toggle-asistencia btn-asist-si {% if c.asistencia == 'Sí' %}btn-success text-white{% else %}btn-outline-success{% endif %}"
+                                                            data-id="{{ c.id_clase }}" data-val="Sí" title="Marcar como Asistió">
+                                                        <i class="bi bi-check-lg"></i>
+                                                    </button>
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-toggle-asistencia btn-asist-no {% if c.asistencia != 'Sí' %}btn-danger text-white{% else %}btn-outline-danger{% endif %}"
+                                                            data-id="{{ c.id_clase }}" data-val="No" title="Marcar como No Asistió">
+                                                        <i class="bi bi-x-lg"></i>
+                                                    </button>
+                                                </div>
+                                                <span class="badge ms-1 {% if c.asistencia == 'Sí' %}bg-success{% else %}bg-danger{% endif %}" id="statusBadgeTabla{{ c.id_clase }}">
+                                                    {{ 'Asistió' if c.asistencia == 'Sí' else 'No Asistió' }}
+                                                </span>
+                                            </div>
                                         </td>
                                         <td>{{ c.num_estudiantes or '-' }}</td>
                                         <td><span class="badge bg-info text-dark">{{ c.modalidad }}</span></td>
                                         <td class="text-end">
                                             <div class="btn-group btn-group-sm">
-                                                <button type="button" class="btn btn-success fw-semibold" 
-                                                        data-bs-toggle="modal" data-bs-target="#modalAsistencia{{ c.id_clase }}">
-                                                    <i class="bi bi-calendar-check me-1"></i> Asistencia
+                                                <button type="button" class="btn btn-outline-primary btn-abrir-asistencia"
+                                                        data-id="{{ c.id_clase }}"
+                                                        data-salon="{{ c.salon }}"
+                                                        data-horario="{{ c.hora_inicio.strftime('%H:%M') }} - {{ c.hora_fin.strftime('%H:%M') }}"
+                                                        data-profesor="{{ c.nombre_profesor }}"
+                                                        data-materia="{{ c.materia }}"
+                                                        data-asistencia="{{ c.asistencia }}"
+                                                        data-observaciones="{{ c.observaciones or '' }}"
+                                                        title="Abrir formulario detallado de asistencia">
+                                                    <i class="bi bi-pencil-square me-1"></i> Detalle
                                                 </button>
                                                 {% if session.rol in ('admin', 'superadmin') or mod_access.salas_computo.eliminar %}
                                                 <form action="{{ url_for('salas_computo.editar_clase', id_clase=c.id_clase) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar esta clase programada?');">
@@ -645,51 +858,6 @@
                                             </div>
                                         </td>
                                     </tr>
-
-                                    <!-- Modal de Asistencia Docente -->
-                                    <div class="modal fade" id="modalAsistencia{{ c.id_clase }}" tabindex="-1" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered">
-                                            <div class="modal-content shadow-lg border-0">
-                                                <form action="{{ url_for('salas_computo.actualizar_asistencia', id_clase=c.id_clase) }}" method="POST">
-                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                                    <div class="modal-header bg-primary text-white">
-                                                        <h5 class="modal-title"><i class="bi bi-check2-circle me-1"></i> Registro de Asistencia Docente</h5>
-                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="alert alert-light border mb-3">
-                                                            <div class="row g-2">
-                                                                <div class="col-6"><small class="text-muted d-block">Salón</small><strong>{{ c.salon }}</strong></div>
-                                                                <div class="col-6"><small class="text-muted d-block">Horario</small><strong>{{ c.hora_inicio.strftime('%H:%M') }} - {{ c.hora_fin.strftime('%H:%M') }}</strong></div>
-                                                                <div class="col-12 mt-2"><small class="text-muted d-block">Docente</small><strong>{{ c.nombre_profesor }}</strong> ({{ c.materia }})</div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label class="form-label fw-bold">¿Asistió el docente a la clase?</label>
-                                                            <div class="d-flex gap-4">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="radio" name="asistencia" value="Sí" id="asisSi{{ c.id_clase }}" {% if c.asistencia == 'Sí' %}checked{% endif %}>
-                                                                    <label class="form-check-label text-success fw-bold" for="asisSi{{ c.id_clase }}">SÍ, Asistió</label>
-                                                                </div>
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="radio" name="asistencia" value="No" id="asisNo{{ c.id_clase }}" {% if c.asistencia == 'No' %}checked{% endif %}>
-                                                                    <label class="form-check-label text-danger fw-bold" for="asisNo{{ c.id_clase }}">NO Asistió</label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="mb-0">
-                                                            <label class="form-label small">Observaciones del Auxiliar:</label>
-                                                            <textarea class="form-control" name="observaciones" rows="2" placeholder="Ej: Docente llegó puntual, se encendieron 25 PCs...">{{ c.observaciones or '' }}</textarea>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
-                                                        <button type="submit" class="btn btn-success fw-bold px-4"><i class="bi bi-save me-1"></i> Guardar Asistencia</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
                                     {% else %}
                                     <tr>
                                         <td colspan="9" class="text-center py-4 text-muted">
@@ -724,7 +892,7 @@
                             <form action="{{ url_for('salas_computo.registrar_practica_libre') }}" method="POST" id="formPracticaLibre">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <input type="hidden" name="estudiante_id" id="practica_estudiante_id">
-                                <input type="hidden" name="sede_id" id="practica_sede_id" value="{{ session.get('sede_id') or 1 }}">
+                                <input type="hidden" name="sede_id" id="practica_sede_id" value="{{ filtros.sede or session.get('sede_id') or 1 }}">
 
                                 <!-- Búsqueda y Datos del Estudiante -->
                                 <div class="mb-3">
@@ -898,6 +1066,7 @@
                         <div class="card-body p-3 bg-light border-bottom">
                             <form method="GET" action="{{ url_for('salas_computo.dashboard_salas') }}" class="row g-2 align-items-center">
                                 <input type="hidden" name="tab" value="practica">
+                                <input type="hidden" name="sede" value="{{ filtros.sede }}">
                                 <div class="col-md-3">
                                     <input type="date" class="form-control form-control-sm" name="practica_fecha" value="{{ filtros.practica_fecha or '' }}">
                                 </div>
@@ -909,7 +1078,7 @@
                                 </div>
                                 <div class="col-md-2 d-flex gap-1">
                                     <button type="submit" class="btn btn-sm btn-primary w-100"><i class="bi bi-funnel"></i></button>
-                                    <a href="{{ url_for('salas_computo.dashboard_salas', tab='practica') }}" class="btn btn-sm btn-light border"><i class="bi bi-x"></i></a>
+                                    <a href="{{ url_for('salas_computo.dashboard_salas', tab='practica', sede=filtros.sede) }}" class="btn btn-sm btn-light border" title="Limpiar filtros"><i class="bi bi-x"></i></a>
                                 </div>
                             </form>
                         </div>
@@ -1140,17 +1309,18 @@
             <form action="{{ url_for('salas_computo.asignar_software_salas') }}" method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="software_id" id="asignar_software_id">
+                <input type="hidden" name="sede_id" value="{{ filtros.sede or session.get('sede_id') or '' }}">
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title"><i class="bi bi-check-all me-2"></i> Asignar Salas para: <span id="asignar_software_nombre"></span></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p class="small text-muted mb-2">Marca las salas de cómputo donde este programa se encuentra actualmente instalado:</p>
+                    <p class="small text-muted mb-2">Marca las salas de cómputo donde este programa se encuentra actualmente instalado en la sede <strong>{{ sede_activa_obj.nombre if sede_activa_obj else (session.get('sede_nombre') or 'activa') }}</strong>:</p>
                     <div class="row g-2" style="max-height: 280px; overflow-y: auto;" id="listaCheckboxesSalas">
                         {% for sm in salas_metricas %}
                         <div class="col-6">
                             <div class="form-check p-2 border rounded bg-light">
-                                <input class="form-check-input" type="checkbox" name="salas_ids" value="{{ sm.sala.id }}" id="checkSala{{ sm.sala.id }}">
+                                <input class="form-check-input" type="checkbox" name="salas_ids" value="{{ sm.sala.id }}" id="checkSala{{ sm.sala.id }}" data-sala-nombre="{{ sm.sala.nombre }}">
                                 <label class="form-check-label small fw-bold" for="checkSala{{ sm.sala.id }}">
                                     {{ sm.sala.nombre }} ({{ sm.sede_nombre }})
                                 </label>
@@ -1172,7 +1342,7 @@
 <div class="modal fade" id="modalConfigurarPuestos" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow-lg border-0">
-            <form action="{{ url_for('salas_computo.generar_puestos_sala') }}" method="POST">
+            <form action="{{ url_for('salas_computo.generar_puestos_sala') }}" method="POST" id="formConfigurarPuestos" onsubmit="return validarFormConfigurarPuestos()">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="recurso_id" id="config_recurso_id">
                 <div class="modal-header bg-primary text-white">
@@ -1200,10 +1370,410 @@
 
 
 <!-- ========================================================================= -->
+<!-- MODAL CENTRALIZADO DE ASISTENCIA DOCENTE                                  -->
+<!-- ========================================================================= -->
+<div class="modal fade" id="modalAsistenciaDocente" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <form id="formAsistenciaDocente" action="" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-check2-circle me-1"></i> Registro de Asistencia Docente</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-light border mb-3">
+                        <div class="row g-2">
+                            <div class="col-6"><small class="text-muted d-block">Salón</small><strong id="asistenciaModalSalon">--</strong></div>
+                            <div class="col-6"><small class="text-muted d-block">Horario</small><strong id="asistenciaModalHorario">--</strong></div>
+                            <div class="col-12 mt-2"><small class="text-muted d-block">Docente</small><strong id="asistenciaModalDocente">--</strong></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">¿Asistió el docente a la clase?</label>
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="asistencia" value="Sí" id="asistenciaRadioSi" required>
+                                <label class="form-check-label text-success fw-bold" for="asistenciaRadioSi">SÍ, Asistió</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="asistencia" value="No" id="asistenciaRadioNo" required>
+                                <label class="form-check-label text-danger fw-bold" for="asistenciaRadioNo">NO Asistió</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label small">Observaciones del Auxiliar:</label>
+                        <textarea class="form-control" name="observaciones" id="asistenciaModalObservaciones" rows="2" placeholder="Ej: Docente llegó puntual, se encendieron 25 PCs..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success fw-bold px-4"><i class="bi bi-save me-1"></i> Guardar Asistencia</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
 <!-- JAVASCRIPT DINÁMICO DEL MÓDULO                                            -->
 <!-- ========================================================================= -->
 <script>
     let cacheSalasData = {};
+
+    // =========================================================================
+    // CONTROL DE ASISTENCIA RÁPIDA (RONDA DE AUXILIARES Y CLICS EN TIEMPO REAL)
+    // =========================================================================
+
+    // Alternar entre Vista de Ronda Rápida y Vista de Tabla
+    function alternarModoVistaClases(modo) {
+        const contenedorRonda = document.getElementById('contenedorRondaRapida');
+        const contenedorTabla = document.getElementById('contenedorTablaClases');
+        const btnRonda = document.getElementById('btnModoRonda');
+        const btnTabla = document.getElementById('btnModoTabla');
+
+        if (modo === 'tabla') {
+            if (contenedorRonda) contenedorRonda.classList.add('d-none');
+            if (contenedorTabla) contenedorTabla.classList.remove('d-none');
+            if (btnRonda) { btnRonda.classList.remove('btn-primary', 'active'); btnRonda.classList.add('btn-outline-primary'); }
+            if (btnTabla) { btnTabla.classList.remove('btn-outline-primary'); btnTabla.classList.add('btn-primary', 'active'); }
+            localStorage.setItem('modo_vista_clases', 'tabla');
+        } else {
+            if (contenedorRonda) contenedorRonda.classList.remove('d-none');
+            if (contenedorTabla) contenedorTabla.classList.add('d-none');
+            if (btnTabla) { btnTabla.classList.remove('btn-primary', 'active'); btnTabla.classList.add('btn-outline-primary'); }
+            if (btnRonda) { btnRonda.classList.remove('btn-outline-primary'); btnRonda.classList.add('btn-primary', 'active'); }
+            localStorage.setItem('modo_vista_clases', 'ronda');
+        }
+    }
+
+    // Inicializar modo preferido
+    document.addEventListener('DOMContentLoaded', function () {
+        const modoGuardado = localStorage.getItem('modo_vista_clases') || 'ronda';
+        alternarModoVistaClases(modoGuardado);
+    });
+
+    // Toast flotante de confirmación rápida
+    function mostrarToastAsistencia(mensaje, esExito = true) {
+        const toast = document.getElementById('toastAsistenciaRapida');
+        const texto = document.getElementById('toastAsistenciaTexto');
+        if (!toast || !texto) return;
+
+        texto.textContent = mensaje;
+        toast.className = `badge ${esExito ? 'bg-success' : 'bg-danger'} text-white py-1 px-3 shadow-sm animate__animated animate__fadeIn`;
+        toast.classList.remove('d-none');
+
+        clearTimeout(window._toastAsistTimeout);
+        window._toastAsistTimeout = setTimeout(() => {
+            toast.classList.add('d-none');
+        }, 3000);
+    }
+
+    // Actualizar contadores globales en la interfaz
+    function actualizarContadoresAsistencia() {
+        const items = document.querySelectorAll('.item-clase-ronda');
+        let asistieron = 0;
+        let sinAsistencia = 0;
+
+        items.forEach(el => {
+            const badge = el.querySelector('#statusBadgeRonda' + el.getAttribute('data-id'));
+            if (badge && badge.textContent.includes('Asistió') && !badge.textContent.includes('No Asistió')) {
+                asistieron++;
+            } else {
+                sinAsistencia++;
+            }
+        });
+
+        const elTotal = document.getElementById('contadorTotalClases');
+        const elAsist = document.getElementById('contadorAsistieron');
+        const elSin = document.getElementById('contadorSinAsistencia');
+
+        if (elTotal) elTotal.textContent = items.length;
+        if (elAsist) elAsist.textContent = asistieron;
+        if (elSin) elSin.textContent = sinAsistencia;
+    }
+
+    // Actualizar visualmente una clase en ambas vistas (Ronda y Tabla)
+    function actualizarEstadoVisualClase(claseId, nuevoEstado) {
+        const esSi = (nuevoEstado === 'Sí');
+
+        // 1. Actualizar en Vista Ronda
+        const cardClase = document.getElementById('cardClase' + claseId);
+        if (cardClase) {
+            if (esSi) {
+                cardClase.classList.add('border-success-subtle', 'bg-success-subtle');
+            } else {
+                cardClase.classList.remove('border-success-subtle', 'bg-success-subtle');
+            }
+
+            const btnSi = cardClase.querySelector('.btn-asist-si');
+            const btnNo = cardClase.querySelector('.btn-asist-no');
+            if (btnSi && btnNo) {
+                if (esSi) {
+                    btnSi.className = 'btn btn-sm btn-toggle-asistencia btn-asist-si btn-success text-white shadow-2xs';
+                    btnNo.className = 'btn btn-sm btn-toggle-asistencia btn-asist-no btn-outline-danger';
+                } else {
+                    btnSi.className = 'btn btn-sm btn-toggle-asistencia btn-asist-si btn-outline-success';
+                    btnNo.className = 'btn btn-sm btn-toggle-asistencia btn-asist-no btn-danger text-white shadow-2xs';
+                }
+            }
+
+            const badgeRonda = document.getElementById('statusBadgeRonda' + claseId);
+            if (badgeRonda) {
+                badgeRonda.className = `badge ${esSi ? 'bg-success' : 'bg-secondary'}`;
+                badgeRonda.textContent = esSi ? 'Asistió' : 'No Asistió';
+            }
+        }
+
+        // 2. Actualizar en Vista Tabla
+        const row = document.getElementById('rowTablaClase' + claseId);
+        if (row) {
+            const btnSiTab = row.querySelector('.btn-asist-si');
+            const btnNoTab = row.querySelector('.btn-asist-no');
+            if (btnSiTab && btnNoTab) {
+                if (esSi) {
+                    btnSiTab.className = 'btn btn-sm btn-toggle-asistencia btn-asist-si btn-success text-white';
+                    btnNoTab.className = 'btn btn-sm btn-toggle-asistencia btn-asist-no btn-outline-danger';
+                } else {
+                    btnSiTab.className = 'btn btn-sm btn-toggle-asistencia btn-asist-si btn-outline-success';
+                    btnNoTab.className = 'btn btn-sm btn-toggle-asistencia btn-asist-no btn-danger text-white';
+                }
+            }
+
+            const badgeTab = document.getElementById('statusBadgeTabla' + claseId);
+            if (badgeTab) {
+                badgeTab.className = `badge ms-1 ${esSi ? 'bg-success' : 'bg-danger'}`;
+                badgeTab.textContent = esSi ? 'Asistió' : 'No Asistió';
+            }
+        }
+
+        actualizarContadoresAsistencia();
+    }
+
+    // 1. Manejar Clic Instantáneo en botones SÍ / NO
+    document.addEventListener('click', async function (e) {
+        const btnToggle = e.target.closest('.btn-toggle-asistencia');
+        if (!btnToggle) return;
+
+        e.preventDefault();
+        const claseId = btnToggle.getAttribute('data-id');
+        const valor = btnToggle.getAttribute('data-val');
+
+        btnToggle.disabled = true;
+
+        try {
+            const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
+            const resp = await fetch(`/salas-computo/clase/${claseId}/asistencia`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    csrf_token: csrfToken,
+                    asistencia: valor
+                })
+            });
+
+            const data = await resp.json();
+            if (data.success) {
+                actualizarEstadoVisualClase(claseId, valor);
+                mostrarToastAsistencia(`✓ ${data.profesor || 'Docente'} (${data.salon || 'Sala'}): ${valor === 'Sí' ? 'Asistió' : 'No Asistió'}`);
+            } else {
+                mostrarToastAsistencia('Error: ' + (data.message || 'No se pudo guardar'), false);
+            }
+        } catch (err) {
+            console.error('Error al actualizar asistencia:', err);
+            mostrarToastAsistencia('Error de conexión al actualizar asistencia', false);
+        } finally {
+            btnToggle.disabled = false;
+        }
+    });
+
+    // 2. Guardar observación rápida en tiempo real
+    async function guardarObservacionRapida(claseId, texto) {
+        try {
+            const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
+            const resp = await fetch(`/salas-computo/clase/${claseId}/asistencia`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    csrf_token: csrfToken,
+                    asistencia: document.getElementById('cardClase' + claseId)?.querySelector('.btn-asist-si.btn-success') ? 'Sí' : 'No',
+                    observaciones: texto
+                })
+            });
+            const data = await resp.json();
+            if (data.success) {
+                mostrarToastAsistencia('Nota guardada');
+            }
+        } catch (err) {
+            console.error('Error guardando nota:', err);
+        }
+    }
+
+    document.addEventListener('click', function(e) {
+        const btnGuardarObs = e.target.closest('.btn-guardar-obs');
+        if (!btnGuardarObs) return;
+        const claseId = btnGuardarObs.getAttribute('data-id');
+        const input = document.getElementById('obsRonda' + claseId);
+        if (input) {
+            guardarObservacionRapida(claseId, input.value);
+        }
+    });
+
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('input-obs-rapida')) {
+            const claseId = e.target.getAttribute('data-id');
+            guardarObservacionRapida(claseId, e.target.value);
+        }
+    });
+
+    // 3. Marcar Todo el Salón como Asistió
+    document.addEventListener('click', async function (e) {
+        const btnSalon = e.target.closest('.btn-marcar-salon');
+        if (!btnSalon) return;
+
+        e.preventDefault();
+        const salonNombre = btnSalon.getAttribute('data-salon');
+        const idsStr = btnSalon.getAttribute('data-ids') || '';
+        const ids = idsStr.split(',').filter(x => x.trim().length > 0);
+
+        if (!ids.length) return;
+        btnSalon.disabled = true;
+
+        try {
+            const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
+            const resp = await fetch('/salas-computo/clases/marcar-asistencia-masiva', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    csrf_token: csrfToken,
+                    clase_ids: ids,
+                    asistencia: 'Sí'
+                })
+            });
+
+            const data = await resp.json();
+            if (data.success) {
+                ids.forEach(id => actualizarEstadoVisualClase(id, 'Sí'));
+                mostrarToastAsistencia(`✓ Todo ${salonNombre} marcado como Asistió (${data.count} clases)`);
+            } else {
+                mostrarToastAsistencia('Error: ' + (data.message || 'Error masivo'), false);
+            }
+        } catch (err) {
+            console.error('Error masivo salón:', err);
+            mostrarToastAsistencia('Error de conexión', false);
+        } finally {
+            btnSalon.disabled = false;
+        }
+    });
+
+    // 4. Marcar TODAS las clases visibles como Asistió
+    const btnMarcarTodo = document.getElementById('btnMarcarVisiblesSi');
+    if (btnMarcarTodo) {
+        btnMarcarTodo.addEventListener('click', async function () {
+            const items = document.querySelectorAll('.item-clase-ronda');
+            const ids = Array.from(items).map(el => el.getAttribute('data-id')).filter(Boolean);
+
+            if (!ids.length) {
+                alert('No hay clases visibles para marcar.');
+                return;
+            }
+
+            if (!confirm(`¿Deseas marcar como ASISTIÓ a todas las ${ids.length} clases visibles actualmente?`)) {
+                return;
+            }
+
+            btnMarcarTodo.disabled = true;
+
+            try {
+                const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
+                const resp = await fetch('/salas-computo/clases/marcar-asistencia-masiva', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        csrf_token: csrfToken,
+                        clase_ids: ids,
+                        asistencia: 'Sí'
+                    })
+                });
+
+                const data = await resp.json();
+                if (data.success) {
+                    ids.forEach(id => actualizarEstadoVisualClase(id, 'Sí'));
+                    mostrarToastAsistencia(`✓ Se marcaron ${data.count} clases como Asistió.`);
+                } else {
+                    mostrarToastAsistencia('Error: ' + (data.message || 'Error masivo'), false);
+                }
+            } catch (err) {
+                console.error('Error masivo general:', err);
+                mostrarToastAsistencia('Error al aplicar cambios', false);
+            } finally {
+                btnMarcarTodo.disabled = false;
+            }
+        });
+    }
+
+    // Delegación de clic para abrir el modal de asistencia docente de forma segura y estable
+    document.addEventListener('click', function (e) {
+        const btn = e.target.closest('.btn-abrir-asistencia');
+        if (!btn) return;
+        
+        e.preventDefault();
+        const id = btn.getAttribute('data-id');
+        const salon = btn.getAttribute('data-salon') || '--';
+        const horario = btn.getAttribute('data-horario') || '--';
+        const profesor = btn.getAttribute('data-profesor') || '--';
+        const materia = btn.getAttribute('data-materia') || '';
+        const asistencia = btn.getAttribute('data-asistencia') || 'No';
+        const observaciones = btn.getAttribute('data-observaciones') || '';
+        
+        const form = document.getElementById('formAsistenciaDocente');
+        if (form) {
+            form.action = `/salas-computo/clase/${id}/asistencia`;
+        }
+        
+        const elSalon = document.getElementById('asistenciaModalSalon');
+        if (elSalon) elSalon.textContent = salon;
+        
+        const elHorario = document.getElementById('asistenciaModalHorario');
+        if (elHorario) elHorario.textContent = horario;
+        
+        const elDocente = document.getElementById('asistenciaModalDocente');
+        if (elDocente) elDocente.textContent = materia ? `${profesor} (${materia})` : profesor;
+        
+        const elObs = document.getElementById('asistenciaModalObservaciones');
+        if (elObs) elObs.value = observaciones;
+        
+        const radioSi = document.getElementById('asistenciaRadioSi');
+        const radioNo = document.getElementById('asistenciaRadioNo');
+        if (radioSi && radioNo) {
+            if (asistencia === 'Sí') {
+                radioSi.checked = true;
+                radioNo.checked = false;
+            } else {
+                radioNo.checked = true;
+                radioSi.checked = false;
+            }
+        }
+        
+        const modalEl = document.getElementById('modalAsistenciaDocente');
+        if (modalEl) {
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
+        }
+    });
 
     document.addEventListener('DOMContentLoaded', function () {
         const selectorSala = document.getElementById('selectorSalaPuestos');
@@ -1413,17 +1983,63 @@
 
     // 6. Abrir modal configurar puestos
     function abrirModalConfigurarPuestos() {
+        const selector = document.getElementById('selectorSalaPuestos');
+        const inputRecurso = document.getElementById('config_recurso_id');
+        const labelSala = document.getElementById('config_sala_nombre');
+        const inputCantidad = document.getElementById('config_cantidad_puestos');
+
+        if (selector && selector.value) {
+            inputRecurso.value = selector.value;
+            const textoSeleccionado = selector.options[selector.selectedIndex]?.text || '';
+            const nombreLimpio = textoSeleccionado.split(' - ')[0] || textoSeleccionado;
+            labelSala.textContent = nombreLimpio;
+
+            if (cacheSalasData && cacheSalasData[selector.value]) {
+                const data = cacheSalasData[selector.value];
+                inputCantidad.value = data.total_puestos || 25;
+                if (data.sala_nombre) {
+                    labelSala.textContent = data.sala_nombre;
+                }
+            }
+        }
+
+        if (!inputRecurso.value) {
+            alert('Por favor selecciona primero una sala de cómputo en el menú desplegable.');
+            return;
+        }
+
+        // Asegurar que el token CSRF esté presente y sincronizado con el meta-tag
+        const tokenInput = document.querySelector('#modalConfigurarPuestos input[name="csrf_token"]');
+        const metaToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (tokenInput && metaToken && (!tokenInput.value || tokenInput.value === 'None')) {
+            tokenInput.value = metaToken;
+        }
+
         const modal = new bootstrap.Modal(document.getElementById('modalConfigurarPuestos'));
         modal.show();
     }
 
+    function validarFormConfigurarPuestos() {
+        const recursoId = document.getElementById('config_recurso_id').value;
+        if (!recursoId) {
+            alert('Error: No se ha detectado una sala válida. Selecciona una sala primero.');
+            return false;
+        }
+        return true;
+    }
+
     // 7. Abrir modal asignar salas a software
-    function abrirModalAsignarSalas(softwareId, softwareNombre) {
+    function abrirModalAsignarSalas(softwareId, softwareNombre, salasNombres = []) {
         document.getElementById('asignar_software_id').value = softwareId;
         document.getElementById('asignar_software_nombre').textContent = softwareNombre;
 
-        // Desmarcar todos primero
-        document.querySelectorAll('#listaCheckboxesSalas input[type="checkbox"]').forEach(c => c.checked = false);
+        const salasSet = new Set(Array.isArray(salasNombres) ? salasNombres.map(s => String(s).trim().toUpperCase()) : []);
+
+        // Desmarcar todos primero y marcar los que correspondan al software en esta sede
+        document.querySelectorAll('#listaCheckboxesSalas input[type="checkbox"]').forEach(c => {
+            const salaNombreAttr = (c.getAttribute('data-sala-nombre') || '').trim().toUpperCase();
+            c.checked = salasSet.has(salaNombreAttr);
+        });
 
         const modal = new bootstrap.Modal(document.getElementById('modalAsignarSalas'));
         modal.show();
@@ -1525,9 +2141,7 @@
         document.getElementById('practica_codigo_banner').value = est.codigo_banner;
         document.getElementById('practica_nombre_estudiante').value = est.nombre_completo;
         document.getElementById('practica_programa_estudiante').value = est.programa || '';
-        if (est.sede_id) {
-            document.getElementById('practica_sede_id').value = est.sede_id;
-        }
+        // No sobreescribir practica_sede_id para respetar la sede donde se encuentra la sala física.
 
         const container = document.getElementById('sugerenciasEstudiantes');
         container.style.display = 'none';
@@ -1569,7 +2183,8 @@
         textSpan.innerHTML = '<div class="spinner-border spinner-border-sm text-info me-1" role="status"></div> Verificando programación de clases y disponibilidad...';
 
         try {
-            const url = `/salas-computo/api/verificar-disponibilidad?recurso_id=${encodeURIComponent(recursoId)}&salon=${encodeURIComponent(salonNombre)}&hora_inicio=${encodeURIComponent(horaInicio)}&hora_fin=${encodeURIComponent(horaFin)}`;
+            const sedeId = document.getElementById('practica_sede_id')?.value || '{{ filtros.sede or session.get("sede_id") or "" }}';
+            const url = `/salas-computo/api/verificar-disponibilidad?recurso_id=${encodeURIComponent(recursoId)}&salon=${encodeURIComponent(salonNombre)}&hora_inicio=${encodeURIComponent(horaInicio)}&hora_fin=${encodeURIComponent(horaFin)}&sede_id=${encodeURIComponent(sedeId)}`;
             const resp = await fetch(url);
             const data = await resp.json();
 

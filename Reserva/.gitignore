@@ -4,6 +4,7 @@
 # Scripts de utilidad / diagnóstico (no deben estar en producción)
 check_*.py
 test_*.py
+!tests/**
 add_*.py
 actualizar_*.py
 app_improved.py

@@ -4,13 +4,14 @@ Permite administrar horarios semanales, tareas y permisos de módulos.
 """
 from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for
 from datetime import datetime
+from sqlalchemy import or_
 from extensions import db
 from database import Colaborador, HorarioColaborador, TareaColaborador, PermisoColaborador, Sede
 from decorators import login_required
 
 colaboradores_bp = Blueprint('colaboradores', __name__, url_prefix='/colaboradores')
 
-DIAS_SEMANA = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo']
+DIAS_SEMANA = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado']
 MODULOS_SISTEMA = ['prestamos', 'reservas', 'inventario', 'profesores',
                    'estadisticas', 'bitacora', 'salas_computo', 'colaboradores']
 
@@ -24,43 +25,8 @@ def _admin_required():
 @colaboradores_bp.route('/')
 @login_required
 def colaboradores_main():
-    """Página principal de colaboradores con lista y vista de horarios."""
-    colaboradores = Colaborador.query.filter_by(activo=True).order_by(Colaborador.nombre_completo).all()
-    sedes = Sede.query.order_by(Sede.nombre).all()
-
-    # Stats
-    total = Colaborador.query.filter_by(activo=True).count()
-    inactivos = Colaborador.query.filter_by(activo=False).count()
-    total_tareas_pendientes = TareaColaborador.query.filter_by(estado='pendiente').count()
-
-    # Cobertura de colaboradores con turno programado por día
-    cobertura_dias = {dia: 0 for dia in DIAS_SEMANA}
-    total_horas_programadas = 0.0
-    total_horas_meta = 0
-
-    for c in colaboradores:
-        total_horas_meta += (c.total_horas_semana or 42)
-        total_horas_programadas += c.horas_programadas_total
-        for h in c.horarios:
-            if h.dia in cobertura_dias and (h.hora_entrada or h.hora_salida or h.horas_dia):
-                cobertura_dias[h.dia] += 1
-
-    stats = {
-        'total': total,
-        'inactivos': inactivos,
-        'tareas_pendientes': total_tareas_pendientes,
-        'cobertura_dias': cobertura_dias,
-        'total_horas_programadas': round(total_horas_programadas, 1),
-        'total_horas_meta': total_horas_meta,
-        'cumplimiento_pct': round((total_horas_programadas / total_horas_meta * 100), 1) if total_horas_meta > 0 else 0,
-    }
-
-    return render_template('colaboradores.html',
-                           colaboradores=colaboradores,
-                           sedes=sedes,
-                           stats=stats,
-                           dias_semana=DIAS_SEMANA,
-                           modulos_sistema=MODULOS_SISTEMA)
+    """Redirige a la pestaña de colaboradores en el Directorio Unificado de Usuarios."""
+    return redirect(url_for('usuarios.usuarios_dashboard', tab='colaboradores'))
 
 
 # ─── API COLABORADORES ───────────────────────────────────────────────────────
@@ -68,11 +34,16 @@ def colaboradores_main():
 @colaboradores_bp.route('/api/colaboradores', methods=['GET'])
 @login_required
 def api_listar():
-    """Retorna lista de colaboradores en JSON."""
+    """Retorna lista de colaboradores en JSON filtrados por sede de la sesión si aplica."""
     solo_activos = request.args.get('activos', '1') == '1'
+    sede_id = request.args.get('sede_id', type=int) or session.get('sede_id')
+    
     q = Colaborador.query
     if solo_activos:
         q = q.filter_by(activo=True)
+    if sede_id:
+        q = q.filter(or_(Colaborador.sede_id == sede_id, Colaborador.sede_id.is_(None)))
+
     colaboradores = q.order_by(Colaborador.nombre_completo).all()
     return jsonify({'success': True, 'colaboradores': [_collab_to_dict(c) for c in colaboradores]})
 
@@ -80,7 +51,7 @@ def api_listar():
 @colaboradores_bp.route('/api/colaboradores', methods=['POST'])
 @login_required
 def api_crear():
-    """Crea un nuevo colaborador."""
+    """Crea un nuevo colaborador asignando la sede de la sesión si no se especifica."""
     if not _admin_required():
         return jsonify({'success': False, 'message': 'Sin permisos'}), 403
 
@@ -94,15 +65,25 @@ def api_crear():
     if doc and Colaborador.query.filter_by(documento=doc).first():
         return jsonify({'success': False, 'message': 'Ya existe un colaborador con ese documento'}), 400
 
+    # Sede: tomar del payload o de la sesión activa
+    sede_id_val = None
+    if data.get('sede_id'):
+        try:
+            sede_id_val = int(data['sede_id'])
+        except (ValueError, TypeError):
+            sede_id_val = session.get('sede_id')
+    else:
+        sede_id_val = session.get('sede_id')
+
     colab = Colaborador(
         nombre_completo=nombre,
         cargo=(data.get('cargo') or '').strip() or None,
         documento=doc,
         correo=(data.get('correo') or '').strip() or None,
         telefono=(data.get('telefono') or '').strip() or None,
-        sede_id=int(data['sede_id']) if data.get('sede_id') else None,
+        sede_id=sede_id_val,
         total_horas_semana=int(data.get('total_horas_semana') or 42),
-        fecha_inicio_horario=(data.get('fecha_inicio_horario') or '').strip() or None,
+        fecha_inicio_horario=(data.get('fecha_inicio_horario') or 'A partir del 15 de julio 2026').strip() or None,
         horario_texto=(data.get('horario_texto') or '').strip() or None,
         observaciones=(data.get('observaciones') or '').strip() or None,
     )
@@ -137,13 +118,23 @@ def api_editar(cid):
     if not nombre:
         return jsonify({'success': False, 'message': 'El nombre es requerido'}), 400
 
+    # Actualizar y validar documento único
+    doc = (data.get('documento') or '').strip() or None
+    if doc and doc != colab.documento:
+        existente = Colaborador.query.filter(Colaborador.documento == doc, Colaborador.id != cid).first()
+        if existente:
+            return jsonify({'success': False, 'message': f'Ya existe otro colaborador con el documento {doc}'}), 400
+        colab.documento = doc
+    elif not doc:
+        colab.documento = None
+
     colab.nombre_completo = nombre
     colab.cargo = (data.get('cargo') or '').strip() or None
     colab.correo = (data.get('correo') or '').strip() or None
     colab.telefono = (data.get('telefono') or '').strip() or None
     colab.sede_id = int(data['sede_id']) if data.get('sede_id') else None
     colab.total_horas_semana = int(data.get('total_horas_semana') or 42)
-    colab.fecha_inicio_horario = (data.get('fecha_inicio_horario') or '').strip() or None
+    colab.fecha_inicio_horario = (data.get('fecha_inicio_horario') or '').strip() or "A partir del 15 de julio 2026"
     colab.horario_texto = (data.get('horario_texto') or '').strip() or None
     colab.observaciones = (data.get('observaciones') or '').strip() or None
     colab.activo = bool(data.get('activo', True))
@@ -168,8 +159,12 @@ def api_eliminar(cid):
 @colaboradores_bp.route('/api/horarios-todos', methods=['GET'])
 @login_required
 def api_todos_horarios():
-    """Retorna todos los colaboradores con sus horarios completos."""
-    colaboradores = Colaborador.query.filter_by(activo=True).order_by(Colaborador.nombre_completo).all()
+    """Retorna todos los colaboradores con sus horarios completos, filtrando por sede de sesión si aplica."""
+    sede_id = request.args.get('sede_id', type=int) or session.get('sede_id')
+    q = Colaborador.query.filter_by(activo=True)
+    if sede_id:
+        q = q.filter(or_(Colaborador.sede_id == sede_id, Colaborador.sede_id.is_(None)))
+    colaboradores = q.order_by(Colaborador.nombre_completo).all()
     return jsonify({
         'success': True,
         'colaboradores': [_collab_to_dict(c, detalle=True) for c in colaboradores]
@@ -187,7 +182,7 @@ def api_horarios(cid):
 @colaboradores_bp.route('/api/colaboradores/<int:cid>/horarios', methods=['PUT'])
 @login_required
 def api_guardar_horarios(cid):
-    """Guarda/actualiza todos los horarios diarios de un colaborador con validación."""
+    """Guarda/actualiza todos los horarios diarios de un colaborador con validación de hora militar."""
     if not _admin_required():
         return jsonify({'success': False, 'message': 'Sin permisos'}), 403
 
@@ -197,9 +192,20 @@ def api_guardar_horarios(cid):
 
     total_calculado = 0.0
 
+    # Actualizar y validar documento si viene en el payload
+    if 'documento' in data:
+        doc = (data.get('documento') or '').strip() or None
+        if doc and doc != colab.documento:
+            existente = Colaborador.query.filter(Colaborador.documento == doc, Colaborador.id != cid).first()
+            if existente:
+                return jsonify({'success': False, 'message': f'Ya existe otro colaborador con el documento {doc}'}), 400
+            colab.documento = doc
+        elif not doc:
+            colab.documento = None
+
     for h_data in horarios_data:
         dia = (h_data.get('dia') or '').strip()
-        if not dia:
+        if not dia or dia.lower() in ('domingo', 'sunday'):
             continue
         horario = HorarioColaborador.query.filter_by(colaborador_id=cid, dia=dia).first()
         if not horario:
@@ -230,8 +236,27 @@ def api_guardar_horarios(cid):
                 total_calculado += horas_dia_val
             except (ValueError, TypeError):
                 horario.horas_dia = None
+        elif h_ent and h_sal:
+            try:
+                t1 = datetime.strptime(h_ent, '%H:%M')
+                t2 = datetime.strptime(h_sal, '%H:%M')
+                diff_horas = round((t2 - t1).total_seconds() / 3600.0, 2)
+                horario.horas_dia = diff_horas
+                total_calculado += diff_horas
+            except Exception:
+                horario.horas_dia = None
         else:
             horario.horas_dia = None
+
+    # Eliminar cualquier registro obsoleto de domingo para este colaborador si existiera
+    HorarioColaborador.query.filter(
+        HorarioColaborador.colaborador_id == cid,
+        HorarioColaborador.dia.in_(['Domingo', 'domingo'])
+    ).delete(synchronize_session=False)
+
+    # Asignar sede de sesión si no tiene
+    if not colab.sede_id and session.get('sede_id'):
+        colab.sede_id = session.get('sede_id')
 
     # Actualizar total_horas_semana en colaborador
     total_enviado = data.get('total_horas_semana')
@@ -240,6 +265,16 @@ def api_guardar_horarios(cid):
             colab.total_horas_semana = int(total_enviado)
         except (ValueError, TypeError):
             colab.total_horas_semana = round(total_calculado)
+    elif not colab.total_horas_semana:
+        colab.total_horas_semana = 42
+
+    if 'fecha_inicio_horario' in data:
+        colab.fecha_inicio_horario = (data.get('fecha_inicio_horario') or '').strip() or "A partir del 15 de julio 2026"
+    elif not colab.fecha_inicio_horario:
+        colab.fecha_inicio_horario = "A partir del 15 de julio 2026"
+
+    if 'horario_texto' in data:
+        colab.horario_texto = (data.get('horario_texto') or '').strip() or None
 
     db.session.commit()
     return jsonify({
@@ -369,7 +404,7 @@ def _collab_to_dict(c: Colaborador, detalle=False):
         'observaciones': c.observaciones,
     }
     if detalle:
-        d['horarios'] = [_horario_to_dict(h) for h in c.horarios]
+        d['horarios'] = [_horario_to_dict(h) for h in c.horarios if h.dia not in ('Domingo', 'domingo')]
         d['tareas'] = [_tarea_to_dict(t) for t in c.tareas]
         d['permisos'] = [_permiso_to_dict(p) for p in c.permisos]
     return d

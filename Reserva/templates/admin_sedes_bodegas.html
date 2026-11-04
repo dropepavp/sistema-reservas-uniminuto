@@ -180,15 +180,22 @@
 </div>
 
 <!-- Forms ocultos para eliminación -->
-<form id="formEliminarSede" method="POST" style="display:none;"></form>
-<form id="formEliminarBodega" method="POST" style="display:none;"></form>
-<form id="formEliminarCategoria" method="POST" style="display:none;"></form>
+<form id="formEliminarSede" method="POST" style="display:none;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+</form>
+<form id="formEliminarBodega" method="POST" style="display:none;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+</form>
+<form id="formEliminarCategoria" method="POST" style="display:none;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+</form>
 
 <!-- Modal Agregar Categoría -->
 <div class="modal fade" id="modalAgregarCategoria" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <form action="{{ url_for('admin.agregar_categoria') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="modal-header">
                     <h5 class="modal-title">Nueva Categoría</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -213,6 +220,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <form action="{{ url_for('admin.agregar_sede') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="modal-header">
                     <h5 class="modal-title">Nueva Sede</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -237,6 +245,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <form action="{{ url_for('admin.agregar_bodega') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="modal-header">
                     <h5 class="modal-title">Nueva Bodega</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -271,6 +280,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <form action="{{ url_for('admin.editar_sede') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="modal-header">
                     <h5 class="modal-title">Editar Sede</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -296,6 +306,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <form action="{{ url_for('admin.editar_bodega') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="modal-header">
                     <h5 class="modal-title">Editar Bodega</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>

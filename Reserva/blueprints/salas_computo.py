@@ -30,11 +30,12 @@ def dashboard_salas():
 
         # Paginación y Filtros de Clases
         page = request.args.get('page', 1, type=int)
-        per_page = 15
-        
         tab_activa = request.args.get('tab', 'clases')
+        per_page = request.args.get('per_page', 50, type=int) if tab_activa == 'clases' else 15
+        
         fecha_filtro = request.args.get('fecha', '')
         salon_filtro = request.args.get('salon', '')
+        jornada_filtro = request.args.get('jornada', '').strip()
         busqueda = request.args.get('busqueda', '')
         sede_filtro_id = request.args.get('sede', '')
         
@@ -53,6 +54,9 @@ def dashboard_salas():
         if salon_filtro:
             query_clases = query_clases.filter(ClaseSalaComputo.salon.ilike(f"%{salon_filtro}%"))
             
+        if jornada_filtro:
+            query_clases = query_clases.filter(ClaseSalaComputo.jornada.ilike(f"%{jornada_filtro}%"))
+
         if busqueda:
             term = f"%{busqueda}%"
             query_clases = query_clases.filter(
@@ -74,12 +78,79 @@ def dashboard_salas():
         pagination_clases = query_clases.paginate(page=page, per_page=per_page, error_out=False)
         clases = pagination_clases.items
 
+        # Agrupar clases por Piso y Salón para la vista de Ronda Rápida
+        clases_agrupadas = {}
+        total_asistieron = sum(1 for c in clases if c.asistencia == 'Sí')
+        total_no_asistieron = sum(1 for c in clases if c.asistencia != 'Sí')
+
+        clases_ordenadas_ronda = sorted(clases, key=lambda x: (x.salon or '', x.hora_inicio))
+        for c in clases_ordenadas_ronda:
+            sal = (c.salon or 'General').strip()
+            if sal.startswith('7'):
+                grupo = 'Piso 7'
+            elif sal.startswith('8'):
+                grupo = 'Piso 8'
+            elif sal.startswith('A'):
+                grupo = 'Edificio A'
+            elif sal.startswith('B'):
+                grupo = 'Edificio B'
+            elif sal.startswith('C'):
+                grupo = 'Edificio C'
+            elif sal.startswith('D'):
+                grupo = 'Edificio D'
+            else:
+                grupo = 'Salas Generales'
+                
+            if grupo not in clases_agrupadas:
+                clases_agrupadas[grupo] = {}
+            if sal not in clases_agrupadas[grupo]:
+                clases_agrupadas[grupo][sal] = []
+            clases_agrupadas[grupo][sal].append(c)
+
         # -------------------------------------------------------------
-        # 1.2 Consultas de Salas de Cómputo y Puestos
+        # 1.2 Consultas de Salas de Cómputo y Puestos (Salas específicas por sede)
         # -------------------------------------------------------------
-        query_salas = Recurso.query.filter(Recurso.tipo.in_(['Salón', 'Laboratorio', 'Sala']))
+        query_salas = Recurso.query.join(Ubicacion).filter(Recurso.activo.is_(True))
         if sede_filtro_id:
-            query_salas = query_salas.join(Ubicacion).filter(Ubicacion.sede_id == int(sede_filtro_id))
+            s_id = int(sede_filtro_id)
+            if s_id == 1:
+                query_salas = query_salas.filter(
+                    Ubicacion.sede_id == 1,
+                    Recurso.nombre.in_(SystemConstants.SALONES_PERDOMO_COMPUTO)
+                )
+            elif s_id == 2:
+                query_salas = query_salas.filter(
+                    Ubicacion.sede_id == 2,
+                    db.or_(
+                        Recurso.nombre.ilike('%LS%'),
+                        Recurso.nombre.in_(SystemConstants.SALONES_PRINCIPAL_COMPUTO)
+                    )
+                )
+            else:
+                query_salas = query_salas.filter(
+                    Ubicacion.sede_id == s_id,
+                    Recurso.nombre.ilike('%LS%')
+                )
+        else:
+            query_salas = query_salas.filter(
+                db.or_(
+                    db.and_(
+                        Ubicacion.sede_id == 1,
+                        Recurso.nombre.in_(SystemConstants.SALONES_PERDOMO_COMPUTO)
+                    ),
+                    db.and_(
+                        Ubicacion.sede_id == 2,
+                        db.or_(
+                            Recurso.nombre.ilike('%LS%'),
+                            Recurso.nombre.in_(SystemConstants.SALONES_PRINCIPAL_COMPUTO)
+                        )
+                    ),
+                    db.and_(
+                        ~Ubicacion.sede_id.in_([1, 2]),
+                        Recurso.nombre.ilike('%LS%')
+                    )
+                )
+            )
             
         salas_db = query_salas.order_by(Recurso.nombre.asc()).all()
 
@@ -209,6 +280,9 @@ def dashboard_salas():
             salas_metricas=salas_metricas,
             software_catalogo=software_catalogo,
             novedades=novedades_todas,
+            clases_agrupadas=clases_agrupadas,
+            total_asistieron=total_asistieron,
+            total_no_asistieron=total_no_asistieron,
             total_clases_hoy=total_clases_hoy,
             total_puestos_global=total_puestos_global,
             total_puestos_operativos=total_puestos_operativos,
@@ -224,6 +298,7 @@ def dashboard_salas():
             filtros={
                 'fecha': fecha_filtro,
                 'salon': salon_filtro,
+                'jornada': jornada_filtro,
                 'busqueda': busqueda,
                 'sede': sede_filtro_id,
                 'practica_busqueda': practica_busqueda,
@@ -738,13 +813,14 @@ def editar_clase(id_clase):
 def actualizar_asistencia(id_clase):
     try:
         clase = ClaseSalaComputo.query.get_or_404(id_clase)
-        datos = request.form
+        datos = request.get_json(silent=True) if request.is_json else request.form
         
         asistencia = datos.get('asistencia', 'No')
-        observaciones = datos.get('observaciones', '').strip()
+        observaciones = datos.get('observaciones')
         
         clase.asistencia = asistencia
-        clase.observaciones = observaciones
+        if observaciones is not None:
+            clase.observaciones = observaciones.strip()
         
         db.session.commit()
         
@@ -758,12 +834,228 @@ def actualizar_asistencia(id_clase):
             descripcion=f'Asistencia actualizada a {asistencia}: {clase.materia} ({clase.salon})'
         )
         
+        if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({
+                'success': True,
+                'id_clase': clase.id_clase,
+                'asistencia': clase.asistencia,
+                'observaciones': clase.observaciones or '',
+                'salon': clase.salon,
+                'profesor': clase.nombre_profesor,
+                'message': f'Asistencia de {clase.nombre_profesor} en {clase.salon} guardada como {asistencia}.'
+            })
+
         flash('Asistencia actualizada correctamente.', 'success')
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(f"Error actualizando asistencia: {e}")
+        if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': str(e)}), 500
         flash(f'Error al actualizar la asistencia: {str(e)}', 'danger')
         
+    return redirect(url_for('salas_computo.dashboard_salas', tab='clases'))
+
+
+@salas_computo_bp.route('/clases/marcar-asistencia-masiva', methods=['POST'])
+@login_required
+@permiso_requerido('salas_computo', 'editar')
+def marcar_asistencia_masiva():
+    """Permite marcar asistencia masiva a clases (por salón, piso o todas las visibles)."""
+    try:
+        data = request.get_json(silent=True) if request.is_json else request.form
+        asistencia_val = data.get('asistencia', 'Sí')
+        
+        ids_raw = data.getlist('clase_ids') if hasattr(data, 'getlist') else data.get('clase_ids', [])
+        if isinstance(ids_raw, str):
+            ids = [int(i.strip()) for i in ids_raw.split(',') if i.strip().isdigit()]
+        elif isinstance(ids_raw, list):
+            ids = [int(i) for i in ids_raw if str(i).isdigit()]
+        else:
+            ids = []
+            
+        if not ids:
+            if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'success': False, 'message': 'No se seleccionaron clases para actualizar.'}), 400
+            flash('No seleccionaste clases para actualizar.', 'warning')
+            return redirect(url_for('salas_computo.dashboard_salas', tab='clases'))
+            
+        clases = ClaseSalaComputo.query.filter(ClaseSalaComputo.id_clase.in_(ids)).all()
+        for c in clases:
+            c.asistencia = asistencia_val
+            
+        db.session.commit()
+        
+        registrar_auditoria(
+            modulo='salas_computo',
+            entidad_tipo='ClaseSalaComputo',
+            entidad_id=','.join(str(i) for i in ids[:10]),
+            accion='EDITAR_ASISTENCIA_MASIVA',
+            usuario_documento=session.get('usuario', ''),
+            usuario_nombre=session.get('nombre_completo', ''),
+            descripcion=f'Asistencia ({asistencia_val}) asignada masivamente a {len(clases)} clases'
+        )
+        
+        msg = f'Asistencia ({asistencia_val}) registrada para {len(clases)} clases.'
+        if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': True, 'count': len(clases), 'asistencia': asistencia_val, 'message': msg})
+            
+        flash(msg, 'success')
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error en asistencia masiva: {e}")
+        if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': str(e)}), 500
+        flash(f'Error al registrar asistencia masiva: {str(e)}', 'danger')
+        
+    return redirect(url_for('salas_computo.dashboard_salas', tab='clases'))
+
+
+@salas_computo_bp.route('/clases/sincronizar-reservas', methods=['POST'])
+@login_required
+@permiso_requerido('salas_computo', 'crear')
+def sincronizar_reservas_a_clases():
+    """Sincroniza reservas existentes hacia clases_salas_computo para seguimiento y asistencia docente."""
+    try:
+        user_rol = session.get('rol')
+        user_sede_id = session.get('sede_id')
+        sede_param = request.form.get('sede_id') or request.args.get('sede')
+        
+        sede_filtro = None
+        if user_rol not in ('admin', 'superadmin'):
+            sede_filtro = user_sede_id
+        elif sede_param and str(sede_param).isdigit():
+            sede_filtro = int(sede_param)
+
+        alias_map = {
+            'LS1': '704LS1',
+            'LS2': '803LS2',
+            'LS3': '804LS3',
+            'LS4': '801LS4',
+            'LS5': '703LS5'
+        }
+        
+        recursos = Recurso.query.join(Ubicacion).all()
+        rec_map = {}
+        for r in recursos:
+            s_id = r.ubicacion.sede_id if r.ubicacion else None
+            rec_map[(r.nombre.upper(), s_id)] = r
+            if (r.nombre.upper(), None) not in rec_map:
+                rec_map[(r.nombre.upper(), None)] = r
+
+        query_res = Reserva.query
+        if sede_filtro:
+            query_res = query_res.filter(
+                or_(
+                    Reserva.sede_id == sede_filtro,
+                    Reserva.recurso.has(Recurso.ubicacion.has(Ubicacion.sede_id == sede_filtro))
+                )
+            )
+            
+        reservas = query_res.order_by(Reserva.fecha.asc(), Reserva.hora_inicio.asc()).all()
+        creados = 0
+        actualizados = 0
+
+        for r in reservas:
+            nombre_salon = (r.recurso_nombre or 'Salón').strip()
+            if nombre_salon in alias_map:
+                nombre_salon = alias_map[nombre_salon]
+
+            s_id = r.sede_id
+            if not s_id:
+                if nombre_salon in ['704LS1', '803LS2', '804LS3', '801LS4', '703LS5']:
+                    s_id = 1
+                elif nombre_salon.startswith(('A', 'B', 'C', 'D')) or 'Niñera' in nombre_salon:
+                    s_id = 2
+                else:
+                    s_id = 1
+
+            rec_id = r.recurso_id
+            if not rec_id or not db.session.get(Recurso, rec_id):
+                match_rec = rec_map.get((nombre_salon.upper(), s_id)) or rec_map.get((nombre_salon.upper(), None))
+                if match_rec:
+                    rec_id = match_rec.id
+
+            obs = (r.observaciones or '').strip()
+            if obs and not obs.lower().startswith('reserva generada') and obs.lower() not in ['prueba automática', 'ok', 'prueba']:
+                materia = obs
+            elif r.nrc:
+                materia = f"Clase NRC {r.nrc}"
+            else:
+                materia = r.programa or "Clase Académica"
+
+            if r.hora_inicio and r.hora_fin:
+                dt_ini = datetime.combine(date.min, r.hora_inicio)
+                dt_fin = datetime.combine(date.min, r.hora_fin)
+                duracion_seg = (dt_fin - dt_ini).total_seconds()
+                horas_acad = round(duracion_seg / 3600.0, 2)
+            else:
+                horas_acad = 1.5
+
+            jornada = r.jornada
+            if not jornada and r.hora_inicio:
+                if r.hora_inicio < time(13, 45):
+                    jornada = 'MAÑANA'
+                elif r.hora_inicio < time(18, 15):
+                    jornada = 'TARDE'
+                else:
+                    jornada = 'NOCHE'
+            elif jornada:
+                jornada = jornada.upper()
+
+            asistencia = 'Sí' if r.estado == 'Completada' else 'No'
+            estado = 'Cancelada' if r.estado == 'Cancelada' else ('Realizada' if r.estado == 'Completada' else 'Programada')
+            obs_final = f"NRC: {r.nrc} | {r.observaciones or ''}".strip(' |')
+
+            clase_existente = ClaseSalaComputo.query.filter(
+                ClaseSalaComputo.fecha == r.fecha,
+                ClaseSalaComputo.salon == nombre_salon,
+                ClaseSalaComputo.hora_inicio == r.hora_inicio
+            ).first()
+
+            if clase_existente:
+                clase_existente.sede_id = s_id
+                clase_existente.recurso_id = rec_id
+                clase_existente.cedula_profesor = r.cedula_profesor
+                clase_existente.nombre_profesor = r.nombre_profesor
+                clase_existente.materia = materia
+                clase_existente.horas_academicas = horas_acad
+                clase_existente.jornada = jornada
+                clase_existente.programa = r.programa
+                clase_existente.programa_id = r.programa_id
+                if not clase_existente.observaciones:
+                    clase_existente.observaciones = obs_final
+                actualizados += 1
+            else:
+                nueva = ClaseSalaComputo(
+                    fecha=r.fecha,
+                    hora_inicio=r.hora_inicio,
+                    hora_fin=r.hora_fin,
+                    sede_id=s_id,
+                    recurso_id=rec_id,
+                    salon=nombre_salon,
+                    cedula_profesor=r.cedula_profesor,
+                    nombre_profesor=r.nombre_profesor,
+                    materia=materia,
+                    asistencia=asistencia,
+                    horas_academicas=horas_acad,
+                    jornada=jornada,
+                    num_estudiantes=None,
+                    programa=r.programa,
+                    programa_id=r.programa_id,
+                    modalidad='Presencial',
+                    estado=estado,
+                    observaciones=obs_final
+                )
+                db.session.add(nueva)
+                creados += 1
+
+        db.session.commit()
+        flash(f'Sincronización completada: {creados} nuevas clases creadas y {actualizados} actualizadas desde la lista de reservas.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error sincronizando reservas a clases: {e}")
+        flash(f'Error al sincronizar reservas a clases: {str(e)}', 'danger')
+
     return redirect(url_for('salas_computo.dashboard_salas', tab='clases'))
 
 

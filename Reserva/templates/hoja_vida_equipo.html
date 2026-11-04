@@ -1,0 +1,883 @@
+{% include 'components/header.html' %}
+{% include 'components/navbar.html' %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* ── Contenedor Hoja de Vida ── */
+    .hv-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* ── Cabecera de la Hoja de Vida ── */
+    .hv-header-card {
+        background: linear-gradient(135deg, #1e3a5f 0%, #2d6a9f 100%);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        color: white;
+        box-shadow: 0 8px 24px rgba(30, 58, 95, 0.16);
+    }
+
+    /* ── Espacio para la Foto del Equipo ── */
+    .hv-photo-wrapper {
+        width: 100%;
+        max-width: 320px;
+        height: 280px;
+        border-radius: 14px;
+        background: #f8fafc;
+        border: 2px dashed #cbd5e1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        margin: 0 auto;
+    }
+    .hv-photo-wrapper.has-photo {
+        border: 2px solid #e2e8f0;
+        background: #ffffff;
+    }
+    .hv-photo-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    .hv-photo-wrapper:hover img {
+        transform: scale(1.03);
+    }
+    .hv-photo-overlay-btn {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        background: rgba(15, 23, 42, 0.75);
+        backdrop-filter: blur(4px);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        padding: 0.35rem 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    .hv-photo-overlay-btn:hover {
+        background: #1e3a5f;
+        color: #ffffff;
+    }
+
+    /* ── Tarjetas de Especificaciones ── */
+    .hv-spec-card {
+        background: #ffffff;
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        padding: 1.5rem;
+        height: 100%;
+    }
+    .hv-spec-item {
+        display: flex;
+        flex-direction: column;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .hv-spec-item:last-child {
+        border-bottom: none;
+    }
+    .hv-spec-label {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: #64748b;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.15rem;
+    }
+    .hv-spec-value {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    /* ── Timeline de Mantenimiento ── */
+    .hv-timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+    .hv-timeline::before {
+        content: '';
+        position: absolute;
+        top: 8px;
+        bottom: 8px;
+        left: 11px;
+        width: 2px;
+        background: #e2e8f0;
+    }
+    .hv-timeline-item {
+        position: relative;
+        margin-bottom: 1.75rem;
+    }
+    .hv-timeline-item:last-child {
+        margin-bottom: 0;
+    }
+    .hv-timeline-dot {
+        position: absolute;
+        left: -2rem;
+        top: 4px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 3px solid #2d6a9f;
+        box-shadow: 0 0 0 3px rgba(45, 106, 159, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .hv-timeline-card {
+        background: #ffffff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        padding: 1.25rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        transition: transform 0.2s ease;
+    }
+    .hv-timeline-card:hover {
+        transform: translateX(4px);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    }
+
+    /* ── Estilos de Impresión Profesional (A4 / Carta) ── */
+    @media print {
+        /* Ocultar barra de navegación, sidebar y botones */
+        .app-topbar,
+        .app-sidebar,
+        .drawer-overlay,
+        .no-print,
+        footer,
+        .btn,
+        #themeToggle {
+            display: none !important;
+        }
+
+        body {
+            padding: 0 !important;
+            background: white !important;
+            color: black !important;
+            font-size: 11pt;
+        }
+        #app-layout,
+        #app-content {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+        }
+
+        .hv-container {
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+
+        .hv-header-card {
+            background: #ffffff !important;
+            color: #000000 !important;
+            border: 2px solid #1e3a5f !important;
+            box-shadow: none !important;
+            padding: 1rem !important;
+            margin-bottom: 1.5rem !important;
+        }
+
+        .hv-header-card h1, .hv-header-card h2, .hv-header-card p {
+            color: #000000 !important;
+        }
+
+        .hv-spec-card, .hv-timeline-card {
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: none !important;
+            page-break-inside: avoid;
+        }
+
+        .hv-photo-wrapper {
+            max-width: 220px !important;
+            height: 200px !important;
+            border: 1px solid #000 !important;
+        }
+
+        .badge {
+            border: 1px solid #000 !important;
+            color: #000 !important;
+            background: transparent !important;
+        }
+    }
+</style>
+
+<div class="container-fluid py-4 px-md-4">
+    <div class="hv-container">
+        <!-- Barra de Acciones Superior (No se imprime) -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3 no-print">
+            <a href="{{ url_for('mantenimiento.dashboard_mantenimiento', tab='hojas_vida') }}" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2">
+                <i class="bi bi-arrow-left"></i> Volver al Catálogo
+            </a>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-primary btn-sm fw-semibold d-flex align-items-center gap-2" onclick="window.print()">
+                    <i class="bi bi-printer-fill"></i> Imprimir Hoja de Vida
+                </button>
+                <button type="button" class="btn btn-warning text-dark btn-sm fw-bold d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalNuevoMantenimiento">
+                    <i class="bi bi-plus-circle-fill"></i> Registrar Mantenimiento
+                </button>
+            </div>
+        </div>
+
+        <!-- Encabezado Oficial Institucional -->
+        <div class="hv-header-card mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <span class="badge bg-white bg-opacity-25 text-white mb-2 text-uppercase fw-bold" style="letter-spacing: 0.5px;">
+                        Sistema Integrado de Gestión Tecnológica
+                    </span>
+                    <h1 class="h3 fw-bold mb-1">HOJA DE VIDA DE EQUIPO DE CÓMPUTO</h1>
+                    <p class="mb-0 text-white-50 small">
+                        Ficha Técnica, Registro de Mantenimientos, Actualizaciones, Software y Trazabilidad Oficial
+                    </p>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <div class="p-2 px-3 rounded-3 bg-white bg-opacity-10 d-inline-block text-start border border-white border-opacity-25">
+                        <small class="text-white-50 text-uppercase d-block" style="font-size: 0.68rem; font-weight: 700;">N° de Inventario</small>
+                        <span class="h4 fw-extrabold text-warning mb-0">{{ equipo.numero_inventario or 'S/N' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ficha Principal: Foto + Especificaciones -->
+        <div class="row g-4 mb-4">
+            <!-- Columna Izquierda: Espacio para la Foto del Equipo -->
+            <div class="col-lg-4">
+                <div class="hv-spec-card text-center d-flex flex-column justify-content-between">
+                    <div>
+                        <h6 class="small fw-bold text-uppercase text-muted mb-3 d-flex align-items-center justify-content-between">
+                            <span><i class="bi bi-camera me-1"></i> Foto del Equipo</span>
+                            <span class="badge bg-light text-dark border">{{ equipo.categoria }}</span>
+                        </h6>
+
+                        <!-- Contenedor de Foto con Espacio Dedicado -->
+                        <div class="hv-photo-wrapper {% if equipo.foto_url %}has-photo{% endif %} mb-3">
+                            {% if equipo.foto_url %}
+                                <img src="{{ equipo.foto_url }}" alt="Foto de {{ equipo.item }}" id="fotoEquipoImg">
+                                <button type="button" class="hv-photo-overlay-btn no-print" data-bs-toggle="modal" data-bs-target="#modalCambiarFoto">
+                                    <i class="bi bi-camera-fill me-1"></i> Cambiar Foto
+                                </button>
+                            {% else %}
+                                <div class="p-3 text-center">
+                                    <div class="rounded-circle bg-light d-inline-flex p-3 mb-2 text-muted border">
+                                        <i class="bi bi-laptop display-4"></i>
+                                    </div>
+                                    <h6 class="fw-bold text-dark mb-1">Sin foto registrada</h6>
+                                    <p class="text-muted small mb-3" style="font-size: 0.78rem;">Agrega una fotografía oficial para completar la hoja de vida física.</p>
+                                    <button type="button" class="btn btn-sm btn-primary fw-semibold no-print" data-bs-toggle="modal" data-bs-target="#modalCambiarFoto">
+                                        <i class="bi bi-cloud-arrow-up-fill me-1"></i> Subir Foto del Equipo
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Estado Actual y Placa -->
+                        <div class="d-flex justify-content-center gap-2 mb-3">
+                            {% if equipo.estado == 'Disponible' %}
+                            <span class="badge bg-success px-3 py-2 fs-6 shadow-sm"><i class="bi bi-check-circle me-1"></i> Operativo / Disponible</span>
+                            {% elif equipo.estado in ('En Mantenimiento', 'En Reparación') %}
+                            <span class="badge bg-warning text-dark px-3 py-2 fs-6 shadow-sm"><i class="bi bi-tools me-1"></i> {{ equipo.estado }}</span>
+                            {% elif equipo.estado == 'En Préstamo' %}
+                            <span class="badge bg-primary px-3 py-2 fs-6 shadow-sm"><i class="bi bi-person-check me-1"></i> En Préstamo</span>
+                            {% else %}
+                            <span class="badge bg-secondary px-3 py-2 fs-6 shadow-sm">{{ equipo.estado }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Datos Resumen al pie de la foto -->
+                    <div class="p-3 bg-light rounded-3 text-start small border">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Activo Fijo (Placa):</span>
+                            <strong>{{ equipo.activo_fijo or '--' }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Serial de Fábrica:</span>
+                            <code>{{ equipo.serial or '--' }}</code>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Mantenimientos Realizados:</span>
+                            <span class="badge bg-dark rounded-pill">{{ total_intervenciones }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Especificaciones Técnicas y Ubicación -->
+            <div class="col-lg-8">
+                <div class="hv-spec-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                            <i class="bi bi-cpu text-primary"></i> Ficha Técnica & Especificaciones
+                        </h5>
+                        <button type="button" class="btn btn-sm btn-outline-primary fw-semibold no-print" data-bs-toggle="modal" data-bs-target="#modalEditarEspecificaciones">
+                            <i class="bi bi-pencil-square me-1"></i> Editar Especificaciones
+                        </button>
+                    </div>
+
+                    <div class="row g-3">
+                        <!-- Fila 1: Nombre y Marca/Modelo -->
+                        <div class="col-md-6">
+                            <div class="hv-spec-item">
+                                <span class="hv-spec-label">Elemento / Ítem</span>
+                                <span class="hv-spec-value text-primary">{{ equipo.item }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="hv-spec-item">
+                                <span class="hv-spec-label">Marca y Modelo</span>
+                                <span class="hv-spec-value">{{ equipo.marca_modelo or 'No especificado' }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Fila 2: Ubicación, Sede y Bodega -->
+                        <div class="col-md-4">
+                            <div class="hv-spec-item">
+                                <span class="hv-spec-label">Sede Asignada</span>
+                                <span class="hv-spec-value">{{ equipo.bodega.sede.nombre if equipo.bodega and equipo.bodega.sede else 'Sin Sede' }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="hv-spec-item">
+                                <span class="hv-spec-label">Bodega / Área</span>
+                                <span class="hv-spec-value">{{ equipo.bodega.nombre if equipo.bodega else 'Sin Bodega' }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="hv-spec-item">
+                                <span class="hv-spec-label">Ubicación Permanente</span>
+                                <span class="hv-spec-value">{{ equipo.ubicacion_permanente or '--' }}</span>
+                            </div>
+                        </div>
+
+                        {# Solo mostrar Hardware para Equipos de Cómputo, Pantallas Digitales ONE SCREEN o si tiene datos técnicos registrados #}
+                        {% set cat_norm = (equipo.categoria or '')|lower %}
+                        {% set item_norm = (equipo.item or '')|lower %}
+                        {% set es_hardware = ('portatil' in cat_norm or 'portatiles' in cat_norm or 'todo en uno' in cat_norm or 'comput' in cat_norm or 'pantalla' in cat_norm or 'screen' in cat_norm or 'portatil' in item_norm or 'comput' in item_norm or 'laptop' in item_norm or 'screen' in item_norm or equipo.procesador or equipo.ram_gb or equipo.almacenamiento or equipo.sistema_operativo) %}
+                        {% if es_hardware %}
+                        {% if equipo.hostname %}
+                        <!-- Fila: Hostname / Red -->
+                        <div class="col-12">
+                            <div class="hv-spec-item bg-primary bg-opacity-10 border border-primary-subtle">
+                                <span class="hv-spec-label text-primary fw-bold"><i class="bi bi-hdd-network me-1"></i> Hostname / Nombre de Red</span>
+                                <span class="hv-spec-value text-primary fw-bold font-monospace fs-6">{{ equipo.hostname }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Fila 3: Hardware Clave -->
+                        <div class="col-md-6">
+                            <div class="hv-spec-item">
+                                <span class="hv-spec-label"><i class="bi bi-cpu me-1"></i> Procesador</span>
+                                <span class="hv-spec-value">{{ equipo.procesador or 'No especificado' }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="hv-spec-item">
+                                <span class="hv-spec-label"><i class="bi bi-memory me-1"></i> Memoria RAM</span>
+                                <span class="hv-spec-value">{{ equipo.ram_gb or 'No especificado' }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Fila 4: Almacenamiento y Sistema Operativo -->
+                        <div class="col-md-6">
+                            <div class="hv-spec-item">
+                                <span class="hv-spec-label"><i class="bi bi-hdd me-1"></i> Disco / Almacenamiento</span>
+                                <span class="hv-spec-value">{{ equipo.almacenamiento or 'No especificado' }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="hv-spec-item">
+                                <span class="hv-spec-label"><i class="bi bi-windows me-1"></i> Sistema Operativo</span>
+                                <span class="hv-spec-value">{{ equipo.sistema_operativo or 'No especificado' }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Fila 5: Proveedor y Garantía -->
+                        <div class="col-md-4">
+                            <div class="hv-spec-item">
+                                <span class="hv-spec-label">Fecha de Adquisición</span>
+                                <span class="hv-spec-value">{{ equipo.fecha_adquisicion.strftime('%d/%m/%Y') if equipo.fecha_adquisicion else '--' }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="hv-spec-item">
+                                <span class="hv-spec-label">Proveedor / Fabricante</span>
+                                <span class="hv-spec-value">{{ equipo.proveedor or '--' }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="hv-spec-item">
+                                <span class="hv-spec-label">Vencimiento Garantía</span>
+                                <span class="hv-spec-value">{{ equipo.garantia_vencimiento.strftime('%d/%m/%Y') if equipo.garantia_vencimiento else '--' }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Especificaciones y Observaciones Técnicas Adicionales -->
+                        <div class="col-12">
+                            <div class="hv-spec-item">
+                                <span class="hv-spec-label">Especificaciones Técnicas Detalladas / Notas</span>
+                                <div class="p-3 bg-light rounded-3 text-secondary small mt-1 border">
+                                    {{ equipo.especificaciones_tecnicas or equipo.observaciones or 'Sin observaciones técnicas adicionales registradas.' }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Línea de Tiempo de Mantenimientos e Intervenciones -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-header bg-white p-4 border-0 d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                        <i class="bi bi-clock-history text-primary"></i> Historial de Mantenimientos & Intervenciones
+                    </h5>
+                    <p class="text-muted small mb-0">Trazabilidad completa de actualizaciones, instalaciones de programas, cambio de repuestos y reparaciones.</p>
+                </div>
+                <button type="button" class="btn btn-warning text-dark btn-sm fw-bold no-print" data-bs-toggle="modal" data-bs-target="#modalNuevoMantenimiento">
+                    <i class="bi bi-plus-lg me-1"></i> Registrar Intervención
+                </button>
+            </div>
+
+            <div class="card-body p-4 pt-0">
+                {% if mantenimientos and mantenimientos|length > 0 %}
+                <div class="hv-timeline mt-2">
+                    {% for m in mantenimientos %}
+                    <div class="hv-timeline-item">
+                        <div class="hv-timeline-dot">
+                            <i class="bi bi-check" style="font-size: 0.8rem; color: #2d6a9f;"></i>
+                        </div>
+                        <div class="hv-timeline-card">
+                            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        {% if 'Actualización' in m.tipo %}
+                                            <span class="badge badge-tipo-actualizacion"><i class="bi bi-arrow-up-circle-fill me-1"></i> Actualización</span>
+                                        {% elif 'Software' in m.tipo %}
+                                            <span class="badge badge-tipo-software"><i class="bi bi-code-slash me-1"></i> Software</span>
+                                        {% elif 'Partes' in m.tipo %}
+                                            <span class="badge badge-tipo-partes"><i class="bi bi-cpu me-1"></i> Partes / Repuesto</span>
+                                        {% elif 'Arreglo' in m.tipo or 'Correctivo' in m.tipo %}
+                                            <span class="badge badge-tipo-reparacion"><i class="bi bi-tools me-1"></i> Arreglo / Reparación</span>
+                                        {% elif 'Preventivo' in m.tipo %}
+                                            <span class="badge badge-tipo-preventivo"><i class="bi bi-shield-check me-1"></i> Preventivo</span>
+                                        {% else %}
+                                            <span class="badge badge-tipo-garantia">{{ m.tipo }}</span>
+                                        {% endif %}
+
+                                        <span class="small text-muted fw-bold">
+                                            <i class="bi bi-calendar3 me-1"></i> {{ m.fecha_envio.strftime('%d/%m/%Y') if m.fecha_envio else '--' }}
+                                        </span>
+                                    </div>
+                                    <h6 class="fw-bold text-dark mb-0">{{ m.titulo or m.motivo }}</h6>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge {% if m.estado == 'Finalizado' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                        {{ m.estado }}
+                                    </span>
+                                    {% if m.costo and m.costo > 0 %}
+                                    <span class="small fw-bold text-muted d-block mt-1">$ {{ m.costo|round(2) }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <p class="text-secondary small mb-2">{{ m.motivo }}</p>
+
+                            <!-- Bloques específicos: Software o Partes -->
+                            {% if m.software_instalado %}
+                            <div class="p-2 px-3 mb-2 rounded-2 small" style="background: #faf5ff; border-left: 3px solid #a855f7;">
+                                <strong class="text-purple"><i class="bi bi-code-slash me-1"></i> Software Instalado / Licencias:</strong>
+                                <span class="text-dark ms-1">{{ m.software_instalado }}</span>
+                            </div>
+                            {% endif %}
+
+                            {% if m.partes_cambiadas %}
+                            <div class="p-2 px-3 mb-2 rounded-2 small" style="background: #fffbeb; border-left: 3px solid #f59e0b;">
+                                <strong class="text-warning-emphasis"><i class="bi bi-cpu me-1"></i> Partes / Repuestos Sustituidos:</strong>
+                                <span class="text-dark ms-1">{{ m.partes_cambiadas }}</span>
+                            </div>
+                            {% endif %}
+
+                            {% if m.trabajo_realizado %}
+                            <div class="small text-muted mb-2">
+                                <strong>Procedimiento técnico:</strong> {{ m.trabajo_realizado }}
+                            </div>
+                            {% endif %}
+
+                            {% if m.foto_evidencia_url %}
+                            <div class="mt-2 mb-2">
+                                <label class="small fw-bold text-muted d-block mb-1">Evidencia Fotográfica de la Intervención:</label>
+                                <a href="{{ m.foto_evidencia_url }}" target="_blank">
+                                    <img src="{{ m.foto_evidencia_url }}" alt="Evidencia" class="rounded border" style="max-height: 120px; object-fit: cover;">
+                                </a>
+                            </div>
+                            {% endif %}
+
+                            <div class="pt-2 border-top d-flex justify-content-between align-items-center small text-muted">
+                                <div>
+                                    <i class="bi bi-person-badge me-1"></i> <strong>Técnico Responsable:</strong> {{ m.auxiliar_responsable or m.proveedor_tecnico }}
+                                </div>
+                                {% if m.proximo_mantenimiento %}
+                                <div>
+                                    <i class="bi bi-calendar-event me-1"></i> Próximo sugerido: <strong>{{ m.proximo_mantenimiento.strftime('%d/%m/%Y') }}</strong>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4 bg-light rounded-3">
+                    <i class="bi bi-journal-check fs-2 text-muted mb-2 d-block"></i>
+                    <p class="text-muted small mb-0">Este equipo aún no tiene mantenimientos ni intervenciones registradas.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Historial de Préstamos Recientes -->
+        {% if prestamos and prestamos|length > 0 %}
+        <div class="card border-0 shadow-sm rounded-4 mb-4 page-break">
+            <div class="card-header bg-white p-4 border-0">
+                <h5 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                    <i class="bi bi-arrow-left-right text-primary"></i> Préstamos Recientes del Equipo
+                </h5>
+                <p class="text-muted small mb-0">Últimos registros de préstamo asociados al número de inventario {{ equipo.numero_inventario }}.</p>
+            </div>
+            <div class="card-body p-4 pt-0">
+                <div class="table-responsive rounded-3 border">
+                    <table class="table table-sm table-hover mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Docente / Solicitante</th>
+                                <th>Fecha Préstamo</th>
+                                <th>Horario</th>
+                                <th>Ubicación</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in prestamos %}
+                            <tr>
+                                <td class="small text-muted">#{{ p.id_prestamo }}</td>
+                                <td class="fw-semibold small">{{ p.nombre_profesor or '--' }}</td>
+                                <td class="small">{{ p.fecha or '--' }}</td>
+                                <td class="small">{{ p.hora_inicio or '--' }} - {{ p.hora_fin or '--' }}</td>
+                                <td class="small">{{ p.ubicacion or '--' }}</td>
+                                <td>
+                                    {% if p.estado == 'Devuelto' %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">Devuelto</span>
+                                    {% elif p.estado == 'Prestado' %}
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Prestado</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ p.estado }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Pie Institucional de Hoja de Vida (Impresión) -->
+        <div class="text-center py-4 text-muted small border-top mt-4">
+            <p class="mb-1"><strong>SISTEMA INTEGRADO UNIMINUTO</strong> - Hoja de Vida Técnica Oficial</p>
+            <p class="mb-0">Generado el {{ hoy_str }} por {{ session.nombre_completo or session.usuario or 'Administrador' }}</p>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL: CAMBIAR / SUBIR FOTO DEL EQUIPO -->
+<!-- ========================================================================= -->
+<div class="modal fade no-print" id="modalCambiarFoto" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form action="{{ url_for('mantenimiento.subir_foto_equipo', inventario_id=equipo.id) }}" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-camera me-2"></i> Foto Oficial del Equipo</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 text-center">
+                    <p class="small text-muted mb-3">
+                        Sube una foto nítida de frente o en perspectiva del equipo ({{ equipo.item }} - {{ equipo.numero_inventario }}).
+                    </p>
+
+                    <div id="previewFotoContainer" class="rounded-3 border p-2 mb-3 bg-light d-flex align-items-center justify-content-center" style="height: 220px; overflow: hidden;">
+                        {% if equipo.foto_url %}
+                        <img src="{{ equipo.foto_url }}" alt="Preview" id="imgFotoPreview" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                        {% else %}
+                        <div id="placeholderFotoPreview" class="text-muted">
+                            <i class="bi bi-image display-4 d-block mb-1"></i>
+                            <span class="small">Previsualización de la foto</span>
+                        </div>
+                        <img src="" alt="Preview" id="imgFotoPreview" style="max-height: 100%; max-width: 100%; object-fit: contain; display: none;">
+                        {% endif %}
+                    </div>
+
+                    <input type="file" class="form-control" name="foto" id="inputFotoArchivo" accept="image/png, image/jpeg, image/jpg, image/webp" required onchange="previsualizarFoto(this)">
+                    <small class="text-muted d-block mt-2">Formatos soportados: JPG, PNG, WEBP. Tamaño máximo recomendado: 10 MB.</small>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">
+                        <i class="bi bi-upload me-1"></i> Guardar Foto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL: EDITAR ESPECIFICACIONES TÉCNICAS -->
+<!-- ========================================================================= -->
+<div class="modal fade no-print" id="modalEditarEspecificaciones" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form action="{{ url_for('mantenimiento.actualizar_especificaciones_equipo', inventario_id=equipo.id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-cpu me-2"></i> Editar Ficha Técnica & Especificaciones</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold"><i class="bi bi-hdd-network text-primary me-1"></i> Hostname / Nombre de Red</label>
+                            <input type="text" class="form-control" name="hostname" value="{{ equipo.hostname or '' }}" placeholder="Ej: LAB101-PC01">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Procesador</label>
+                            <input type="text" class="form-control" name="procesador" value="{{ equipo.procesador or '' }}" placeholder="Ej: Intel Core i5-1135G7 @ 2.40GHz">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Memoria RAM</label>
+                            <input type="text" class="form-control" name="ram_gb" value="{{ equipo.ram_gb or '' }}" placeholder="Ej: 16 GB DDR4 3200MHz">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Disco / Almacenamiento</label>
+                            <input type="text" class="form-control" name="almacenamiento" value="{{ equipo.almacenamiento or '' }}" placeholder="Ej: SSD NVMe 512 GB Kingston">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Sistema Operativo</label>
+                            <input type="text" class="form-control" name="sistema_operativo" value="{{ equipo.sistema_operativo or '' }}" placeholder="Ej: Windows 11 Pro 64-bit">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Fecha de Adquisición</label>
+                            <input type="date" class="form-control" name="fecha_adquisicion" value="{{ equipo.fecha_adquisicion.strftime('%Y-%m-%d') if equipo.fecha_adquisicion else '' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Proveedor / Contrato</label>
+                            <input type="text" class="form-control" name="proveedor" value="{{ equipo.proveedor or '' }}" placeholder="Ej: Lenovo Colombia / Contrato Marco 2024">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Vencimiento de Garantía</label>
+                            <input type="date" class="form-control" name="garantia_vencimiento" value="{{ equipo.garantia_vencimiento.strftime('%Y-%m-%d') if equipo.garantia_vencimiento else '' }}">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Especificaciones Detalladas / Notas Técnicas</label>
+                            <textarea class="form-control" name="especificaciones_tecnicas" rows="3" placeholder="Detalles de pantalla, tarjeta gráfica, puertos, MAC address, accesorios incluidos...">{{ equipo.especificaciones_tecnicas or '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL: NUEVA INTERVENCIÓN PARA ESTE EQUIPO -->
+<!-- ========================================================================= -->
+<div class="modal fade no-print" id="modalNuevoMantenimiento" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <form class="modal-content border-0 shadow" action="{{ url_for('mantenimiento.registrar_mantenimiento') }}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <input type="hidden" name="inventario_id" value="{{ equipo.id }}"/>
+
+            <div class="modal-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-tools fs-5 me-2"></i>
+                    <h5 class="modal-title fw-bold mb-0">Registrar Mantenimiento para {{ equipo.numero_inventario }}</h5>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="submit" class="btn btn-warning text-dark fw-bold btn-sm shadow-sm d-flex align-items-center gap-1">
+                        <i class="bi bi-floppy-fill"></i> Guardar
+                    </button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+            </div>
+
+            <div class="modal-body p-4">
+                    <div class="p-2 px-3 bg-light rounded-3 border mb-3 d-flex align-items-center justify-content-between">
+                        <div>
+                            <strong class="text-primary">{{ equipo.numero_inventario }}</strong> - {{ equipo.item }}
+                            <small class="text-muted d-block">Serial: {{ equipo.serial or '--' }} | Sede: {{ equipo.bodega.sede.nombre if equipo.bodega and equipo.bodega.sede else 'Sin Sede' }}</small>
+                        </div>
+                        <span class="badge bg-secondary">{{ equipo.estado }}</span>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Tipo de Intervención <span class="text-danger">*</span></label>
+                            <select class="form-select" name="tipo" required onchange="adaptarFormModalHv(this.value)">
+                                <option value="Actualización de Equipo">Actualización de Equipo (Upgrade HW/SO)</option>
+                                <option value="Instalación de Software">Instalación / Licencia de Software</option>
+                                <option value="Cambio de Partes / Repuestos">Cambio de Partes / Repuestos</option>
+                                <option value="Arreglo / Reparación">Arreglo / Reparación Correctiva</option>
+                                <option value="Mantenimiento Preventivo" selected>Mantenimiento Preventivo (Limpieza/Revisión)</option>
+                                <option value="Garantía / Diagnóstico">Garantía / Diagnóstico Técnico</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Título / Resumen Breve</label>
+                            <input type="text" class="form-control" name="titulo" placeholder="Ej: Cambio a SSD 500GB + Instalación Office">
+                        </div>
+                    </div>
+
+                    <!-- Campos dinámicos -->
+                    <div id="bloqueSoftwareHv" class="p-3 mb-3 rounded-3" style="display: none; background: #faf5ff; border: 1px dashed #d8b4fe;">
+                        <label class="form-label fw-bold text-purple"><i class="bi bi-code-slash me-1"></i> Software Instalado / Licencias</label>
+                        <input type="text" class="form-control mb-1" name="software_instalado" placeholder="Ej: AutoCAD 2026, Office 365, Antivirus ESET">
+                        <small class="text-muted">Especifique nombres de programas y licencias instaladas en este equipo.</small>
+                    </div>
+
+                    <div id="bloquePartesHv" class="p-3 mb-3 rounded-3" style="display: none; background: #fffbeb; border: 1px dashed #fde68a;">
+                        <label class="form-label fw-bold text-warning-emphasis"><i class="bi bi-cpu me-1"></i> Partes / Repuestos Sustituidos</label>
+                        <input type="text" class="form-control mb-1" name="partes_cambiadas" placeholder="Ej: Disco SSD 480GB Kingston, Teclado USB, Batería">
+                        <small class="text-muted">Detalla las piezas sustituidas o incorporadas.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Motivo o Falla Detectada <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="motivo" rows="2" placeholder="Motivo o necesidad técnica..." required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Procedimiento Técnico / Trabajo Realizado</label>
+                        <textarea class="form-control" name="trabajo_realizado" rows="2" placeholder="Detalle los procedimientos ejecutados..."></textarea>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Técnico / Responsable</label>
+                            <input type="text" class="form-control" name="tecnico_responsable" value="{{ session.nombre_completo or session.usuario or 'Técnico UNIMINUTO' }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Fecha</label>
+                            <input type="date" class="form-control" name="fecha_envio" value="{{ hoy_iso or '' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Costo ($)</label>
+                            <input type="number" step="0.01" class="form-control" name="costo" value="0">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Estado de Intervención</label>
+                            <select class="form-select" name="estado">
+                                <option value="Finalizado" selected>Finalizado (Trabajo concluido)</option>
+                                <option value="En Proceso">En Proceso (En taller)</option>
+                                <option value="No Reparable">No Reparable</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Estado Resultante del Equipo</label>
+                            <select class="form-select" name="nuevo_estado_equipo">
+                                <option value="Disponible" selected>Disponible / Operativo</option>
+                                <option value="En Mantenimiento">En Mantenimiento</option>
+                                <option value="En Reparación">En Reparación</option>
+                                <option value="De Baja">De Baja</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 border mb-3">
+                        <label class="form-label fw-bold text-dark"><i class="bi bi-camera me-1"></i> Foto de Evidencia Técnica (Opcional)</label>
+                        <input type="file" class="form-control form-control-sm" name="foto_evidencia" accept="image/*">
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label small fw-semibold text-muted">Próximo Mantenimiento Sugerido</label>
+                        <input type="date" class="form-control form-control-sm" name="proximo_mantenimiento">
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light border-top" style="position: sticky; bottom: 0; z-index: 1055;">
+                    <button type="button" class="btn btn-secondary px-3" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4 shadow-sm">
+                        <i class="bi bi-floppy-fill me-1"></i> Guardar Mantenimiento
+                    </button>
+                </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Previsualización de Foto al seleccionar archivo
+    function previsualizarFoto(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById('imgFotoPreview');
+                const placeholder = document.getElementById('placeholderFotoPreview');
+                if (img) {
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                }
+                if (placeholder) placeholder.style.display = 'none';
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function adaptarFormModalHv(tipo) {
+        const bSw = document.getElementById('bloqueSoftwareHv');
+        const bPartes = document.getElementById('bloquePartesHv');
+
+        if (tipo === 'Instalación de Software') {
+            bSw.style.display = 'block';
+            bPartes.style.display = 'none';
+        } else if (tipo === 'Cambio de Partes / Repuestos') {
+            bSw.style.display = 'none';
+            bPartes.style.display = 'block';
+        } else if (tipo === 'Actualización de Equipo') {
+            bSw.style.display = 'block';
+            bPartes.style.display = 'block';
+        } else {
+            bSw.style.display = 'none';
+            bPartes.style.display = 'none';
+        }
+    }
+</script>
+
+{% include 'components/footer.html' %}

@@ -362,6 +362,7 @@
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="{{ url_for('admin.backup_sistema') }}"><i class="bi bi-download"></i> Backup Sistema</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('admin.importar_datos') }}"><i class="bi bi-cloud-arrow-up-fill"></i> Importar Datos</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('planillas.planillas_dashboard') }}"><i class="bi bi-file-earmark-spreadsheet-fill text-success"></i> Planillas Excel</a></li>
             </ul>
         </div>
         {% endif %}
@@ -449,7 +450,7 @@
             <span class="sidebar-tooltip">Inicio</span>
         </a>
 
-        {% if session.rol in ('admin', 'superadmin') or mod_access.prestamos.ver %}
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('prestamos') %}
         <a class="sidebar-item {% if 'prestamos' in request.path %}active{% endif %}" href="{{ url_for('prestamos.prestamos_equipos') }}">
             <i class="bi bi-laptop"></i>
             <span class="sidebar-item-text">Préstamos</span>
@@ -457,7 +458,7 @@
         </a>
         {% endif %}
 
-        {% if session.rol in ('admin', 'superadmin') or mod_access.reservas.ver %}
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('reservas') %}
         <a class="sidebar-item {% if 'reservas' in request.path %}active{% endif %}" href="{{ url_for('reservas.reservas_main') }}">
             <i class="bi bi-calendar-check"></i>
             <span class="sidebar-item-text">Reservas</span>
@@ -465,7 +466,7 @@
         </a>
         {% endif %}
 
-        {% if session.rol in ('admin', 'superadmin') or mod_access.salas_computo.ver %}
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('salas_computo') %}
         <a class="sidebar-item {% if 'salas-computo' in request.path %}active{% endif %}" href="{{ url_for('salas_computo.dashboard_salas') }}">
             <i class="bi bi-pc-display"></i>
             <span class="sidebar-item-text">Salas Cómputo</span>
@@ -473,7 +474,7 @@
         </a>
         {% endif %}
 
-        {% if session.rol in ('admin', 'superadmin') or mod_access.inventario.ver %}
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('inventario') %}
         <a class="sidebar-item {% if 'inventario' in request.path %}active{% endif %}" href="{{ url_for('inventario.inventario_main') }}">
             <i class="bi bi-archive"></i>
             <span class="sidebar-item-text">Inventario</span>
@@ -481,33 +482,31 @@
         </a>
         {% endif %}
 
-        {% if session.rol in ('admin', 'superadmin') or mod_access.profesores.ver %}
-        <a class="sidebar-item {% if 'profesores' in request.path %}active{% endif %}" href="{{ url_for('profesores.profesores_main') }}">
-            <i class="bi bi-people"></i>
-            <span class="sidebar-item-text">Profesores</span>
-            <span class="sidebar-tooltip">Profesores</span>
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('mantenimiento') %}
+        <a class="sidebar-item {% if 'mantenimiento' in request.path %}active{% endif %}" href="{{ url_for('mantenimiento.dashboard_mantenimiento') }}">
+            <i class="bi bi-tools"></i>
+            <span class="sidebar-item-text">Mantenimiento</span>
+            <span class="sidebar-tooltip">Mantenimiento & Hojas de Vida</span>
         </a>
-        <a class="sidebar-item {% if 'estudiantes' in request.path %}active{% endif %}" href="{{ url_for('estudiantes.estudiantes_main') }}">
-            <i class="bi bi-person-badge"></i>
-            <span class="sidebar-item-text">Estudiantes</span>
-            <span class="sidebar-tooltip">Estudiantes</span>
+        {% endif %}
+
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('usuarios') or mod_access.get('profesores') or mod_access.get('colaboradores') %}
+        <a class="sidebar-item {% if 'usuarios' in request.path or 'profesores' in request.path or 'estudiantes' in request.path or 'colaboradores' in request.path %}active{% endif %}" href="{{ url_for('usuarios.usuarios_dashboard') }}">
+            <i class="bi bi-people-fill"></i>
+            <span class="sidebar-item-text">Usuarios</span>
+            <span class="sidebar-tooltip">Usuarios (Colaboradores, Profesores, Estudiantes)</span>
         </a>
+        {% endif %}
+
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('profesores') %}
         <a class="sidebar-item {% if 'programas' in request.path %}active{% endif %}" href="{{ url_for('programas.programas_main') }}">
             <i class="bi bi-mortarboard"></i>
             <span class="sidebar-item-text">Programas</span>
-            <span class="sidebar-tooltip">Programas</span>
+            <span class="sidebar-tooltip">Programas Académicos</span>
         </a>
         {% endif %}
 
-        {% if session.rol in ('admin', 'superadmin') or mod_access.get('colaboradores') %}
-        <a class="sidebar-item {% if 'colaboradores' in request.path %}active{% endif %}" href="{{ url_for('colaboradores.colaboradores_main') }}">
-            <i class="bi bi-person-vcard"></i>
-            <span class="sidebar-item-text">Colaboradores</span>
-            <span class="sidebar-tooltip">Colaboradores</span>
-        </a>
-        {% endif %}
-
-        {% if session.rol in ('admin', 'superadmin') or mod_access.estadisticas.ver %}
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('estadisticas') %}
         <a class="sidebar-item {% if 'estadisticas' in request.path %}active{% endif %}" href="{{ url_for('estadisticas.dashboard') }}">
             <i class="bi bi-graph-up"></i>
             <span class="sidebar-item-text">Estadísticas</span>
@@ -515,12 +514,31 @@
         </a>
         {% endif %}
 
-        {% if session.rol in ('admin', 'superadmin') %}
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('bitacora') %}
         <a class="sidebar-item {% if 'bitacora' in request.path %}active{% endif %}" href="{{ url_for('bitacora.dashboard_bitacora') }}">
             <i class="bi bi-journal-text"></i>
             <span class="sidebar-item-text">Bitácora</span>
             <span class="sidebar-tooltip">Bitácora</span>
         </a>
+        {% endif %}
+
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('entregas_turno') %}
+        <a class="sidebar-item {% if 'entregas-turno' in request.path or 'turnos' in request.path %}active{% endif %}" href="{{ url_for('entregas_turno.dashboard_entregas') }}">
+            <i class="bi bi-envelope-paper-fill"></i>
+            <span class="sidebar-item-text">Entregas de Turno</span>
+            <span class="sidebar-tooltip">Entregas de Turno (Mañana / Tarde)</span>
+        </a>
+        {% endif %}
+
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('planillas') or mod_access.get('inventario') %}
+        <a class="sidebar-item {% if 'planillas' in request.path %}active{% endif %}" href="{{ url_for('planillas.planillas_dashboard') }}">
+            <i class="bi bi-file-earmark-spreadsheet-fill text-success"></i>
+            <span class="sidebar-item-text">Planillas Excel</span>
+            <span class="sidebar-tooltip">Planillas Excel & Carga Masiva</span>
+        </a>
+        {% endif %}
+
+        {% if session.rol in ('admin', 'superadmin') %}
         <a class="sidebar-item {% if 'admin/usuarios' in request.path %}active{% endif %}" href="{{ url_for('admin.usuarios_main') }}">
             <i class="bi bi-shield-lock"></i>
             <span class="sidebar-item-text">Usuarios & Roles</span>

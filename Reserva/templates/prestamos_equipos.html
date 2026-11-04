@@ -491,7 +491,7 @@
                         </thead>
                         <tbody>
                             {% for prestamo in prestamos_dia %}
-                            <tr class="{% if prestamo.estado == 'Vencido' %}table-danger{% endif %}">
+                            <tr id="prestamo-row-{{ prestamo.id_prestamo }}" class="{% if prestamo.estado == 'Vencido' %}table-danger{% endif %}" style="transition: all 0.4s ease;">
                                 <td>{{ prestamo.nombre_profesor }}</td>
                                 <td>{{ prestamo.equipo_prestado }}</td>
                                 <td>{{ prestamo.fecha }}</td>
@@ -604,7 +604,14 @@ function devolverPrestamo(prestamoId) {
                         sound: 'success'
                     });
                 }
-                location.reload();
+                const fila = document.getElementById(`prestamo-row-${prestamoId}`);
+                if (fila) {
+                    fila.style.transition = 'all 0.5s ease';
+                    fila.style.backgroundColor = '#d1e7dd';
+                    fila.style.opacity = '0';
+                    fila.style.transform = 'translateX(30px)';
+                    setTimeout(() => fila.remove(), 500);
+                }
             } else {
                 if (window.notificationSystem) {
                     window.notificationSystem.notify({

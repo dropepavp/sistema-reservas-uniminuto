@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acta de Entrega de Turno — {{ entrega.consecutivo }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        @page {
+            size: letter;
+            margin: 1.5cm;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #1a202c;
+            background: #f8fafc;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .acta-sheet {
+            max-width: 850px;
+            margin: 30px auto;
+            background: #ffffff;
+            padding: 40px 45px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+        }
+        .acta-header {
+            border-bottom: 3px double #1e3a5f;
+            padding-bottom: 18px;
+            margin-bottom: 24px;
+        }
+        .uniminuto-logo-text {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1e3a5f;
+            letter-spacing: 0.5px;
+            line-height: 1.1;
+        }
+        .uniminuto-sub-text {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .consecutivo-box {
+            background: #1e3a5f;
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-align: right;
+            font-weight: 700;
+        }
+        .table-meta th {
+            background-color: #f1f5f9;
+            color: #334155;
+            width: 25%;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        .table-meta td {
+            font-size: 13px;
+        }
+        .section-header {
+            background-color: #f1f5f9;
+            color: #1e3a5f;
+            padding: 8px 14px;
+            font-weight: 700;
+            font-size: 13px;
+            border-left: 4px solid #1e3a5f;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .section-content {
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            white-space: pre-line;
+            background: #fafafa;
+            font-family: inherit;
+        }
+        .badge-shift {
+            font-weight: 700;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+        .shift-manana {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+        .shift-tarde {
+            background: #e0e7ff;
+            color: #3730a3;
+            border: 1px solid #c7d2fe;
+        }
+        .signature-box {
+            border-top: 1px solid #1a202c;
+            padding-top: 8px;
+            margin-top: 60px;
+            text-align: center;
+        }
+        .signature-role {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .no-print {
+            max-width: 850px;
+            margin: 20px auto 0;
+        }
+
+        @media print {
+            body {
+                background: #ffffff !important;
+                font-size: 11.5px;
+            }
+            .acta-sheet {
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                max-width: 100% !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Botones de Acción para Pantalla (Ocultos al Imprimir) -->
+    <div class="no-print d-flex justify-content-between align-items-center mb-3">
+        <a href="{{ url_for('entregas_turno.ver_entrega', entrega_id=entrega.id) }}" class="btn btn-outline-secondary btn-sm fw-bold">
+            <i class="bi bi-arrow-left me-1"></i> Volver a la Entrega
+        </a>
+        <div class="d-flex gap-2">
+            <button onclick="window.print()" class="btn btn-primary btn-sm fw-bold px-3">
+                <i class="bi bi-printer-fill me-1"></i> Imprimir / Guardar como PDF
+            </button>
+            <button onclick="window.close()" class="btn btn-secondary btn-sm">
+                Cerrar
+            </button>
+        </div>
+    </div>
+
+    <!-- Hoja del Acta Oficial -->
+    <div class="acta-sheet">
+        <!-- Header Institucional -->
+        <div class="acta-header d-flex justify-content-between align-items-center">
+            <div>
+                <div class="uniminuto-logo-text">CORPORACIÓN UNIVERSITARIA MINUTO DE DIOS</div>
+                <div class="uniminuto-sub-text">Sede {{ entrega.sede.nombre if entrega.sede else 'UNIMINUTO' }} — Dirección de Infraestructura y Tecnología</div>
+                <div class="fw-bold text-dark mt-1" style="font-size: 15px;">ACTA OFICIAL DE ENTREGA Y RECEPCIÓN DE TURNO OPERATIVO</div>
+            </div>
+            <div class="consecutivo-box">
+                <div style="font-size: 10px; opacity: 0.85;">ACTA Nº</div>
+                <div style="font-size: 15px;">{{ entrega.consecutivo }}</div>
+            </div>
+        </div>
+
+        <!-- Metadatos de la Entrega -->
+        <table class="table table-bordered table-meta mb-3">
+            <tbody>
+                <tr>
+                    <th>Fecha del Turno:</th>
+                    <td><strong>{{ entrega.fecha.strftime('%d/%m/%Y') }}</strong></td>
+                    <th>Hora de Emisión:</th>
+                    <td>{{ entrega.hora.strftime('%H:%M') }} hrs</td>
+                </tr>
+                <tr>
+                    <th>Jornada Entregada:</th>
+                    <td>
+                        {% if entrega.jornada == 'Mañana' %}
+                        <span class="badge-shift shift-manana">☀️ Jornada Mañana (06:00 - 14:00)</span>
+                        {% else %}
+                        <span class="badge-shift shift-tarde">🌙 Jornada Tarde (14:00 - 22:00)</span>
+                        {% endif %}
+                    </td>
+                    <th>Prioridad:</th>
+                    <td>
+                        {% if entrega.prioridad == 'Urgente' %}
+                        <span class="text-danger fw-bold"><i class="bi bi-exclamation-triangle-fill"></i> Urgente</span>
+                        {% elif entrega.prioridad == 'Importante' %}
+                        <span class="text-warning fw-bold"><i class="bi bi-bell-fill"></i> Importante</span>
+                        {% else %}
+                        <span>Normal</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Operador Saliente (Emisor):</th>
+                    <td><strong>{{ entrega.emisor.nombre_completo if entrega.emisor else 'Auxiliar' }}</strong> (Doc. {{ entrega.usuario_emisor_doc }})</td>
+                    <th>Destinatario / Receptor:</th>
+                    <td>{{ entrega.receptor.nombre_completo if entrega.receptor else 'Toda la sede / Turno Entrante' }}</td>
+                </tr>
+                <tr>
+                    <th>Asunto:</th>
+                    <td colspan="3"><strong>{{ entrega.asunto }}</strong></td>
+                </tr>
+                <tr>
+                    <th>Estado de Recepción:</th>
+                    <td colspan="3">
+                        {% if entrega.estado == 'Recibido Conforme' %}
+                        <span class="text-success fw-bold"><i class="bi bi-check-circle-fill"></i> Recibido Conforme por {{ entrega.usuario_acuse.nombre_completo if entrega.usuario_acuse else entrega.usuario_acuse_doc }}</span>
+                        {% if entrega.fecha_acuse %}
+                        <span class="text-muted small">({{ entrega.fecha_acuse.strftime('%d/%m/%Y %H:%M') }})</span>
+                        {% endif %}
+                        {% elif entrega.estado == 'Con Observaciones' %}
+                        <span class="text-warning-emphasis fw-bold"><i class="bi bi-exclamation-circle-fill"></i> Recibido Con Observaciones</span>
+                        {% if entrega.fecha_acuse %}
+                        <span class="text-muted small">({{ entrega.fecha_acuse.strftime('%d/%m/%Y %H:%M') }})</span>
+                        {% endif %}
+                        {% else %}
+                        <span class="text-secondary"><i class="bi bi-hourglass-split"></i> Pendiente de confirmación por el turno entrante</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 1. Actividades Realizadas en la Jornada -->
+        <div class="section-header">1. Actividades Realizadas en la Jornada</div>
+        <div class="section-content">{{ entrega.actividades_realizadas or 'Sin registro de actividades.' }}</div>
+
+        <!-- 2. Equipos y Préstamos Pendientes -->
+        <div class="section-header">2. Equipos y Préstamos Pendientes por Devolver</div>
+        <div class="section-content">
+            {% if entrega.equipos_pendientes %}
+            {{ entrega.equipos_pendientes }}
+            {% else %}
+            <em>Sin equipos ni préstamos pendientes al cierre de la jornada. Todos los activos fueron devueltos a bodega.</em>
+            {% endif %}
+        </div>
+
+        <!-- 3. Novedades Técnicas en Salas o Equipos -->
+        <div class="section-header">3. Novedades Técnicas en Salas, Salones o Equipos</div>
+        <div class="section-content">
+            {% if entrega.novedades_salas %}
+            {{ entrega.novedades_salas }}
+            {% else %}
+            <em>Salas y recursos operando con normalidad. No se presentaron fallas técnicas durante el turno.</em>
+            {% endif %}
+        </div>
+
+        <!-- 4. Tareas e Instrucciones para el Siguiente Turno -->
+        <div class="section-header">4. Tareas e Instrucciones para el Turno Entrante</div>
+        <div class="section-content">
+            {% if entrega.pendientes_siguiente_turno %}
+            {{ entrega.pendientes_siguiente_turno }}
+            {% else %}
+            <em>Sin tareas extraordinarias asignadas.</em>
+            {% endif %}
+        </div>
+
+        <!-- 5. Observaciones Generales -->
+        {% if entrega.observaciones %}
+        <div class="section-header">5. Observaciones Generales</div>
+        <div class="section-content">{{ entrega.observaciones }}</div>
+        {% endif %}
+
+        <!-- Observaciones del Acuse si hubo -->
+        {% if entrega.observaciones_acuse %}
+        <div class="section-header" style="border-left-color: #059669; color: #065f46;">
+            6. Observaciones de Recepción (Turno Entrante)
+        </div>
+        <div class="section-content" style="background: #f0fdf4; border-color: #bbf7d0;">
+            <strong>Nota registrada por {{ entrega.usuario_acuse.nombre_completo if entrega.usuario_acuse else entrega.usuario_acuse_doc }}:</strong><br>
+            {{ entrega.observaciones_acuse }}
+        </div>
+        {% endif %}
+
+        <!-- Sección de Firmas -->
+        <div class="row mt-4 pt-3">
+            <div class="col-6">
+                <div class="signature-box mx-3">
+                    <div class="fw-bold">{{ entrega.emisor.nombre_completo if entrega.emisor else 'Operador Saliente' }}</div>
+                    <div class="signature-role">Operador Turno Saliente (Jornada {{ entrega.jornada }})</div>
+                    <div class="text-muted small">C.C. {{ entrega.usuario_emisor_doc }}</div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="signature-box mx-3">
+                    <div class="fw-bold">{{ entrega.usuario_acuse.nombre_completo if entrega.usuario_acuse else (entrega.receptor.nombre_completo if entrega.receptor else 'Operador Entrante') }}</div>
+                    <div class="signature-role">Operador Turno Entrante / Receptor</div>
+                    <div class="text-muted small">C.C. {{ entrega.usuario_acuse_doc or (entrega.usuario_receptor_doc or '_____________________') }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pie de Página Legal -->
+        <div class="text-center text-muted small mt-5 pt-3 border-top" style="font-size: 10px;">
+            Este documento constituye constancia oficial de entrega de puesto y novedades del área de Infraestructura Tecnológica UNIMINUTO.<br>
+            Generado digitalmente el {{ entrega.created_at.strftime('%d/%m/%Y %H:%M:%S') if entrega.created_at else '' }} — Sistema Integrado de Gestión UNIMINUTO.
+        </div>
+    </div>
+
+</body>
+</html>

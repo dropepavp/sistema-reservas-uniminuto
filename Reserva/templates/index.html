@@ -120,6 +120,108 @@
     .bg-dark-soft {
         background-color: #f3f4f6;
     }
+
+    .bg-teal-soft {
+        background-color: #ccfbf1;
+    }
+    .text-teal {
+        color: #0d9488 !important;
+    }
+    .btn-teal {
+        background-color: #0d9488;
+        border-color: #0d9488;
+        color: white;
+    }
+    .btn-teal:hover {
+        background-color: #0f766e;
+        border-color: #0f766e;
+        color: white;
+    }
+
+    .bg-purple-soft {
+        background-color: #f3e8ff;
+    }
+    .text-purple {
+        color: #7c3aed !important;
+    }
+    .btn-purple {
+        background-color: #7c3aed;
+        border-color: #7c3aed;
+        color: white;
+    }
+    .btn-purple:hover {
+        background-color: #6d28d9;
+        border-color: #6d28d9;
+        color: white;
+    }
+
+    .bg-indigo-soft {
+        background-color: #e0e7ff;
+    }
+    .text-indigo {
+        color: #4f46e5 !important;
+    }
+    .btn-indigo {
+        background-color: #4f46e5;
+        border-color: #4f46e5;
+        color: white;
+    }
+    .btn-indigo:hover {
+        background-color: #4338ca;
+        border-color: #4338ca;
+        color: white;
+    }
+
+    .bg-orange-soft {
+        background-color: #ffedd5;
+    }
+    .text-orange {
+        color: #ea580c !important;
+    }
+    .btn-orange {
+        background-color: #ea580c;
+        border-color: #ea580c;
+        color: white;
+    }
+    .btn-orange:hover {
+        background-color: #c2410c;
+        border-color: #c2410c;
+        color: white;
+    }
+
+    .bg-navy-soft {
+        background-color: #e2e8f0;
+    }
+    .text-navy {
+        color: #1e3a5f !important;
+    }
+    .btn-navy {
+        background-color: #1e3a5f;
+        border-color: #1e3a5f;
+        color: white;
+    }
+    .btn-navy:hover {
+        background-color: #152840;
+        border-color: #152840;
+        color: white;
+    }
+
+    .bg-emerald-soft {
+        background-color: #d1fae5;
+    }
+    .text-emerald {
+        color: #059669 !important;
+    }
+    .btn-emerald {
+        background-color: #059669;
+        border-color: #059669;
+        color: white;
+    }
+    .btn-emerald:hover {
+        background-color: #047857;
+        border-color: #047857;
+        color: white;
+    }
 </style>
 
 <div class="container mt-4">
@@ -127,10 +229,10 @@
     <div class="hero-bienvenida mb-3">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div>
-                <h1>👋 ¡Hola, {{ session.nombre_completo.split(' ')[0] }}!</h1>
+                <h1>👋 ¡Hola, {{ (session.get('nombre_completo') or 'Usuario').split(' ')[0] }}!</h1>
                 <p>Panel principal del Sistema Integrado — {{ "hoy" }}</p>
             </div>
-            <span class="badge-rol"><i class="bi bi-shield-check me-1"></i>{{ session.rol|capitalize }}</span>
+            <span class="badge-rol"><i class="bi bi-shield-check me-1"></i>{{ (session.get('rol') or 'Usuario')|capitalize }}</span>
         </div>
     </div>
 
@@ -287,92 +389,242 @@
         <div class="col-12">
             <h2 class="pb-2 border-bottom my-4">Accesos Rápidos</h2>
         </div>
-        {% if session.rol == 'admin' or mod_access.prestamos %}
+
+        {# 1. Préstamos #}
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('prestamos') %}
         <div class="col-md-6 col-lg-3 mb-4">
             <div class="card text-center h-100 shadow-sm border-0 transition-hover">
                 <div class="card-body d-flex flex-column justify-content-center p-4">
                     <div class="icon-circle bg-primary-soft mb-3 mx-auto">
                         <i class="bi bi-laptop fs-2 text-primary"></i>
                     </div>
-                    <h5 class="card-title">Préstamos de Equipos</h5>
-                    <p class="card-text small text-muted">Registra y gestiona la entrega y devolución de portátiles.</p>
-                    <a href="{{ url_for('prestamos.prestamos_equipos') }}" class="btn btn-primary mt-auto w-100">Ir a
-                        Préstamos</a>
+                    <h5 class="card-title fw-bold">Préstamos de Equipos</h5>
+                    <p class="card-text small text-muted">Registra y gestiona la entrega y devolución de portátiles y accesorios.</p>
+                    <a href="{{ url_for('prestamos.prestamos_equipos') }}" class="btn btn-primary mt-auto w-100">Ir a Préstamos</a>
                 </div>
             </div>
         </div>
         {% endif %}
-        {% if session.rol == 'admin' or mod_access.reservas %}
+
+        {# 2. Reservas #}
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('reservas') %}
         <div class="col-md-6 col-lg-3 mb-4">
             <div class="card text-center h-100 shadow-sm border-0 transition-hover">
                 <div class="card-body d-flex flex-column justify-content-center p-4">
                     <div class="icon-circle bg-success-soft mb-3 mx-auto">
                         <i class="bi bi-calendar-week fs-2 text-success"></i>
                     </div>
-                    <h5 class="card-title">Reservas de Recursos</h5>
-                    <p class="card-text small text-muted">Consulta disponibilidad y reserva salones o niñeras.</p>
-                    <a href="{{ url_for('reservas.reservas_main') }}" class="btn btn-success mt-auto w-100">Ir a
-                        Reservas</a>
+                    <h5 class="card-title fw-bold">Reservas de Recursos</h5>
+                    <p class="card-text small text-muted">Consulta disponibilidad y reserva salones, espacios o niñeras.</p>
+                    <a href="{{ url_for('reservas.reservas_main') }}" class="btn btn-success mt-auto w-100">Ir a Reservas</a>
                 </div>
             </div>
         </div>
         {% endif %}
-        {% if session.rol == 'admin' or mod_access.salas_computo %}
+
+        {# 3. Salas de Cómputo #}
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('salas_computo') %}
         <div class="col-md-6 col-lg-3 mb-4">
             <div class="card text-center h-100 shadow-sm border-0 transition-hover">
                 <div class="card-body d-flex flex-column justify-content-center p-4">
                     <div class="icon-circle bg-dark-soft mb-3 mx-auto">
                         <i class="bi bi-pc-display fs-2 text-dark"></i>
                     </div>
-                    <h5 class="card-title">Salas de Cómputo</h5>
-                    <p class="card-text small text-muted">Control de asistencia y programación de salas de sistemas.</p>
-                    <a href="{{ url_for('salas_computo.dashboard_salas') }}" class="btn btn-dark mt-auto w-100">Ver
-                        Salas</a>
+                    <h5 class="card-title fw-bold">Salas de Cómputo</h5>
+                    <p class="card-text small text-muted">Control de asistencia, software instalado y reservas de salas de sistemas.</p>
+                    <a href="{{ url_for('salas_computo.dashboard_salas') }}" class="btn btn-dark mt-auto w-100">Ver Salas</a>
                 </div>
             </div>
         </div>
         {% endif %}
-        {% if session.rol == 'admin' or mod_access.profesores %}
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="card text-center h-100 shadow-sm border-0 transition-hover">
-                <div class="card-body d-flex flex-column justify-content-center p-4">
-                    <div class="icon-circle bg-warning-soft mb-3 mx-auto">
-                        <i class="bi bi-person-badge fs-2 text-warning"></i>
-                    </div>
-                    <h5 class="card-title">Gestión de Profesores</h5>
-                    <p class="card-text small text-muted">Administra información de contacto y programas académicos.</p>
-                    <a href="{{ url_for('profesores.profesores_main') }}" class="btn btn-warning mt-auto w-100">Ir a
-                        Profesores</a>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-        {% if session.rol == 'admin' or mod_access.inventario %}
+
+        {# 4. Inventario #}
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('inventario') %}
         <div class="col-md-6 col-lg-3 mb-4">
             <div class="card text-center h-100 shadow-sm border-0 transition-hover">
                 <div class="card-body d-flex flex-column justify-content-center p-4">
                     <div class="icon-circle bg-info-soft mb-3 mx-auto">
                         <i class="bi bi-box-seam fs-2 text-info"></i>
                     </div>
-                    <h5 class="card-title">Gestión de Inventario</h5>
-                    <p class="card-text small text-muted">Administra los equipos y recursos físicos institucionales.</p>
-                    <a href="{{ url_for('inventario.inventario_main') }}" class="btn btn-info mt-auto w-100">Ir a
-                        Inventario</a>
+                    <h5 class="card-title fw-bold">Gestión de Inventario</h5>
+                    <p class="card-text small text-muted">Administra equipos, activos fijos, consumibles y stock por bodega.</p>
+                    <a href="{{ url_for('inventario.inventario_main') }}" class="btn btn-info text-white mt-auto w-100">Ir a Inventario</a>
                 </div>
             </div>
         </div>
         {% endif %}
-        {% if session.rol == 'admin' or mod_access.estadisticas %}
+
+        {# 5. Mantenimiento & Hojas de Vida #}
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('mantenimiento') %}
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card text-center h-100 shadow-sm border-0 transition-hover">
+                <div class="card-body d-flex flex-column justify-content-center p-4">
+                    <div class="icon-circle bg-teal-soft mb-3 mx-auto">
+                        <i class="bi bi-tools fs-2 text-teal"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Mantenimiento & Hojas de Vida</h5>
+                    <p class="card-text small text-muted">Reparaciones, software, repuestos, estado técnico y hoja de vida del equipo.</p>
+                    <a href="{{ url_for('mantenimiento.dashboard_mantenimiento') }}" class="btn btn-teal mt-auto w-100">Ver Mantenimiento</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# 6. Directorio General de Usuarios #}
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('usuarios') or mod_access.get('profesores') or mod_access.get('colaboradores') %}
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card text-center h-100 shadow-sm border-0 transition-hover">
+                <div class="card-body d-flex flex-column justify-content-center p-4">
+                    <div class="icon-circle bg-navy-soft mb-3 mx-auto">
+                        <i class="bi bi-people-fill fs-2 text-navy"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Directorio de Usuarios</h5>
+                    <p class="card-text small text-muted">Panel centralizado con pestañas de Colaboradores, Profesores y Estudiantes.</p>
+                    <a href="{{ url_for('usuarios.usuarios_dashboard') }}" class="btn btn-navy mt-auto w-100">Ver Usuarios</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# 7. Colaboradores #}
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('colaboradores') or mod_access.get('usuarios') %}
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card text-center h-100 shadow-sm border-0 transition-hover">
+                <div class="card-body d-flex flex-column justify-content-center p-4">
+                    <div class="icon-circle bg-purple-soft mb-3 mx-auto">
+                        <i class="bi bi-person-workspace fs-2 text-purple"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Colaboradores</h5>
+                    <p class="card-text small text-muted">Horarios semanales, turnos de apoyo, tareas operativas y matriz de permisos.</p>
+                    <a href="{{ url_for('usuarios.usuarios_dashboard', tab='colaboradores') }}" class="btn btn-purple mt-auto w-100">Ir a Colaboradores</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# 8. Profesores #}
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('profesores') or mod_access.get('usuarios') %}
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card text-center h-100 shadow-sm border-0 transition-hover">
+                <div class="card-body d-flex flex-column justify-content-center p-4">
+                    <div class="icon-circle bg-warning-soft mb-3 mx-auto">
+                        <i class="bi bi-person-video3 fs-2 text-warning"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Profesores</h5>
+                    <p class="card-text small text-muted">Directorio docente, datos de contacto, programas académicos e historial de préstamos.</p>
+                    <a href="{{ url_for('usuarios.usuarios_dashboard', tab='profesores') }}" class="btn btn-warning text-dark mt-auto w-100">Ir a Profesores</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# 9. Estudiantes #}
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('usuarios') or mod_access.get('profesores') %}
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card text-center h-100 shadow-sm border-0 transition-hover">
+                <div class="card-body d-flex flex-column justify-content-center p-4">
+                    <div class="icon-circle bg-emerald-soft mb-3 mx-auto">
+                        <i class="bi bi-mortarboard-fill fs-2 text-emerald"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Estudiantes</h5>
+                    <p class="card-text small text-muted">Consulta y gestión de alumnos con códigos Banner, sedes y programas académicos.</p>
+                    <a href="{{ url_for('usuarios.usuarios_dashboard', tab='estudiantes') }}" class="btn btn-emerald mt-auto w-100">Ir a Estudiantes</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# 10. Programas Académicos #}
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('profesores') %}
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card text-center h-100 shadow-sm border-0 transition-hover">
+                <div class="card-body d-flex flex-column justify-content-center p-4">
+                    <div class="icon-circle bg-indigo-soft mb-3 mx-auto">
+                        <i class="bi bi-book-half fs-2 text-indigo"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Programas Académicos</h5>
+                    <p class="card-text small text-muted">Catálogo de carreras, facultades y vinculación curricular de la sede.</p>
+                    <a href="{{ url_for('programas.programas_main') }}" class="btn btn-indigo mt-auto w-100">Ver Programas</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# 11. Estadísticas y Reportes #}
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('estadisticas') %}
         <div class="col-md-6 col-lg-3 mb-4">
             <div class="card text-center h-100 shadow-sm border-0 transition-hover">
                 <div class="card-body d-flex flex-column justify-content-center p-4">
                     <div class="icon-circle bg-danger-soft mb-3 mx-auto">
                         <i class="bi bi-graph-up-arrow fs-2 text-danger"></i>
                     </div>
-                    <h5 class="card-title">Estadísticas y Reportes</h5>
-                    <p class="card-text small text-muted">Visualiza gráficos y análisis detallados del sistema.</p>
-                    <a href="{{ url_for('estadisticas.dashboard') }}" class="btn btn-danger mt-auto w-100">Ver
-                        Reportes</a>
+                    <h5 class="card-title fw-bold">Estadísticas y Reportes</h5>
+                    <p class="card-text small text-muted">Visualiza gráficos, métricas operativas y análisis detallados del sistema.</p>
+                    <a href="{{ url_for('estadisticas.dashboard') }}" class="btn btn-danger mt-auto w-100">Ver Reportes</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# 12. Bitácora del Sistema #}
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('bitacora') %}
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card text-center h-100 shadow-sm border-0 transition-hover">
+                <div class="card-body d-flex flex-column justify-content-center p-4">
+                    <div class="icon-circle bg-orange-soft mb-3 mx-auto">
+                        <i class="bi bi-journal-text fs-2 text-orange"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Bitácora & Auditoría</h5>
+                    <p class="card-text small text-muted">Trazabilidad de operaciones, auditoría de eventos y registros de seguridad.</p>
+                    <a href="{{ url_for('bitacora.dashboard_bitacora') }}" class="btn btn-orange mt-auto w-100">Ver Bitácora</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# 13. Entregas de Turno #}
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('entregas_turno') %}
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card text-center h-100 shadow-sm border-0 transition-hover">
+                <div class="card-body d-flex flex-column justify-content-center p-4">
+                    <div class="icon-circle bg-primary-soft mb-3 mx-auto">
+                        <i class="bi bi-envelope-paper-fill fs-2 text-primary"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Entregas de Turno</h5>
+                    <p class="card-text small text-muted">Correo interno y novedades entre jornadas (Mañana y Tarde) con acuse formal y acta.</p>
+                    <a href="{{ url_for('entregas_turno.dashboard_entregas') }}" class="btn btn-primary mt-auto w-100">Buzón de Turnos</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# 13. Administración y Sedes (Solo Administradores) #}
+        {% if session.rol in ('admin', 'superadmin') %}
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card text-center h-100 shadow-sm border-0 transition-hover">
+                <div class="card-body d-flex flex-column justify-content-center p-4">
+                    <div class="icon-circle bg-dark-soft mb-3 mx-auto">
+                        <i class="bi bi-gear-fill fs-2 text-dark"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Configuración Global</h5>
+                    <p class="card-text small text-muted">Administración de sedes, bodegas físicas, backups y parámetros del sistema.</p>
+                    <a href="{{ url_for('admin.sedes_bodegas_main') }}" class="btn btn-dark mt-auto w-100">Configuración</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# 14. Planillas Excel & Carga Masiva #}
+        {% if session.rol in ('admin', 'superadmin') or mod_access.get('planillas') or mod_access.get('inventario') %}
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card text-center h-100 shadow-sm border-0 transition-hover">
+                <div class="card-body d-flex flex-column justify-content-center p-4">
+                    <div class="icon-circle bg-success-soft mb-3 mx-auto" style="background: rgba(22, 163, 74, 0.1);">
+                        <i class="bi bi-file-earmark-spreadsheet-fill fs-2 text-success"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Planillas Excel</h5>
+                    <p class="card-text small text-muted">Descarga de formatos oficiales y subida masiva de datos en Excel para todos los módulos.</p>
+                    <a href="{{ url_for('planillas.planillas_dashboard') }}" class="btn btn-success mt-auto w-100">Centro de Planillas</a>
                 </div>
             </div>
         </div>

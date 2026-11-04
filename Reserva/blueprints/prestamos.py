@@ -233,6 +233,19 @@ def prestamos_equipos():
         total_realizados = query_todos.with_entities(func.count(func.distinct(group_key))).scalar() or 0
         total_vencidos = len(prestamos_vencidos) if prestamos_vencidos else 0
 
+        # Determinar si la sede activa es Perdomo o Principal (controles automáticos solo en Principal)
+        sede_nom_val = (session.get('sede_nombre') or '').strip().upper()
+        if not sede_nom_val and session.get('sede_id'):
+            try:
+                s_obj = Sede.query.get(int(session.get('sede_id')))
+                if s_obj:
+                    sede_nom_val = s_obj.nombre.strip().upper()
+                    session['sede_nombre'] = s_obj.nombre
+            except Exception:
+                pass
+        es_sede_perdomo = 'PERDOMO' in sede_nom_val
+        es_sede_principal = not es_sede_perdomo
+
         sedes = Sede.query.all()
 
         return render_template('prestamos_equipos_mejorado.html',
@@ -246,10 +259,15 @@ def prestamos_equipos():
                                total_activos=total_activos,
                                total_devueltos=total_devueltos,
                                total_realizados=total_realizados,
-                               total_vencidos=total_vencidos)
+                               total_vencidos=total_vencidos,
+                               es_sede_perdomo=es_sede_perdomo,
+                               es_sede_principal=es_sede_principal)
     except Exception as e:
         current_app.logger.exception("Error cargando módulo de préstamos: %s", str(e))
         flash('No se pudieron cargar algunos datos de préstamos. Puedes recargar la página e intentar nuevamente.', 'warning')
+        sede_nom_val = (session.get('sede_nombre') or '').strip().upper()
+        es_sede_perdomo = 'PERDOMO' in sede_nom_val
+        es_sede_principal = not es_sede_perdomo
         return render_template('prestamos_equipos_mejorado.html',
                                current_user=request.current_user if hasattr(request, 'current_user') else None,
                                prestamos_activos=[],
@@ -261,7 +279,9 @@ def prestamos_equipos():
                                total_vencidos=0,
                                total_realizados=0,
                                disponibles={'portatiles': {'disponible': 0, 'total': 0}, 'cargadores': {'disponible': 0, 'total': 0}, 'hdmi': {'disponible': 0, 'total': 0}, 'controles': {'disponible': 0, 'total': 0}, 'teclados': {'disponible': 0, 'total': 0}},
-                               sedes=[])
+                               sedes=[],
+                               es_sede_perdomo=es_sede_perdomo,
+                               es_sede_principal=es_sede_principal)
 
 
 @prestamos_bp.route('/devueltos')
@@ -479,37 +499,49 @@ def detalles_prestamo(id_grupo):
         if not prestamos_grupo:
             return jsonify({'success': False, 'message': 'Préstamo no encontrado'}), 404
 
-        equipos_agrupados = {'portatiles': [], 'cargadores': [], 'hdmi': [], 'controles': [], 'teclados': []}
+        equipos_agrupados = {
+            'portatiles': [],
+            'cargadores': [],
+            'hdmi': [],
+            'controles': [],
+            'teclados': [],
+            'otros': []
+        }
 
         for prestamo in prestamos_grupo:
             item_lower = prestamo.equipo_prestado.lower() if prestamo.equipo_prestado else ''
             equipo_info = {
                 'id_prestamo': prestamo.id_prestamo,
+                'item': prestamo.equipo_prestado or 'Equipo',
+                'equipo_prestado': prestamo.equipo_prestado,
+                'numero': prestamo.numero_inventario_equipo,
                 'numero_inventario': prestamo.numero_inventario_equipo,
                 'numero_corto': extraer_numero_corto(prestamo.numero_inventario_equipo),
-                'equipo_prestado': prestamo.equipo_prestado,
                 'hora_inicio': prestamo.hora_inicio.strftime('%H:%M') if prestamo.hora_inicio else None,
                 'hora_fin': prestamo.hora_fin.strftime('%H:%M') if prestamo.hora_fin else None,
-                'estado': prestamo.estado
+                'estado': prestamo.estado,
+                'cantidad': prestamo.cantidad_prestada or 1
             }
 
             if 'portátil' in item_lower or 'portatil' in item_lower or 'laptop' in item_lower:
                 equipos_agrupados['portatiles'].append(equipo_info)
             elif 'cargador' in item_lower or 'adaptador' in item_lower or 'fuente' in item_lower:
                 equipos_agrupados['cargadores'].append(equipo_info)
-            elif 'hdmi' in item_lower:
+            elif 'hdmi' in item_lower or 'cable hdmi' in item_lower:
                 equipos_agrupados['hdmi'].append(equipo_info)
             elif 'control' in item_lower or 'remoto' in item_lower:
                 equipos_agrupados['controles'].append(equipo_info)
             elif 'teclado' in item_lower or 'keyboard' in item_lower:
                 equipos_agrupados['teclados'].append(equipo_info)
+            else:
+                equipos_agrupados['otros'].append(equipo_info)
 
         primer_prestamo = prestamos_grupo[0]
         detalles = {
             'id_grupo': id_grupo,
             'cedula_profesor': primer_prestamo.cedula_profesor,
             'nombre_profesor': primer_prestamo.nombre_profesor,
-            'telefono': primer_prestamo.telefono,
+            'telefono': primer_prestamo.profesor.telefono if primer_prestamo.profesor else '--',
             'fecha_prestamo': primer_prestamo.fecha_prestamo.strftime('%Y-%m-%d') if primer_prestamo.fecha_prestamo else None,
             'hora_inicio': primer_prestamo.hora_inicio.strftime('%H:%M') if primer_prestamo.hora_inicio else None,
             'hora_fin': primer_prestamo.hora_fin.strftime('%H:%M') if primer_prestamo.hora_fin else None,
@@ -532,10 +564,16 @@ def detalles_prestamo(id_grupo):
 @permiso_requerido('prestamos', 'editar')
 def editar_prestamo(id_prestamo):
     """Obtiene o actualiza los datos de un préstamo."""
+    prestamo_base = PrestamoEquipo.query.get(id_prestamo)
+    if prestamo_base and prestamo_base.id_grupo_prestamo:
+        id_grupo = prestamo_base.id_grupo_prestamo
+    else:
+        id_grupo = id_prestamo
+
     prestamo_grupo = PrestamoEquipo.query.filter(
         db.or_(
-            PrestamoEquipo.id_grupo_prestamo == id_prestamo,
-            PrestamoEquipo.id_prestamo == id_prestamo
+            PrestamoEquipo.id_grupo_prestamo == id_grupo,
+            PrestamoEquipo.id_prestamo == id_grupo
         )
     ).all()
 
@@ -547,16 +585,23 @@ def editar_prestamo(id_prestamo):
     if request.method == 'GET':
         equipos_agrupados = {
             'portatiles': [], 'cargadores': [], 'hdmi': [],
-            'controles': [], 'teclados': [], 'cables': []
+            'controles': [], 'teclados': [], 'cables': [], 'otros': []
         }
+        lista_equipos = []
 
         for p in prestamo_grupo:
+            num_corto = extraer_numero_corto(p.numero_inventario_equipo)
             equipo_data = {
                 'id_prestamo': p.id_prestamo,
                 'numero_inventario': p.numero_inventario_equipo,
+                'numero_corto': num_corto,
                 'equipo': p.equipo_prestado,
-                'item': p.equipo_prestado
+                'item': p.equipo_prestado,
+                'cantidad': p.cantidad_prestada or 1,
+                'estado': p.estado
             }
+            lista_equipos.append(equipo_data)
+
             item_lower = (p.equipo_prestado or '').lower()
             if 'laptop' in item_lower or 'portátil' in item_lower or 'portatil' in item_lower:
                 equipos_agrupados['portatiles'].append(equipo_data)
@@ -570,17 +615,22 @@ def editar_prestamo(id_prestamo):
                 equipos_agrupados['teclados'].append(equipo_data)
             elif 'cable' in item_lower:
                 equipos_agrupados['cables'].append(equipo_data)
+            else:
+                equipos_agrupados['otros'].append(equipo_data)
 
         prestamo_data = {
             'id_prestamo': prestamo.id_prestamo,
-            'id_grupo': prestamo.id_grupo_prestamo or prestamo.id_prestamo,
+            'id_grupo': id_grupo,
+            'cedula_profesor': prestamo.cedula_profesor,
             'nombre_profesor': prestamo.nombre_profesor,
-            'ubicacion': prestamo.ubicacion,
-            'hora_inicio': prestamo.hora_inicio.strftime('%H:%M'),
-            'hora_fin': prestamo.hora_fin.strftime('%H:%M'),
-            'observaciones': prestamo.observaciones,
-            'fecha_prestamo': prestamo.fecha_prestamo.strftime('%Y-%m-%d'),
-            'equipos': equipos_agrupados
+            'ubicacion': prestamo.ubicacion or '',
+            'hora_inicio': prestamo.hora_inicio.strftime('%H:%M') if prestamo.hora_inicio else '',
+            'hora_fin': prestamo.hora_fin.strftime('%H:%M') if prestamo.hora_fin else '',
+            'observaciones': prestamo.observaciones or '',
+            'fecha_prestamo': prestamo.fecha_prestamo.strftime('%Y-%m-%d') if prestamo.fecha_prestamo else '',
+            'equipos': equipos_agrupados,
+            'lista_equipos': lista_equipos,
+            'total_equipos': len(prestamo_grupo)
         }
         return jsonify({'success': True, 'prestamo': prestamo_data})
 
@@ -593,14 +643,15 @@ def editar_prestamo(id_prestamo):
                     'message': 'Solo se pueden editar préstamos activos (que no hayan sido devueltos)'
                 }), 400
 
-            datos = request.json
+            datos = request.json or {}
             current_app.logger.info("✏️ PUT datos recibidos: %s", datos)
 
             datos_antes = {
                 'ubicacion': prestamo.ubicacion,
-                'hora_inicio': prestamo.hora_inicio.strftime('%H:%M'),
-                'hora_fin': prestamo.hora_fin.strftime('%H:%M'),
+                'hora_inicio': prestamo.hora_inicio.strftime('%H:%M') if prestamo.hora_inicio else '',
+                'hora_fin': prestamo.hora_fin.strftime('%H:%M') if prestamo.hora_fin else '',
                 'observaciones': prestamo.observaciones or '',
+                'total_equipos': len(prestamo_grupo)
             }
 
             # Validar con DataValidator
@@ -631,51 +682,108 @@ def editar_prestamo(id_prestamo):
             ubicacion = ubicacion_raw.strip()
             observaciones = observaciones_raw.strip()
 
-            # Actualizar todos los registros del grupo
+            fecha_prestamo_str = datos.get('fecha_prestamo')
+            fecha_prestamo_obj = None
+            if fecha_prestamo_str:
+                try:
+                    fecha_prestamo_obj = datetime.strptime(fecha_prestamo_str, '%Y-%m-%d').date()
+                except ValueError:
+                    pass
+
+            items_eliminar = datos.get('items_eliminar', []) or []
+            ids_eliminar = set()
+            for x in items_eliminar:
+                try:
+                    ids_eliminar.add(int(x))
+                except (ValueError, TypeError):
+                    pass
+
+            items_agregar = datos.get('items_agregar', []) or []
+
+            # Verificar si quedan equipos
+            num_restantes = len(prestamo_grupo) - len(ids_eliminar) + len(items_agregar)
+            if num_restantes <= 0:
+                return jsonify({
+                    'success': False,
+                    'message': 'El préstamo debe tener al menos un equipo. Si deseas anularlo por completo, usa la opción de Anular Préstamo.'
+                }), 400
+
+            # 1. Procesar eliminación de equipos (equivocación al prestar)
+            eliminados_info = []
+            for p_del_id in ids_eliminar:
+                p_del = next((p for p in prestamo_grupo if p.id_prestamo == p_del_id), None)
+                if not p_del:
+                    continue
+                num_inv = p_del.numero_inventario_equipo
+                cant = p_del.cantidad_prestada or 1
+                if num_inv:
+                    item_inv = Inventario.query.filter_by(numero_inventario=num_inv).first()
+                    if item_inv:
+                        if item_inv.es_por_cantidad:
+                            item_inv.cantidad_disponible = (item_inv.cantidad_disponible or 0) + cant
+                            if item_inv.cantidad_disponible > 0:
+                                item_inv.estado = 'Disponible'
+                        else:
+                            otros = PrestamoEquipo.query.filter(
+                                PrestamoEquipo.numero_inventario_equipo == num_inv,
+                                PrestamoEquipo.estado == SystemConstants.ESTADO_PRESTADO,
+                                PrestamoEquipo.id_prestamo != p_del.id_prestamo
+                            ).count()
+                            if otros == 0:
+                                item_inv.estado = 'Disponible'
+                eliminados_info.append(f"{p_del.equipo_prestado} [{num_inv}]")
+                db.session.delete(p_del)
+
+            # 2. Actualizar datos base de los registros sobrevivientes
+            horas_academicas = PrestamoService.calcular_horas_academicas(
+                hora_inicio_obj.strftime('%H:%M'),
+                hora_fin_obj.strftime('%H:%M')
+            )
             for p_reg in prestamo_grupo:
+                if p_reg.id_prestamo in ids_eliminar:
+                    continue
                 p_reg.ubicacion = ubicacion
                 p_reg.hora_inicio = hora_inicio_obj
                 p_reg.hora_fin = hora_fin_obj
                 p_reg.observaciones = observaciones
-                p_reg.horas_academicas = PrestamoService.calcular_horas_academicas(
-                    hora_inicio_obj.strftime('%H:%M'),
-                    hora_fin_obj.strftime('%H:%M')
-                )
+                p_reg.horas_academicas = horas_academicas
+                if fecha_prestamo_obj:
+                    p_reg.fecha_prestamo = fecha_prestamo_obj
 
-            # Actualizar items individuales si se proporcionan
-            items_edit = datos.get('items', [])
-            current_app.logger.info("✏️ items_edit recibidos: %s", items_edit)
+            # 3. Actualizar items individuales existentes (swap/cambio de número)
+            items_edit = datos.get('items', []) or []
+            modificados_info = []
             for item_data in items_edit:
                 p_id = item_data.get('id_prestamo')
-                nuevo_num = item_data.get('numero_inventario', '').strip()
-                current_app.logger.info("  → p_id=%s (type=%s) nuevo_num=%s", p_id, type(p_id).__name__, nuevo_num)
+                nuevo_num = (item_data.get('numero_inventario') or '').strip()
                 if not p_id or not nuevo_num:
                     continue
                 try:
                     p_id = int(p_id)
                 except (ValueError, TypeError):
-                    current_app.logger.warning("  → p_id inválido, saltando")
+                    continue
+                if p_id in ids_eliminar:
                     continue
                 p_target = next((p for p in prestamo_grupo if p.id_prestamo == p_id), None)
-                current_app.logger.info("  → p_target encontrado: %s", p_target is not None)
                 if not p_target:
                     continue
                 num_viejo = p_target.numero_inventario_equipo
                 if num_viejo == nuevo_num:
-                    continue  # Sin cambio
+                    continue
 
                 # Verificar que el nuevo equipo existe y está disponible
                 nuevo_item = Inventario.query.filter_by(numero_inventario=nuevo_num).first()
                 if not nuevo_item:
+                    nuevo_item = Inventario.query.filter_by(activo_fijo=nuevo_num).first()
+                if not nuevo_item:
                     return jsonify({'success': False, 'message': f'Equipo "{nuevo_num}" no encontrado en inventario'}), 400
                 if nuevo_item.estado not in ('Disponible', 'En Préstamo') and nuevo_item.numero_inventario != num_viejo:
-                    return jsonify({'success': False, 'message': f'El equipo "{nuevo_num}" no está disponible (estado: {nuevo_item.estado})'}), 400
+                    return jsonify({'success': False, 'message': f'El equipo "{nuevo_item.item}" no está disponible (estado: {nuevo_item.estado})'}), 400
 
                 # Liberar equipo viejo
                 if num_viejo:
                     item_viejo = Inventario.query.filter_by(numero_inventario=num_viejo).first()
                     if item_viejo and item_viejo.estado == 'En Préstamo':
-                        # Solo liberar si no hay otros préstamos activos con ese equipo
                         otros = PrestamoEquipo.query.filter(
                             PrestamoEquipo.numero_inventario_equipo == num_viejo,
                             PrestamoEquipo.estado == SystemConstants.ESTADO_PRESTADO,
@@ -686,31 +794,135 @@ def editar_prestamo(id_prestamo):
 
                 # Marcar nuevo equipo como prestado
                 nuevo_item.estado = 'En Préstamo'
-                p_target.numero_inventario_equipo = nuevo_num
+                p_target.numero_inventario_equipo = nuevo_item.numero_inventario
 
-            datos_despues = {
-                'ubicacion': ubicacion,
-                'hora_inicio': hora_inicio_obj.strftime('%H:%M'),
-                'hora_fin': hora_fin_obj.strftime('%H:%M'),
-                'observaciones': observaciones,
-                'items_actualizados': len(items_edit)
-            }
+                # Actualizar texto del equipo prestado
+                num_corto = extraer_numero_corto(nuevo_item.numero_inventario)
+                serial_valido = None
+                if nuevo_item.serial and str(nuevo_item.serial).strip().lower() not in ['nan', 'undefined', 'null', 'none', '']:
+                    serial_valido = nuevo_item.serial
+                p_target.equipo_prestado = f"{nuevo_item.item} ({serial_valido or num_corto})"
+                modificados_info.append(f"{num_viejo} -> {nuevo_item.numero_inventario}")
+
+            # 4. Procesar items a agregar (añadir algo más al préstamo existente)
+            agregados_info = []
+            for add_entry in items_agregar:
+                if isinstance(add_entry, dict):
+                    add_num = str(add_entry.get('numero_inventario', '')).strip()
+                    add_cant = int(add_entry.get('cantidad', 1))
+                else:
+                    add_num = str(add_entry).strip()
+                    add_cant = 1
+                if not add_num:
+                    continue
+
+                item_inv = Inventario.query.filter_by(numero_inventario=add_num).first()
+                if not item_inv:
+                    item_inv = Inventario.query.filter_by(activo_fijo=add_num).first()
+                if not item_inv:
+                    item_inv = Inventario.query.filter(
+                        db.or_(
+                            Inventario.numero_inventario.ilike(f'%{add_num}'),
+                            Inventario.activo_fijo.ilike(f'%{add_num}')
+                        )
+                    ).first()
+                if not item_inv:
+                    return jsonify({'success': False, 'message': f'Equipo "{add_num}" no encontrado en inventario'}), 400
+
+                # Validar disponibilidad
+                if item_inv.es_por_cantidad:
+                    disp = item_inv.cantidad_disponible or 0
+                    if disp < add_cant:
+                        return jsonify({'success': False, 'message': f'Stock insuficiente para "{item_inv.item}". Disponible: {disp}'}), 400
+                    item_inv.cantidad_disponible = disp - add_cant
+                    if item_inv.cantidad_disponible <= 0:
+                        item_inv.estado = 'En Préstamo'
+                else:
+                    if item_inv.estado != 'Disponible':
+                        return jsonify({'success': False, 'message': f'El equipo "{item_inv.item}" ({item_inv.numero_inventario}) no está disponible (estado actual: {item_inv.estado})'}), 400
+                    item_inv.estado = 'En Préstamo'
+
+                num_corto = extraer_numero_corto(item_inv.numero_inventario)
+                serial_valido = None
+                if item_inv.serial and str(item_inv.serial).strip().lower() not in ['nan', 'undefined', 'null', 'none', '']:
+                    serial_valido = item_inv.serial
+                desc = f"{item_inv.item} ({serial_valido or num_corto})"
+                if item_inv.es_por_cantidad:
+                    desc = f"{item_inv.item} (x{add_cant})"
+
+                nuevo_p = PrestamoEquipo(
+                    cedula_profesor=prestamo.cedula_profesor,
+                    nombre_profesor=prestamo.nombre_profesor,
+                    equipo_prestado=desc,
+                    numero_inventario_equipo=item_inv.numero_inventario,
+                    cantidad_prestada=add_cant,
+                    ubicacion=ubicacion,
+                    ubicacion_id=prestamo.ubicacion_id,
+                    recurso_id=prestamo.recurso_id,
+                    fecha_prestamo=fecha_prestamo_obj or prestamo.fecha_prestamo,
+                    jornada=prestamo.jornada,
+                    hora_inicio=hora_inicio_obj,
+                    hora_fin=hora_fin_obj,
+                    horas_academicas=horas_academicas,
+                    auxiliar_entrega=session.get('nombre_completo') or prestamo.auxiliar_entrega,
+                    observaciones=observaciones,
+                    estado=SystemConstants.ESTADO_PRESTADO,
+                    sede_id=prestamo.sede_id or (item_inv.bodega.sede_id if item_inv.bodega else None),
+                    id_grupo_prestamo=id_grupo
+                )
+                db.session.add(nuevo_p)
+                agregados_info.append(f"{desc} [{item_inv.numero_inventario}]")
+
+            # 5. Mantener consistencia si el líder original fue eliminado
+            restantes = [p for p in prestamo_grupo if p.id_prestamo not in ids_eliminar]
+            nuevo_id_grupo = id_grupo
+            if any(p_id == id_grupo for p_id in ids_eliminar):
+                if restantes:
+                    nuevo_id_grupo = restantes[0].id_prestamo
+                    for p in restantes:
+                        p.id_grupo_prestamo = nuevo_id_grupo
 
             db.session.commit()
+
+            desc_auditoria = f"Modificación de préstamo {id_grupo}"
+            partes_audit = []
+            if eliminados_info:
+                partes_audit.append(f"Eliminados: {', '.join(eliminados_info)}")
+            if agregados_info:
+                partes_audit.append(f"Agregados: {', '.join(agregados_info)}")
+            if modificados_info:
+                partes_audit.append(f"Modificados: {', '.join(modificados_info)}")
+            if partes_audit:
+                desc_auditoria += " (" + "; ".join(partes_audit) + ")"
 
             registrar_auditoria(
                 modulo='prestamos',
                 entidad_tipo='PrestamoEquipo',
-                entidad_id=prestamo.id_grupo_prestamo or prestamo.id_prestamo,
+                entidad_id=nuevo_id_grupo,
                 accion='EDITAR',
                 usuario_documento=session.get('usuario', ''),
                 usuario_nombre=session.get('nombre_completo', ''),
-                descripcion=f"Edición de préstamo {prestamo.id_grupo_prestamo or prestamo.id_prestamo}",
+                descripcion=desc_auditoria,
                 datos_antes=datos_antes,
-                datos_despues=datos_despues
+                datos_despues={
+                    'ubicacion': ubicacion,
+                    'hora_inicio': hora_inicio_obj.strftime('%H:%M'),
+                    'hora_fin': hora_fin_obj.strftime('%H:%M'),
+                    'observaciones': observaciones,
+                    'eliminados': len(eliminados_info),
+                    'agregados': len(agregados_info),
+                    'modificados': len(modificados_info)
+                }
             )
 
-            return jsonify({'success': True, 'message': 'Préstamo y equipos actualizados correctamente'})
+            return jsonify({
+                'success': True,
+                'message': 'Préstamo y equipos actualizados correctamente',
+                'id_grupo': nuevo_id_grupo,
+                'id_grupo_original': id_grupo,
+                'eliminados': len(eliminados_info),
+                'agregados': len(agregados_info)
+            })
 
         except Exception as e:
             db.session.rollback()
@@ -719,6 +931,58 @@ def editar_prestamo(id_prestamo):
                 'success': False,
                 'message': 'No se pudieron guardar los cambios del préstamo. Revisa los datos e inténtalo nuevamente.'
             }), 500
+
+
+@prestamos_bp.route('/anular/<int:id_grupo>', methods=['POST'])
+@login_required
+@permiso_requerido('prestamos', 'editar')
+def anular_prestamo(id_grupo):
+    """Anula un préstamo completo por equivocación y libera todos sus equipos a Disponible."""
+    try:
+        prestamos = PrestamoEquipo.query.filter(
+            db.or_(
+                PrestamoEquipo.id_grupo_prestamo == id_grupo,
+                PrestamoEquipo.id_prestamo == id_grupo
+            )
+        ).all()
+        if not prestamos:
+            return jsonify({'success': False, 'message': 'Préstamo no encontrado'}), 404
+
+        nombres_equipos = []
+        for p in prestamos:
+            if p.numero_inventario_equipo:
+                inv = Inventario.query.filter_by(numero_inventario=p.numero_inventario_equipo).first()
+                if inv:
+                    if inv.es_por_cantidad:
+                        inv.cantidad_disponible = (inv.cantidad_disponible or 0) + (p.cantidad_prestada or 1)
+                        if inv.cantidad_disponible > 0:
+                            inv.estado = 'Disponible'
+                    else:
+                        otros = PrestamoEquipo.query.filter(
+                            PrestamoEquipo.numero_inventario_equipo == p.numero_inventario_equipo,
+                            PrestamoEquipo.estado == SystemConstants.ESTADO_PRESTADO,
+                            PrestamoEquipo.id_prestamo != p.id_prestamo
+                        ).count()
+                        if otros == 0:
+                            inv.estado = 'Disponible'
+            nombres_equipos.append(p.equipo_prestado or p.numero_inventario_equipo)
+            db.session.delete(p)
+
+        db.session.commit()
+        registrar_auditoria(
+            modulo='prestamos',
+            entidad_tipo='PrestamoEquipo',
+            entidad_id=id_grupo,
+            accion='ANULAR',
+            usuario_documento=session.get('usuario', ''),
+            usuario_nombre=session.get('nombre_completo', ''),
+            descripcion=f"Préstamo {id_grupo} anulado por equivocación. Equipos liberados: {', '.join(nombres_equipos)}"
+        )
+        return jsonify({'success': True, 'message': 'Préstamo anulado y equipos liberados correctamente a Disponible'})
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.exception("Error al anular préstamo %s: %s", id_grupo, str(e))
+        return jsonify({'success': False, 'message': 'No se pudo anular el préstamo.'}), 500
 
 
 @prestamos_bp.route('/buscar')
@@ -1095,4 +1359,53 @@ def api_escanear_equipo():
     except Exception as e:
         current_app.logger.exception("Error al escanear equipo: %s", str(e))
         return jsonify({'success': False, 'message': 'Error al escanear equipo'}), 500
+
+
+@prestamos_bp.route('/api/resumen', methods=['GET'])
+@login_required
+@permiso_requerido('prestamos', 'ver')
+def api_resumen():
+    """Retorna en tiempo real el conteo de equipos disponibles y resumen de préstamos."""
+    try:
+        query_inv = Inventario.query
+        query_activos = PrestamoEquipo.query.filter_by(estado=SystemConstants.ESTADO_PRESTADO)
+        query_devueltos = PrestamoEquipo.query.filter_by(estado=SystemConstants.ESTADO_DEVUELTO)
+        query_todos = PrestamoEquipo.query
+
+        rol = session.get('rol')
+        sede_id_raw = session.get('sede_id') if rol not in ('admin', 'superadmin') else None
+        sede_id = None
+        if sede_id_raw is not None and str(sede_id_raw).strip() != '':
+            try:
+                sede_id = int(sede_id_raw)
+            except (ValueError, TypeError):
+                sede_id = None
+
+        if sede_id is not None:
+            query_inv = query_inv.join(Inventario.bodega).filter(Bodega.sede_id == sede_id)
+            query_activos = query_activos.filter_by(sede_id=sede_id)
+            query_devueltos = query_devueltos.filter_by(sede_id=sede_id)
+            query_todos = query_todos.filter_by(sede_id=sede_id)
+
+        disponibles = obtener_disponibles(query_inv)
+        prestamos_vencidos = PrestamoService.obtener_prestamos_vencidos(sede_id=sede_id)
+
+        group_key = func.coalesce(PrestamoEquipo.id_grupo_prestamo, PrestamoEquipo.id_prestamo)
+        total_activos = query_activos.with_entities(func.count(func.distinct(group_key))).scalar() or 0
+        total_devueltos = query_devueltos.with_entities(func.count(func.distinct(group_key))).scalar() or 0
+        total_vencidos = len(prestamos_vencidos) if prestamos_vencidos else 0
+        total_realizados = query_todos.with_entities(func.count(func.distinct(group_key))).scalar() or 0
+
+        return jsonify({
+            'success': True,
+            'disponibles': disponibles,
+            'total_activos': total_activos,
+            'total_devueltos': total_devueltos,
+            'total_vencidos': total_vencidos,
+            'total_realizados': total_realizados
+        })
+    except Exception as e:
+        current_app.logger.exception("Error al obtener resumen de préstamos: %s", str(e))
+        return jsonify({'success': False, 'message': 'Error al obtener resumen', 'error': str(e)}), 500
+
 

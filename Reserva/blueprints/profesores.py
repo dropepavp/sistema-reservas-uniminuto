@@ -64,63 +64,8 @@ def api_buscar_profesores():
 @login_required
 @permiso_requerido('profesores', 'ver')
 def profesores_main():
-    """Página principal de gestión de profesores."""
-    try:
-        # Filtros y búsqueda
-        programa_filtro = request.args.get('programa', '')
-        busqueda = request.args.get('busqueda', '')
-        ordenar_por = request.args.get('ordenar', 'nombre_completo')
-        orden = request.args.get('orden', 'asc')
-        
-        # Query base
-        query = Profesor.query
-        
-        # Aplicar filtros
-        if programa_filtro:
-            query = query.filter(Profesor.programa.ilike(f"%{programa_filtro}%"))
-
-        if busqueda:
-            search_term = f"%{busqueda}%"
-            query = query.filter(
-                or_(
-                    Profesor.nombre_completo.ilike(search_term),
-                    Profesor.correo.ilike(search_term),
-                    Profesor.telefono.ilike(search_term),
-                    cast(Profesor.cedula, String).like(search_term)
-                )
-            )
-        
-        # Ordenamiento
-        if ordenar_por == 'cedula':
-            query = query.order_by(desc(Profesor.cedula) if orden == 'desc' else asc(Profesor.cedula))
-        elif ordenar_por == 'programa':
-            query = query.order_by(desc(Profesor.programa) if orden == 'desc' else asc(Profesor.programa))
-        else:  # nombre_completo por defecto
-            query = query.order_by(desc(Profesor.nombre_completo) if orden == 'desc' else asc(Profesor.nombre_completo))
-        
-        profesores = query.all()
-        
-        # Estadísticas
-        stats = calcular_estadisticas_profesores()
-        
-        # Programas únicos para el filtro
-        programas = list(set([p.programa for p in Profesor.query.all() if p.programa]))
-        programas.sort()
-        
-        return render_template('profesores.html',
-                             profesores=profesores,
-                             programas=programas,
-                             stats=stats,
-                             filtros={
-                                 'programa': programa_filtro,
-                                 'busqueda': busqueda,
-                                 'ordenar': ordenar_por,
-                                 'orden': orden
-                             })
-                             
-    except Exception as e:
-        flash('Error al cargar los profesores.', 'danger')
-        return render_template('profesores.html', profesores=[], programas=[], stats={}, filtros={})
+    """Redirige a la pestaña de profesores en el Directorio Unificado de Usuarios."""
+    return redirect(url_for('usuarios.usuarios_dashboard', tab='profesores'))
 
 @profesores_bp.route('/agregar', methods=['POST'])
 @login_required
