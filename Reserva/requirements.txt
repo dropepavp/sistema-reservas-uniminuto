@@ -18,3 +18,5 @@ requests>=2.31.0
 Pillow>=10.0.0
 importlib_metadata>=4.0
 Werkzeug>=3.0.0
+
+gunicorn>=21.2.0

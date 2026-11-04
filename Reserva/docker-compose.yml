@@ -1,0 +1,78 @@
+# ==============================================================================
+# Docker Compose - Orquestación Multi-Contenedor (UNIMINUTO - Entrega 1)
+# Servicios:
+#   1. web: Aplicación Flask (Contenedor 1)
+#   2. db:  Base de Datos PostgreSQL 15 (Contenedor 2)
+# ==============================================================================
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # CONTENEDOR 2: Base de Datos PostgreSQL (Criterio 3)
+  # ----------------------------------------------------------------------------
+  db:
+    image: postgres:15-alpine
+    container_name: reserva_db
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-sistema_reserva}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Allison2.023*}
+    ports:
+      - "5432:5432"
+    volumes:
+      # Volumen para persistencia de datos (Criterio 3)
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - reserva_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-sistema_reserva}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ----------------------------------------------------------------------------
+  # CONTENEDOR 1: Aplicación Web Flask (Criterio 2)
+  # ----------------------------------------------------------------------------
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: reserva_web
+    restart: always
+    environment:
+      # COMUNICACIÓN MEDIANTE EL NOMBRE DEL SERVICIO 'db' (Criterio 5 - 35 pts)
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-Allison2.023*}@db:5432/${POSTGRES_DB:-sistema_reserva}
+      SECRET_KEY: ${SECRET_KEY:-uniminuto-reserva-secret-key-2026}
+      FLASK_ENV: ${FLASK_ENV:-development}
+      FLASK_CONFIG: ${FLASK_CONFIG:-development}
+      FLASK_RUN_HOST: 0.0.0.0
+      FLASK_RUN_PORT: 5000
+      ADMIN_USER: ${ADMIN_USER:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Allison2.023*}
+      SUPERADMIN_DOCUMENTS: ${SUPERADMIN_DOCUMENTS:-80140666}
+    ports:
+      - "5000:5000"
+    # Espera que el servicio 'db' esté completamente saludable antes de iniciar
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - reserva_net
+
+# ------------------------------------------------------------------------------
+# RED PROPIA DEDICADA (Criterio 4 y 5)
+# Permite resolución DNS interna: 'web' se comunica con 'db' usando el nombre del servicio
+# ------------------------------------------------------------------------------
+networks:
+  reserva_net:
+    driver: bridge
+    name: reserva_network
+
+# ------------------------------------------------------------------------------
+# VOLUMEN PERSISTENTE (Criterio 3)
+# ------------------------------------------------------------------------------
+volumes:
+  db_data:
+    name: reserva_db_data

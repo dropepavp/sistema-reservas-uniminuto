@@ -1,0 +1,41 @@
+# Git y CI
+.git/
+.github/
+.gitignore
+
+# Entornos virtuales Python
+.venv/
+venv/
+env/
+ENV/
+
+# Archivos de caché y bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.hypothesis/
+
+# Variables de entorno y secretos
+.env
+*.env.local
+
+# Bases de datos SQLite locales
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# IDEs
+.vscode/
+.idea/
+
+# Temporales y respaldos
+*.bak
+*.backup
+*.swp
+temp_*
