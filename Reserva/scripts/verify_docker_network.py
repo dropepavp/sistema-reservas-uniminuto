@@ -50,3 +50,4 @@ def verificar_comunicacion():
 
 if __name__ == "__main__":
     verificar_comunicacion()
+

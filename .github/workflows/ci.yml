@@ -1,0 +1,66 @@
+name: CI Pipeline - Docker Build & Test
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  docker-build-and-verify:
+    name: Build & Verify Docker Containers
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Reserva
+
+    steps:
+      - name: 1. Checkout del código fuente
+        uses: actions/checkout@v4
+
+      - name: 2. Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 3. Construir la imagen del Contenedor Web (Dockerfile)
+        run: |
+          docker build -t reserva-web:latest .
+          echo "Imagen reserva-web construida exitosamente."
+
+      - name: 4. Validar configuración de Docker Compose
+        run: |
+          docker compose config
+
+      - name: 5. Levantar servicios con Docker Compose en CI
+        run: |
+          docker compose up -d
+          echo "Servicios iniciando..."
+
+      - name: 6. Esperar a que la base de datos y la web estén saludables
+        run: |
+          echo "Esperando verificación de salud..."
+          for i in {1..30}; do
+            STATUS=$(docker inspect --format='{{json .State.Health.Status}}' reserva_db 2>/dev/null || echo '"unknown"')
+            echo "Estado PostgreSQL: $STATUS ($i/30)"
+            if [ "$STATUS" = '"healthy"' ]; then
+              echo "PostgreSQL está listo."
+              break
+            fi
+            sleep 2
+          done
+
+      - name: 7. Verificar contenedores en ejecución (docker ps)
+        run: |
+          docker ps
+          docker network inspect reserva_network
+
+      - name: 8. Probar comunicación de ida y vuelta e endpoint de login
+        run: |
+          sleep 5
+          docker exec reserva_web python scripts/verify_docker_network.py
+          curl -f http://localhost:5000/login || exit 1
+          echo "Prueba de ida y vuelta exitosa: el servicio web respondió correctamente."
+
+      - name: 9. Detener y limpiar contenedores
+        if: always()
+        run: |
+          docker compose down -v
