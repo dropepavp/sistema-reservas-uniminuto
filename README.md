@@ -16,9 +16,9 @@ El sistema se encuentra contenerizado en una arquitectura multi-contenedor aisla
 * **Contenedor 1 (`web`):** Aplicación Flask construida a partir de una imagen base oficial con versión fija (`python:3.11-slim`), con puerto `5000` expuesto y verificación de salud (`HEALTHCHECK`).
 * **Contenedor 2 (`db`):** Base de datos relacional oficial `postgres:15-alpine`, configurada mediante variables de entorno y con volumen persistente (`db_data`).
 * **Red Dedicada (`reserva_network`):** Red bridge propia que permite la comunicación interna entre contenedores mediante resolución de nombres DNS.
-* **Comunicación Interna (Criterio 5 - 35 pts):** La aplicación `web` se comunica con la base de datos usando estrictamente el nombre del servicio `@db:5432` (**sin usar localhost ni IPs fijas**).
-* **Seguridad (Criterio 6 - 15 pts):** Archivos `.dockerignore` y `.env.example`. Las contraseñas y secretos no se suben al repositorio.
-* **Integración Continua (CI - Criterio 7 - 15 pts):** Pipeline automatizado en GitHub Actions (`.github/workflows/ci.yml`) que construye y valida los contenedores en cada `push` o `pull_request`.
+* **Comunicación Interna (Criterio 5):** La aplicación `web` se comunica con la base de datos usando estrictamente el nombre del servicio `@db:5432` (**sin usar localhost ni IPs fijas**).
+* **Seguridad (Criterio 6 ):** Archivos `.dockerignore` y `.env.example`. Las contraseñas y secretos no se suben al repositorio.
+* **Integración Continua (CI - Criterio 7 ):** Pipeline automatizado en GitHub Actions (`.github/workflows/ci.yml`) que construye y valida los contenedores en cada `push` o `pull_request`.
 
 ---
 
