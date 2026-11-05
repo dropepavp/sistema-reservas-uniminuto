@@ -1,4 +1,4 @@
-# Sistema de Reservas y Gestión Universitaria (UNIMINUTO)
+# Sistema de Reservas y Gestión Universitaria 
 
 [![CI Pipeline - Docker Build & Test](https://github.com/dropepavp/sistema-reservas-uniminuto/actions/workflows/ci.yml/badge.svg)](https://github.com/dropepavp/sistema-reservas-uniminuto/actions/workflows/ci.yml)
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/)
