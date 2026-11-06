@@ -61,7 +61,7 @@ jobs:
       - name: 9. Probar comunicación de ida y vuelta e endpoint de login
         run: |
           sleep 5
-          docker exec reserva_web python scripts/verify_docker_network.py
+          docker exec -e PYTHONPATH=/app reserva_web python scripts/verify_docker_network.py
           curl --retry 10 --retry-delay 3 --retry-connrefused -f http://localhost:5000/login || exit 1
           echo "Prueba de ida y vuelta exitosa: el servicio web respondió correctamente."
 

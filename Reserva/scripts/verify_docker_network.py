@@ -3,6 +3,13 @@ Script de verificación de comunicación entre contenedores (Criterio 5 - 35 pts
 Demuestra la conectividad por nombre de servicio 'db' y realiza una operación
 real de ida y vuelta (escritura y lectura) persistiendo un registro en PostgreSQL.
 """
+import os
+import sys
+
+# Asegurar que el directorio raíz del proyecto esté en el PYTHONPATH
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.getcwd())
+
 from app import create_app
 from database import db
 from sqlalchemy import text
@@ -50,4 +57,3 @@ def verificar_comunicacion():
 
 if __name__ == "__main__":
     verificar_comunicacion()
-
