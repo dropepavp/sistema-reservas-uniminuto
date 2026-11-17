@@ -16,7 +16,8 @@ pipeline {
         stage('2. Build Containers') {
             steps {
                 echo 'Construyendo y levantando los contenedores con Docker Compose...'
-                // Forzar la limpieza total de contenedores y volúmenes previos para evitar conflictos de nombres
+                // Eliminar contenedores previos por nombre para evitar conflictos de colisión
+                sh 'docker rm -f reserva_db reserva_web || true'
                 sh 'docker compose -f Reserva/docker-compose.yml down --volumes --remove-orphans || true'
                 sh 'docker compose -f Reserva/docker-compose.yml build --no-cache'
                 sh 'docker compose -f Reserva/docker-compose.yml up -d'
