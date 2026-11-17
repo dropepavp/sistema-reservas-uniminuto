@@ -16,11 +16,9 @@ pipeline {
         stage('2. Build Containers') {
             steps {
                 echo 'Construyendo y levantando los contenedores con Docker Compose...'
-                // Si tu docker-compose.yml está en la raíz, usa: docker compose
-                // Si está dentro de una subcarpeta (ej. Reserva), usa: docker compose -f Reserva/docker-compose.yml
-                sh 'docker compose down --remove-orphans || true'
-                sh 'docker compose build'
-                sh 'docker compose up -d'
+                sh 'docker compose -f Reserva/docker-compose.yml down --remove-orphans || true'
+                sh 'docker compose -f Reserva/docker-compose.yml build'
+                sh 'docker compose -f Reserva/docker-compose.yml up -d'
             }
         }
 
@@ -40,12 +38,12 @@ pipeline {
     post {
         success {
             echo '¡Pipeline ejecutado con éxito! Los contenedores se comunican correctamente.'
-            sh 'docker compose down'
+            sh 'docker compose -f Reserva/docker-compose.yml down'
         }
         failure {
             echo 'El pipeline falló durante la compilación o las pruebas.'
-            sh 'docker compose logs'
-            sh 'docker compose down'
+            sh 'docker compose -f Reserva/docker-compose.yml logs'
+            sh 'docker compose -f Reserva/docker-compose.yml down'
         }
     }
 }
