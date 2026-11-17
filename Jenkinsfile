@@ -16,8 +16,9 @@ pipeline {
         stage('2. Build Containers') {
             steps {
                 echo 'Construyendo y levantando los contenedores con Docker Compose...'
-                sh 'docker compose -f Reserva/docker-compose.yml down --remove-orphans || true'
-                sh 'docker compose -f Reserva/docker-compose.yml build'
+                // Forzar la limpieza total de contenedores y volúmenes previos para evitar conflictos de nombres
+                sh 'docker compose -f Reserva/docker-compose.yml down --volumes --remove-orphans || true'
+                sh 'docker compose -f Reserva/docker-compose.yml build --no-cache'
                 sh 'docker compose -f Reserva/docker-compose.yml up -d'
             }
         }
