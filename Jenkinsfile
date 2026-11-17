@@ -16,6 +16,8 @@ pipeline {
         stage('2. Build Containers') {
             steps {
                 echo 'Construyendo y levantando los contenedores con Docker Compose...'
+                // Si tu docker-compose.yml está en la raíz, usa: docker compose
+                // Si está dentro de una subcarpeta (ej. Reserva), usa: docker compose -f Reserva/docker-compose.yml
                 sh 'docker compose down --remove-orphans || true'
                 sh 'docker compose build'
                 sh 'docker compose up -d'
@@ -25,7 +27,7 @@ pipeline {
         stage('3. Test & Verification') {
             steps {
                 echo 'Verificando la salud de los servicios y la comunicación entre contenedores...'
-                // Esperar a que la base de datos esté saludable
+                // Esperar a que la base de datos esté plenamente operativa
                 sh 'sleep 5'
                 sh 'docker ps'
                 
