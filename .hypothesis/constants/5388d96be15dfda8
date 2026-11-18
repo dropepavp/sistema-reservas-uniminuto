@@ -1,0 +1,4 @@
+# file: D:\Proyecto de desarrollo versiones\proyecto uniminuto\uniminuto\Reserva\validators.py
+# hypothesis_version: 6.151.9
+
+[128, 254, 255, 365, '\x00', '"', '%H:%M', '%Y-%m-%d', '&', "'", '<', '>', 'La hora es requerida', '[\\s\\-\\(\\)]+', '^[A-Za-z0-9@._\\-]+$', '^[a-zA-Z0-9\\-]+$']

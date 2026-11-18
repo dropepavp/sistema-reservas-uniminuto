@@ -1,0 +1,4 @@
+# file: D:\Proyecto de desarrollo versiones\proyecto uniminuto\uniminuto\Reserva\blueprints\sedes.py
+# hypothesis_version: 6.151.9
+
+[403, '/', '/cambiar-sede', '/seleccionar-sede', 'GET', 'POST', 'admin', 'rol', 'sede_id', 'sede_nombre', 'sedes', 'superadmin', 'usuario']

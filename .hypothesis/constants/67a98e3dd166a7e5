@@ -1,0 +1,4 @@
+# file: D:\Proyecto de desarrollo versiones\proyecto uniminuto\uniminuto\Reserva\utils\export_helpers.py
+# hypothesis_version: 6.151.9
+
+['%Y%m%d_%H%M%S', 'flask.Response', 'openpyxl', 'text/csv', 'utf-8-sig']

@@ -1,0 +1,4 @@
+# file: D:\Proyecto de desarrollo versiones\proyecto uniminuto\uniminuto\Reserva\blueprints\auth.py
+# hypothesis_version: 6.151.9
+
+[400, 404, 500, '%H:%M:%S', '/', '/login', '/logout', '/perfil', '/registro', '/seleccionar-sede', '10 per minute', 'Auxiliar', 'CAMBIAR_CONTRASENA', 'GET', 'LOGIN', 'LOGOUT', 'POST', 'SUPERADMIN_DOCUMENTS', 'Sesion', 'Usuario', 'admin', 'auth', 'auxiliar', 'contrasena_actual', 'contrasena_confirma', 'contrasena_nueva', 'contraseña', 'correo', 'danger', 'hora_login', 'hora_logout', 'login.html', 'message', 'nombre_completo', 'perfil.html', 'puede_cambiar_sede', 'registro.html', 'rol', 'sede_id', 'sede_nombre', 'success', 'superadmin', 'usuario', 'warning']

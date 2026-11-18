@@ -1,0 +1,4 @@
+# file: D:\Proyecto de desarrollo versiones\proyecto uniminuto\uniminuto\Reserva\services\prestamo_service.py
+# hypothesis_version: 6.151.9
+
+[3600, 9999, '%H:%M', '%Y-%m-%d', 'ADA', 'CNT', 'CTRL', 'Disponible', 'En Préstamo', 'HDMI', 'LAP', 'MAÑANA', 'N/A', 'NOCHE', 'TARDE', 'TEC', '\\d+', 'auxiliar_recibe', 'cantidad', 'cedula', 'equipo', 'equipo_prestado', 'estado', 'estado_devolucion', 'fecha_devolucion', 'fecha_prestamo', 'hora_devolucion', 'hora_fin', 'hora_inicio', 'horas_retraso', 'id_prestamo', 'items', 'nan', 'nombre_profesor', 'none', 'null', 'numero', 'numero_inventario', 'observaciones', 'recurso_id', 'sede_id', 'ubicacion', 'ubicacion_id', 'undefined']

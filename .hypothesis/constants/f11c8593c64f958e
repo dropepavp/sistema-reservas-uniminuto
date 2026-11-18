@@ -1,0 +1,4 @@
+# file: D:\Proyecto de desarrollo versiones\proyecto uniminuto\uniminuto\Reserva\auth.py
+# hypothesis_version: 6.151.9
+
+['/login', '/seleccionar-sede', 'admin', 'bitacora', 'crear', 'danger', 'editar', 'eliminar', 'estadisticas', 'index', 'inventario', 'mod_access', 'prestamos', 'profesores', 'puede_crear', 'puede_editar', 'puede_eliminar', 'reservas', 'rol', 'salas_computo', 'sede_id', 'superadmin', 'usuario', 'usuarios', 'ver']

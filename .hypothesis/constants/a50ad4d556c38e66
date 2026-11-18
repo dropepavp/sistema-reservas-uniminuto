@@ -1,0 +1,4 @@
+# file: D:\Proyecto de desarrollo versiones\proyecto uniminuto\uniminuto\Reserva\services\inventario_service.py
+# hypothesis_version: 6.151.9
+
+['De Baja', 'Disponible', 'En Mantenimiento', 'En Préstamo', 'En Reparación', 'Sin marca', 'admin', 'baja_count', 'bodega', 'busqueda', 'categoria', 'categorias_count', 'desc', 'detalles', 'disponible', 'disponibles_count', 'en_uso', 'estado', 'estados_count', 'id', 'item', 'items_mas_prestados', 'mantenimiento_count', 'marca', 'numero_inventario', 'orden', 'ordenar', 'prestados_count', 'sede', 'stock_info', 'stock_por_tipo', 'superadmin', 'total', 'total_items', 'ubicacion']

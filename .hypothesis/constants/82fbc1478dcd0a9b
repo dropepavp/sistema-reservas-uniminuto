@@ -1,0 +1,4 @@
+# file: D:\Proyecto de desarrollo versiones\proyecto uniminuto\uniminuto\Reserva\blueprints\bitacora.py
+# hypothesis_version: 6.151.9
+
+[500, '%H:%M:%S', '%Y-%m-%d', '/', '/api/estadisticas', '/bitacora', '/export/<formato>', '/modulo/<modulo>', 'ALIGN', 'Acción', 'BACKGROUND', 'BOTTOMPADDING', 'Bitacora', 'CENTER', 'CustomTitle', 'Descripción', 'Entidad ID', 'Entidad Tipo', 'FONTNAME', 'FONTSIZE', 'Fecha', 'GRID', 'Heading1', 'Helvetica', 'Helvetica-Bold', 'Hora', 'Módulo', 'Módulo no válido', 'TEXTCOLOR', 'Usuario Documento', 'Usuario Nombre', 'accion', 'admin', 'application/pdf', 'bitacora', 'bitacora.pdf', 'cantidad', 'csv', 'danger', 'distribucion_accion', 'distribucion_modulo', 'error', 'estadisticas', 'excel', 'fecha', 'fecha_fin', 'fecha_inicio', 'info', 'inventario', 'modulo', 'movimientos_7_dias', 'nombre', 'page', 'pdf', 'prestamos', 'profesores', 'registros_30_dias', 'reservas', 'success', 'top_usuarios', 'total_registros', 'usuario']

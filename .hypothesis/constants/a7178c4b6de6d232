@@ -1,0 +1,4 @@
+# file: D:\Proyecto de desarrollo versiones\proyecto uniminuto\uniminuto\Reserva\blueprints\salas_computo.py
+# hypothesis_version: 6.151.9
+
+['%H:%M', '%Y-%m-%d', '/', '/nueva', '/salas-computo', 'CREAR', 'ClaseSalaComputo', 'DELETE', 'EDITAR', 'EDITAR_ASISTENCIA', 'No', 'POST', 'Programada', '_method', 'asistencia', 'busqueda', 'crear', 'danger', 'editar', 'eliminar', 'fecha', 'hora_fin', 'hora_inicio', 'horas_academicas', 'jornada', 'materia', 'modalidad', 'nombre_completo', 'nombre_profesor', 'num_estudiantes', 'observaciones', 'page', 'programa', 'recurso_id', 'salas_computo', 'salas_computo.html', 'salon', 'sede_id', 'success', 'usuario', 'ver', 'warning']

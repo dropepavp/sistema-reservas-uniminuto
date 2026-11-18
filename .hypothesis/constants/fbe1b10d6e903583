@@ -1,0 +1,4 @@
+# file: D:\Proyecto de desarrollo versiones\proyecto uniminuto\uniminuto\Reserva\app.py
+# hypothesis_version: 6.151.9
+
+[400, 403, 404, 500, 5000, '/', '0.0.0.0', 'FLASK_CONFIG', 'FLASK_SKIP_INIT_DB', 'N/A', 'Niñera', 'SWAGGER', 'Salón', 'TESTING', '__main__', 'admin', 'bitacora', 'cantidad', 'de Hoy', 'de la Semana', 'default', 'del Mes', 'dia', 'errors/400.html', 'errors/403.html', 'errors/404.html', 'errors/500.html', 'estadisticas', 'index.html', 'info', 'inventario', 'mod_access', 'mod_access_cache', 'nombre', 'periodo', 'periodo_actual', 'prestamos', 'prestamos_total', 'prestamos_vencidos', 'profesores', 'reservas', 'reservas_ninera', 'reservas_salon', 'rol', 'salas_computo', 'sede_id', 'semana', 'superadmin', 'template', 'titulo_periodo', 'usuario', 'utf-8', 'warning']

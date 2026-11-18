@@ -1,0 +1,4 @@
+# file: D:\Proyecto de desarrollo versiones\proyecto uniminuto\uniminuto\Reserva\extensions.py
+# hypothesis_version: 6.151.9
+
+[5432, '/', '200 per minute', 'DATABASE_URL', 'TESTING', 'client_encoding', 'database', 'engines', 'host', 'localhost', 'password', 'port', 'postgres', 'sistema_reserva', 'sqlite', 'user', 'utf8']
