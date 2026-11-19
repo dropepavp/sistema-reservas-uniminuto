@@ -1,10 +1,9 @@
 pipeline {
     agent any
-
     environment {
         COMPOSE_PROJECT_NAME = "reserva_jenkins"
+        POSTGRES_PASSWORD = credentials('db-password')
     }
-
     stages {
         stage('1. Checkout') {
             steps {
@@ -12,7 +11,6 @@ pipeline {
                 checkout scm
             }
         }
-
         stage('2. Build Containers') {
             steps {
                 echo 'Construyendo y levantando los contenedores con Docker Compose...'
@@ -23,20 +21,17 @@ pipeline {
                 sh 'docker compose -f Reserva/docker-compose.yml up -d'
             }
         }
-
         stage('3. Test & Verification') {
             steps {
                 echo 'Verificando la salud de los servicios y la comunicación entre contenedores...'
                 // Esperar a que la base de datos esté plenamente operativa
                 sh 'sleep 5'
                 sh 'docker ps'
-                
                 // Ejecutar el script de prueba de comunicación de ida y vuelta (Criterio 5 y 6)
                 sh 'docker exec reserva_web python scripts/verify_docker_network.py'
             }
         }
     }
-
     post {
         success {
             echo '¡Pipeline ejecutado con éxito! Los contenedores se comunican correctamente.'
