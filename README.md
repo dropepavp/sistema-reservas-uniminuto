@@ -9,7 +9,7 @@ Aplicación web empresarial desarrollada en **Flask / Python** y **PostgreSQL** 
 
 ---
 
-## 🐳 Despliegue con Docker y Docker Compose (Entrega Proyecto 1)
+## 🐳 Despliegue con Docker y Docker Compose 
 
 El sistema se encuentra contenerizado en una arquitectura multi-contenedor aislada y orquestada:
 
